@@ -9,6 +9,7 @@ import {
   faqs,
 } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
+import type { GoogleReviewsData } from "@/lib/reviews";
 
 const container = "mx-auto max-w-6xl px-5 md:px-8";
 
@@ -404,14 +405,30 @@ export function Distances() {
 }
 
 /* ---------- YORUMLAR ---------- */
-export function Reviews() {
+export function Reviews({ google }: { google?: GoogleReviewsData | null }) {
+  const items =
+    google && google.reviews.length > 0
+      ? google.reviews.map((r) => ({
+          text: r.text,
+          author: r.when ? `${r.author} · ${r.when}` : r.author,
+        }))
+      : reviews;
   return (
     <section className={`${container} pt-10`}>
+      {google && google.count > 0 && (
+        <div className="mb-4 flex items-center gap-2">
+          <Stars className="text-base" />
+          <span className="font-bold text-pine">
+            {google.rating.toLocaleString("tr-TR")}
+          </span>
+          <span className="text-sm text-muted">· {google.count} Google yorumu</span>
+        </div>
+      )}
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
-        {reviews.map((r, i) => (
+        {items.map((r, i) => (
           <div key={i} className="rounded-2xl bg-[#f0e7d3] p-6">
             <Stars className="text-[15px]" />
-            <p className="mt-2.5 font-display text-[17px] italic leading-snug text-pine">
+            <p className="mt-2.5 line-clamp-6 font-display text-[17px] italic leading-snug text-pine">
               “{r.text}”
             </p>
             <div className="mt-3 text-sm font-semibold text-muted">— {r.author}</div>

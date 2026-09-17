@@ -17,8 +17,10 @@ import {
   Faq,
   CtaBand,
 } from "@/components/sections";
+import { getGoogleReviews } from "@/lib/reviews";
 
-export default function Home() {
+export default async function Home() {
+  const googleReviews = await getGoogleReviews();
   return (
     <>
       <Header />
@@ -34,7 +36,7 @@ export default function Home() {
         <TrysaStory />
         <Experiences />
         <Distances />
-        <Reviews />
+        <Reviews google={googleReviews} />
         <Faq />
         <CtaBand />
       </main>
