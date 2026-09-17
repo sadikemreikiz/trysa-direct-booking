@@ -95,7 +95,7 @@ export function BookingBar() {
           </select>
         </label>
         <a
-          href="#rezervasyon"
+          href="/rezervasyon"
           className="mt-3 block rounded-xl bg-clay px-7 py-3 text-center text-sm font-bold text-white md:mt-0"
         >
           Müsaitlik sor
@@ -123,7 +123,7 @@ export function TwoPath() {
               Ahşap odalar, tiny house &amp; kamp · gecelik 1.150 ₺&apos;den
             </p>
             <a
-              href="#rezervasyon"
+              href="/rezervasyon"
               className="mt-4 inline-block rounded-xl bg-clay px-6 py-3 text-sm font-bold text-white"
             >
               Rezervasyon Talebi →
@@ -187,7 +187,7 @@ export function Accommodation() {
         {stays.map((s) => (
           <a
             key={s.slug}
-            href="#rezervasyon"
+            href="/rezervasyon"
             className="overflow-hidden rounded-2xl border border-line bg-white"
           >
             <Photo label={s.photo} tone={s.tone} className="h-44" />
@@ -419,7 +419,7 @@ export function CtaBand() {
         </p>
         <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
           <a
-            href="#"
+            href="/rezervasyon"
             className="rounded-xl bg-white px-8 py-4 text-base font-bold text-clay"
           >
             Müsaitlik &amp; Rezervasyon

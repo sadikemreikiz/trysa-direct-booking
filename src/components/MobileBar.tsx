@@ -21,7 +21,7 @@ export default function MobileBar() {
           Ara
         </a>
         <a
-          href="#rezervasyon"
+          href="/rezervasyon"
           className="flex-1 rounded-xl bg-clay py-3 text-center text-sm font-bold text-white"
         >
           Rezervasyon

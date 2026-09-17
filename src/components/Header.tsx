@@ -45,12 +45,12 @@ export default function Header() {
             <WhatsAppIcon className="h-4 w-4" />
             <span className="hidden sm:inline">WhatsApp</span>
           </a>
-          <a
-            href="#rezervasyon"
+          <Link
+            href="/rezervasyon"
             className="rounded-xl bg-clay px-4 py-2 text-sm font-bold text-white"
           >
             Rezervasyon
-          </a>
+          </Link>
         </div>
       </div>
     </header>

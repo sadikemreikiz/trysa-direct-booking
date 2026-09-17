@@ -1,0 +1,295 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { submitReservation } from "@/app/rezervasyon/actions";
+import { whatsappUrl, type ReservationInput } from "@/lib/reservation";
+import { WhatsAppIcon } from "./icons";
+
+const units = ["Ahşap Oda", "Tiny House", "Kamp & Karavan", "Emin değilim"];
+
+const empty: ReservationInput = {
+  checkin: "",
+  checkout: "",
+  adults: "2",
+  children: "0",
+  unit: "Ahşap Oda",
+  name: "",
+  phone: "",
+  email: "",
+  note: "",
+};
+
+export default function ReservationForm() {
+  const [data, setData] = useState<ReservationInput>(empty);
+  const [kvkk, setKvkk] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const fld =
+    "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink outline-none focus:border-clay";
+  const lbl = "block text-xs font-bold text-muted";
+
+  function set<K extends keyof ReservationInput>(k: K, v: string) {
+    setData((d) => ({ ...d, [k]: v }));
+  }
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    if (!data.checkin || !data.checkout || !data.name.trim() || !data.phone.trim()) {
+      setError("Lütfen tarih, ad ve telefon alanlarını doldur.");
+      return;
+    }
+    if (!kvkk) {
+      setError("Devam etmek için KVKK onayını işaretle.");
+      return;
+    }
+    setStatus("sending");
+    try {
+      await submitReservation(data);
+    } catch {
+      /* e-posta başarısız olsa da WhatsApp ile devam ederiz */
+    }
+    setStatus("done");
+  }
+
+  if (status === "done") {
+    return (
+      <section className="mx-auto max-w-xl px-5 py-14 text-center md:px-8">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#9fd08a]">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#1e3320"
+            strokeWidth={3}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+        </div>
+        <h1 className="font-display text-3xl font-semibold text-pine">
+          Talebin hazır!
+        </h1>
+        <p className="mx-auto mt-3 max-w-sm text-muted">
+          Son bir adım: talebini WhatsApp&apos;tan bize ilet, en kısa sürede
+          müsaitliği teyit edelim.
+        </p>
+
+        <div className="mx-auto mt-6 rounded-2xl border border-line bg-white p-5 text-left text-sm">
+          <div className="mb-3 text-xs font-bold tracking-widest text-clay">
+            TALEBİNİN ÖZETİ
+          </div>
+          <Row k="Tarih" v={`${data.checkin} → ${data.checkout}`} />
+          <Row
+            k="Kişi"
+            v={`${data.adults} yetişkin${
+              Number(data.children) > 0 ? `, ${data.children} çocuk` : ""
+            }`}
+          />
+          <Row k="Konaklama" v={data.unit} last />
+        </div>
+
+        <a
+          href={whatsappUrl(data)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 py-4 text-base font-bold text-white"
+        >
+          <WhatsAppIcon className="h-5 w-5" />
+          WhatsApp&apos;tan gönder
+        </a>
+        <Link
+          href="/"
+          className="mt-3 inline-block text-sm font-semibold text-muted hover:text-clay"
+        >
+          Ana sayfaya dön
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mx-auto max-w-2xl px-5 py-10 md:px-8">
+      <h1 className="font-display text-3xl font-semibold text-pine md:text-4xl">
+        Rezervasyon Talebi
+      </h1>
+      <p className="mt-2 max-w-xl text-muted">
+        Tarihlerini ve birkaç bilgini bırak, en kısa sürede biz dönelim. Bu bir
+        ön talep — onayımızla kesinleşir, şimdi ödeme yok.
+      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className="rounded-full bg-[#f7e7c4] px-3 py-1.5 text-xs font-bold text-[#7a5a1e]">
+          ★ 4,9 · 292 yorum
+        </span>
+        <span className="rounded-full bg-[#e4eadd] px-3 py-1.5 text-xs font-bold text-pine">
+          Komisyonsuz
+        </span>
+      </div>
+
+      <form
+        onSubmit={onSubmit}
+        className="mt-6 space-y-4 rounded-2xl border border-line bg-white p-5 md:p-7"
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block">
+            <span className={lbl}>Giriş tarihi</span>
+            <input
+              type="date"
+              className={fld}
+              value={data.checkin}
+              onChange={(e) => set("checkin", e.target.value)}
+            />
+          </label>
+          <label className="block">
+            <span className={lbl}>Çıkış tarihi</span>
+            <input
+              type="date"
+              className={fld}
+              value={data.checkout}
+              onChange={(e) => set("checkout", e.target.value)}
+            />
+          </label>
+          <label className="block">
+            <span className={lbl}>Yetişkin</span>
+            <select
+              className={fld}
+              value={data.adults}
+              onChange={(e) => set("adults", e.target.value)}
+            >
+              {["1", "2", "3", "4", "5+"].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className={lbl}>Çocuk</span>
+            <select
+              className={fld}
+              value={data.children}
+              onChange={(e) => set("children", e.target.value)}
+            >
+              {["0", "1", "2", "3+"].map((n) => (
+                <option key={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div>
+          <span className={lbl}>Ne için?</span>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {units.map((u) => {
+              const active = data.unit === u;
+              return (
+                <button
+                  type="button"
+                  key={u}
+                  onClick={() => set("unit", u)}
+                  className={`rounded-xl border p-3 text-sm font-semibold ${
+                    active
+                      ? "border-2 border-clay bg-[#fbf0e7] text-pine"
+                      : "border-line bg-white text-pine/80"
+                  }`}
+                >
+                  {u}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="h-px bg-line/70" />
+
+        <label className="block">
+          <span className={lbl}>Ad Soyad</span>
+          <input
+            type="text"
+            className={fld}
+            placeholder="Adın"
+            value={data.name}
+            onChange={(e) => set("name", e.target.value)}
+          />
+        </label>
+        <label className="block">
+          <span className={lbl}>Telefon / WhatsApp</span>
+          <input
+            type="tel"
+            className={fld}
+            placeholder="05xx xxx xx xx"
+            value={data.phone}
+            onChange={(e) => set("phone", e.target.value)}
+          />
+        </label>
+        <label className="block">
+          <span className={lbl}>
+            E-posta <span className="font-normal text-muted/70">(opsiyonel)</span>
+          </span>
+          <input
+            type="email"
+            className={fld}
+            placeholder="ornek@eposta.com"
+            value={data.email}
+            onChange={(e) => set("email", e.target.value)}
+          />
+        </label>
+        <label className="block">
+          <span className={lbl}>
+            Not / özel istekler{" "}
+            <span className="font-normal text-muted/70">(opsiyonel)</span>
+          </span>
+          <textarea
+            className={fld}
+            rows={3}
+            placeholder="Örn. bebek yatağı, geç giriş, evcil hayvan..."
+            value={data.note}
+            onChange={(e) => set("note", e.target.value)}
+          />
+        </label>
+
+        <label className="flex items-start gap-2.5 text-xs leading-relaxed text-muted">
+          <input
+            type="checkbox"
+            className="mt-0.5 h-[18px] w-[18px] accent-clay"
+            checked={kvkk}
+            onChange={(e) => setKvkk(e.target.checked)}
+          />
+          <span>
+            Bilgilerimin talebimi yanıtlamak için kullanılmasını kabul ediyorum
+            (KVKK).
+          </span>
+        </label>
+
+        {error && (
+          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-[#a9501f]">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={status === "sending"}
+          className="w-full rounded-xl bg-clay py-4 text-base font-bold text-white disabled:opacity-60"
+        >
+          {status === "sending" ? "Gönderiliyor..." : "Talebi Gönder"}
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function Row({ k, v, last }: { k: string; v: string; last?: boolean }) {
+  return (
+    <div
+      className={`flex justify-between py-2 ${
+        last ? "" : "border-b border-line/60"
+      }`}
+    >
+      <span className="text-muted">{k}</span>
+      <span className="font-semibold text-ink">{v}</span>
+    </div>
+  );
+}
