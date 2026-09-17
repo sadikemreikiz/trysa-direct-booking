@@ -379,8 +379,24 @@ export function Distances() {
             </div>
           ))}
         </div>
-        <div className="flex h-40 items-center justify-center rounded-2xl border border-dashed border-[#b9c0a9] bg-[#e4e7dc] text-xs text-[#7a8270] md:h-auto">
-          HARİTA: Davazlar, Gölbaşı Mevkii (D400)
+        <div className="flex flex-col gap-2">
+          <div className="min-h-[16rem] flex-1 overflow-hidden rounded-2xl border border-line">
+            <iframe
+              title="Trysa konumu"
+              src="https://maps.google.com/maps?q=36.262198,29.890923&hl=tr&z=15&output=embed"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="h-64 w-full border-0 md:h-full"
+            />
+          </div>
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=36.262198,29.890923"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="self-start text-sm font-bold text-clay"
+          >
+            Yol tarifi al →
+          </a>
         </div>
       </div>
     </section>

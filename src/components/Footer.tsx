@@ -19,8 +19,14 @@ export default function Footer() {
             © {new Date().getFullYear()} Trysa · Gizlilik / KVKK
           </div>
         </div>
-        <div className="flex h-28 w-full items-center justify-center rounded-xl border border-dashed border-[#4a543e] bg-[#333a2e] text-xs text-[#8da089] md:w-72">
-          HARİTA: konum
+        <div className="w-full overflow-hidden rounded-xl md:w-72">
+          <iframe
+            title="Trysa konumu"
+            src="https://maps.google.com/maps?q=36.262198,29.890923&hl=tr&z=14&output=embed"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            className="h-32 w-full border-0"
+          />
         </div>
       </div>
     </footer>
