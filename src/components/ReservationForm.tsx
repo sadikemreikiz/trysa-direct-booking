@@ -7,14 +7,23 @@ import { whatsappUrl, type ReservationInput } from "@/lib/reservation";
 import { rangeHasLockedDay } from "@/lib/availability";
 import { WhatsAppIcon } from "./icons";
 
-const units = ["Ahşap Oda", "Tiny House", "Kamp & Karavan", "Emin değilim"];
+const units = [
+  "Ambar-1",
+  "Ambar-2",
+  "Ambar-3",
+  "Kulübe-1",
+  "Kulübe-2",
+  "Tiny House",
+  "Kamp & Karavan",
+  "Emin değilim",
+];
 
 const empty: ReservationInput = {
   checkin: "",
   checkout: "",
   adults: "2",
   children: "0",
-  unit: "Ahşap Oda",
+  unit: "Ambar-1",
   name: "",
   phone: "",
   email: "",

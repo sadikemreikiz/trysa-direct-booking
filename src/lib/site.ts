@@ -11,21 +11,54 @@ export const site = {
   reviewCount: 292,
 };
 
+// Her oda ayrı. Fiyatlar Airbnb'den; güncelini Emre teyit edecek.
 export const stays = [
   {
-    slug: "ahsap-oda",
-    title: "Doğa İçinde Ahşap Odalar",
-    desc: "2 kişilik · Ambar & Kulübe tipleri",
-    price: "1.150 ₺'den",
+    slug: "ambar-1",
+    title: "Ambar-1",
+    desc: "Doğa içinde 2 kişilik ahşap oda",
+    price: "1.350 ₺",
     tone: "#c7b79a",
-    photo: "Ahşap oda",
+    photo: "Ambar-1",
+  },
+  {
+    slug: "ambar-2",
+    title: "Ambar-2",
+    desc: "Doğa içinde 2 kişilik ahşap oda",
+    price: "1.350 ₺",
+    tone: "#c2b193",
+    photo: "Ambar-2",
+  },
+  {
+    slug: "ambar-3",
+    title: "Ambar-3",
+    desc: "Doğa içinde 2 tek yataklı ahşap oda",
+    price: "1.150 ₺",
+    tone: "#bcaa8a",
+    photo: "Ambar-3",
+  },
+  {
+    slug: "kulube-1",
+    title: "Kulübe-1",
+    desc: "Konforlu ahşap oda, doğa manzaralı",
+    price: "1.500 ₺",
+    tone: "#a7b29a",
+    photo: "Kulübe-1",
+  },
+  {
+    slug: "kulube-2",
+    title: "Kulübe-2",
+    desc: "Konforlu ahşap oda, doğa manzaralı",
+    price: "1.500 ₺",
+    tone: "#9fae93",
+    photo: "Kulübe-2",
   },
   {
     slug: "tiny-house",
     title: "Tiny House",
     desc: "Konforlu, müstakil, doğa manzaralı",
-    price: "1.500 ₺'den",
-    tone: "#a7b29a",
+    price: "1.750 ₺",
+    tone: "#cbb892",
     photo: "Tiny House",
   },
   {
@@ -33,7 +66,7 @@ export const stays = [
     title: "Kamp & Karavan Alanı",
     desc: "Kendi çadırın veya karavanınla",
     price: "Fiyat için sor",
-    tone: "#b9a98c",
+    tone: "#b0a78e",
     photo: "Kamp alanı",
   },
 ];

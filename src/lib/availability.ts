@@ -4,15 +4,19 @@
  * doluysa engellenir (böylece boş oda varken müşteri yanlışlıkla geri çevrilmez).
  * Not: iCal senkronu anlık değildir (Airbnb birkaç saatte bir günceller).
  * Env değişkenleri (virgülle ayrılmış .ics linkleri, GİZLİ, git'e girmez):
- *   AIRBNB_ICAL_AHSAP  → Ahşap Oda üniteleri (Ambar 1-3, Kulübe 1-2)
- *   AIRBNB_ICAL_TINY   → Tiny House
+ * Her oda ayrı — her biri tek ünite, kendi env anahtarı.
+ *   AIRBNB_ICAL_AMBAR1/2/3, AIRBNB_ICAL_KULUBE1/2, AIRBNB_ICAL_TINY
  */
 
 type TypeConfig = { total: number; envKey: string };
 
-// Sitedeki konaklama tipi → toplam ünite sayısı + env anahtarı
+// Oda (rezervasyon seçeneği) → env anahtarı (her oda tek ünite)
 const TYPE_CONFIG: Record<string, TypeConfig> = {
-  "Ahşap Oda": { total: 5, envKey: "AIRBNB_ICAL_AHSAP" },
+  "Ambar-1": { total: 1, envKey: "AIRBNB_ICAL_AMBAR1" },
+  "Ambar-2": { total: 1, envKey: "AIRBNB_ICAL_AMBAR2" },
+  "Ambar-3": { total: 1, envKey: "AIRBNB_ICAL_AMBAR3" },
+  "Kulübe-1": { total: 1, envKey: "AIRBNB_ICAL_KULUBE1" },
+  "Kulübe-2": { total: 1, envKey: "AIRBNB_ICAL_KULUBE2" },
   "Tiny House": { total: 1, envKey: "AIRBNB_ICAL_TINY" },
 };
 
