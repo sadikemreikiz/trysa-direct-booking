@@ -68,7 +68,7 @@ export async function getGoogleReviews(): Promise<GoogleReviewsData | null> {
         "X-Goog-FieldMask": "rating,userRatingCount,reviews",
         "Accept-Language": "tr",
       },
-      next: { revalidate: 3600 },
+      next: { revalidate: 86_400 }, // günde bir yenile
     });
     if (!res.ok) return null;
     const data = (await res.json()) as PlaceResponse;
