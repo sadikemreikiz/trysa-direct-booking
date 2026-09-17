@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import ReservationForm from "@/components/ReservationForm";
+import { getBookedDates } from "@/lib/availability";
 
 export const metadata: Metadata = {
   title: "Rezervasyon Talebi",
@@ -10,12 +11,14 @@ export const metadata: Metadata = {
     "Trysa'da doğada ahşap oda, tiny house veya kamp için rezervasyon talebi gönder. Ön talep — onayla kesinleşir, şimdi ödeme yok.",
 };
 
-export default function ReservationPage() {
+export default async function ReservationPage() {
+  const bookedDates = await getBookedDates();
+
   return (
     <>
       <Header />
       <main className="flex-1 pb-24 md:pb-0">
-        <ReservationForm />
+        <ReservationForm bookedDates={bookedDates} />
       </main>
       <Footer />
       <MobileBar />

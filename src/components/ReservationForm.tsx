@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { submitReservation } from "@/app/rezervasyon/actions";
 import { whatsappUrl, type ReservationInput } from "@/lib/reservation";
+import { rangeHasBookedDay } from "@/lib/availability";
 import { WhatsAppIcon } from "./icons";
 
 const units = ["Ahşap Oda", "Tiny House", "Kamp & Karavan", "Emin değilim"];
@@ -20,11 +21,18 @@ const empty: ReservationInput = {
   note: "",
 };
 
-export default function ReservationForm() {
+export default function ReservationForm({
+  bookedDates = [],
+}: {
+  bookedDates?: string[];
+}) {
   const [data, setData] = useState<ReservationInput>(empty);
   const [kvkk, setKvkk] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
+
+  const today = new Date().toISOString().slice(0, 10);
+  const dateWarning = rangeHasBookedDay(data.checkin, data.checkout, bookedDates);
 
   const fld =
     "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink outline-none focus:border-clay";
@@ -128,6 +136,11 @@ export default function ReservationForm() {
         <span className="rounded-full bg-[#e4eadd] px-3 py-1.5 text-xs font-bold text-pine">
           Komisyonsuz
         </span>
+        {bookedDates.length > 0 && (
+          <span className="rounded-full bg-[#e8f0e2] px-3 py-1.5 text-xs font-bold text-[#2c3a2e]">
+            🗓 Takvim Airbnb ile senkron
+          </span>
+        )}
       </div>
 
       <form
@@ -140,6 +153,7 @@ export default function ReservationForm() {
             <input
               type="date"
               className={fld}
+              min={today}
               value={data.checkin}
               onChange={(e) => set("checkin", e.target.value)}
             />
@@ -149,6 +163,7 @@ export default function ReservationForm() {
             <input
               type="date"
               className={fld}
+              min={data.checkin || today}
               value={data.checkout}
               onChange={(e) => set("checkout", e.target.value)}
             />
@@ -178,6 +193,13 @@ export default function ReservationForm() {
             </select>
           </label>
         </div>
+
+        {dateWarning && (
+          <p className="rounded-lg bg-[#fdf0e0] px-3 py-2 text-sm font-medium text-[#8a5a1e]">
+            Seçtiğin tarihlerin bir kısmı Airbnb takviminde dolu görünüyor. Yine
+            de talep gönderebilirsin; müsait bir ünite varsa teyit ederiz.
+          </p>
+        )}
 
         <div>
           <span className={lbl}>Ne için?</span>
