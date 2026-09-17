@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import ReservationForm from "@/components/ReservationForm";
-import { getBookedDates } from "@/lib/availability";
+import { getLockedDatesByType } from "@/lib/availability";
 
 export const metadata: Metadata = {
   title: "Rezervasyon Talebi",
@@ -12,13 +12,13 @@ export const metadata: Metadata = {
 };
 
 export default async function ReservationPage() {
-  const bookedDates = await getBookedDates();
+  const lockedByType = await getLockedDatesByType();
 
   return (
     <>
       <Header />
       <main className="flex-1 pb-24 md:pb-0">
-        <ReservationForm bookedDates={bookedDates} />
+        <ReservationForm lockedByType={lockedByType} />
       </main>
       <Footer />
       <MobileBar />

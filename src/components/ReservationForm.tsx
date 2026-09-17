@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { submitReservation } from "@/app/rezervasyon/actions";
 import { whatsappUrl, type ReservationInput } from "@/lib/reservation";
-import { rangeHasBookedDay } from "@/lib/availability";
+import { rangeHasLockedDay } from "@/lib/availability";
 import { WhatsAppIcon } from "./icons";
 
 const units = ["Ahşap Oda", "Tiny House", "Kamp & Karavan", "Emin değilim"];
@@ -22,9 +22,9 @@ const empty: ReservationInput = {
 };
 
 export default function ReservationForm({
-  bookedDates = [],
+  lockedByType = {},
 }: {
-  bookedDates?: string[];
+  lockedByType?: Record<string, string[]>;
 }) {
   const [data, setData] = useState<ReservationInput>(empty);
   const [kvkk, setKvkk] = useState(false);
@@ -32,7 +32,8 @@ export default function ReservationForm({
   const [error, setError] = useState<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
-  const dateWarning = rangeHasBookedDay(data.checkin, data.checkout, bookedDates);
+  const lockedDates = lockedByType[data.unit] ?? [];
+  const dateBlocked = rangeHasLockedDay(data.checkin, data.checkout, lockedDates);
 
   const fld =
     "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink outline-none focus:border-clay";
@@ -51,6 +52,10 @@ export default function ReservationForm({
     }
     if (!kvkk) {
       setError("Devam etmek için KVKK onayını işaretle.");
+      return;
+    }
+    if (dateBlocked) {
+      setError("Seçtiğin tarihler dolu, lütfen başka tarih seç.");
       return;
     }
     setStatus("sending");
@@ -136,11 +141,6 @@ export default function ReservationForm({
         <span className="rounded-full bg-[#e4eadd] px-3 py-1.5 text-xs font-bold text-pine">
           Komisyonsuz
         </span>
-        {bookedDates.length > 0 && (
-          <span className="rounded-full bg-[#e8f0e2] px-3 py-1.5 text-xs font-bold text-[#2c3a2e]">
-            🗓 Takvim Airbnb ile senkron
-          </span>
-        )}
       </div>
 
       <form
@@ -194,10 +194,9 @@ export default function ReservationForm({
           </label>
         </div>
 
-        {dateWarning && (
-          <p className="rounded-lg bg-[#fdf0e0] px-3 py-2 text-sm font-medium text-[#8a5a1e]">
-            Seçtiğin tarihlerin bir kısmı Airbnb takviminde dolu görünüyor. Yine
-            de talep gönderebilirsin; müsait bir ünite varsa teyit ederiz.
+        {dateBlocked && (
+          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-[#a9501f]">
+            Seçtiğin tarihler dolu — lütfen başka tarih seç.
           </p>
         )}
 
@@ -293,10 +292,14 @@ export default function ReservationForm({
 
         <button
           type="submit"
-          disabled={status === "sending"}
+          disabled={status === "sending" || dateBlocked}
           className="w-full rounded-xl bg-clay py-4 text-base font-bold text-white disabled:opacity-60"
         >
-          {status === "sending" ? "Gönderiliyor..." : "Talebi Gönder"}
+          {status === "sending"
+            ? "Gönderiliyor..."
+            : dateBlocked
+              ? "Bu tarihler dolu"
+              : "Talebi Gönder"}
         </button>
       </form>
     </section>
