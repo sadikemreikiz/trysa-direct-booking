@@ -4,7 +4,7 @@ import {
   amenities,
   experiences,
   distances,
-  galleryTiles,
+  galleryImages,
   reviews,
   faqs,
 } from "@/lib/site";
@@ -121,7 +121,7 @@ export function TwoPath() {
           <div className="relative h-48">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/img/rooms/kulube-1.jpg"
+              src="/img/rooms/kulube-1/kapak.jpg"
               alt="Trysa konaklama"
               loading="lazy"
               className="h-full w-full object-cover"
@@ -200,7 +200,7 @@ export function Accommodation() {
         {stays.map((s) => (
           <a
             key={s.slug}
-            href="/rezervasyon"
+            href={s.img ? `/oda/${s.slug}` : "/rezervasyon"}
             className="overflow-hidden rounded-2xl border border-line bg-white"
           >
             {s.img ? (
@@ -293,11 +293,11 @@ export function Gallery() {
         <a href="#" className="text-sm font-bold text-clay">Tümünü gör →</a>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        {galleryTiles.map((g, i) => (
+        {galleryImages.map((g, i) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            key={g.label}
-            src={`/img/gallery/g${i + 1}.jpg`}
+            key={i}
+            src={g.src}
             alt={g.label}
             loading="lazy"
             className="h-28 w-full rounded-xl object-cover md:h-36"

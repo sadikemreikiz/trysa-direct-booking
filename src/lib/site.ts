@@ -20,7 +20,7 @@ export const stays = [
     price: "1.350 ₺",
     tone: "#c7b79a",
     photo: "Ambar-1",
-    img: "/img/rooms/ambar-1.jpg",
+    img: "/img/rooms/ambar-1/kapak.jpg",
   },
   {
     slug: "ambar-2",
@@ -29,7 +29,7 @@ export const stays = [
     price: "1.350 ₺",
     tone: "#c2b193",
     photo: "Ambar-2",
-    img: "/img/rooms/ambar-2.jpg",
+    img: "/img/rooms/ambar-2/kapak.jpg",
   },
   {
     slug: "ambar-3",
@@ -38,7 +38,7 @@ export const stays = [
     price: "1.150 ₺",
     tone: "#bcaa8a",
     photo: "Ambar-3",
-    img: "/img/rooms/ambar-3.jpg",
+    img: "/img/rooms/ambar-3/kapak.jpg",
   },
   {
     slug: "kulube-1",
@@ -47,7 +47,7 @@ export const stays = [
     price: "1.500 ₺",
     tone: "#a7b29a",
     photo: "Kulübe-1",
-    img: "/img/rooms/kulube-1.jpg",
+    img: "/img/rooms/kulube-1/kapak.jpg",
   },
   {
     slug: "kulube-2",
@@ -56,7 +56,7 @@ export const stays = [
     price: "1.500 ₺",
     tone: "#9fae93",
     photo: "Kulübe-2",
-    img: "/img/rooms/kulube-2.jpg",
+    img: "/img/rooms/kulube-2/kapak.jpg",
   },
   {
     slug: "tiny-house",
@@ -65,7 +65,7 @@ export const stays = [
     price: "1.750 ₺",
     tone: "#cbb892",
     photo: "Tiny House",
-    img: "/img/rooms/tiny-house.jpg",
+    img: "/img/rooms/tiny-house/kapak.jpg",
   },
   {
     slug: "kamp",
@@ -137,4 +137,15 @@ export const faqs = [
   "Kapora / iptal koşulları?",
   "Havalimanından nasıl gelirim?",
   "Kamp alanında elektrik var mı?",
+];
+
+export const galleryImages = [
+  { src: "/img/rooms/ambar-1/kapak.jpg", label: "Ambar-1" },
+  { src: "/img/rooms/kulube-1/kapak.jpg", label: "Kulübe-1" },
+  { src: "/img/rooms/tiny-house/kapak.jpg", label: "Tiny House" },
+  { src: "/img/rooms/ambar-3/kapak.jpg", label: "Ambar-3" },
+  { src: "/img/rooms/kulube-2/kapak.jpg", label: "Kulübe-2" },
+  { src: "/img/rooms/ambar-2/kapak.jpg", label: "Ambar-2" },
+  { src: "/img/gallery/g5.jpg", label: "Doğa" },
+  { src: "/img/gallery/g6.jpg", label: "Doğa" },
 ];
