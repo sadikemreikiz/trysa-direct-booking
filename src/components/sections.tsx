@@ -158,7 +158,7 @@ export function TwoPath() {
               Likya sofrası, ızgara &amp; taze balık · dışarıya da açık
             </p>
             <a
-              href="#restoran"
+              href="/menu"
               className="mt-4 inline-block rounded-xl bg-pine px-6 py-3 text-sm font-bold text-ivory"
             >
               Menüyü Gör →
@@ -268,7 +268,7 @@ export function Restaurant() {
             bölümünde, doğanın içinde.
           </p>
           <a
-            href="#"
+            href="/menu"
             className="mt-5 inline-block rounded-xl bg-ivory px-5 py-3 text-sm font-bold text-pine"
           >
             Menüyü gör
