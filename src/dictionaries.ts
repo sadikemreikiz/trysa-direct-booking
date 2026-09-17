@@ -108,12 +108,30 @@ const tr = {
   faq: {
     title: "Sıkça sorulanlar",
     items: [
-      "Evcil hayvan kabul ediyor musunuz?",
-      "Check-in / check-out saatleri?",
-      "Kahvaltı dahil mi?",
-      "Kapora / iptal koşulları?",
-      "Havalimanından nasıl gelirim?",
-      "Kamp alanında elektrik var mı?",
+      {
+        q: "Evcil hayvan kabul ediyor musunuz?",
+        a: "Evet, dostlarınız bizde misafir. Küçük evcil hayvanlar odaya alınabilir; dilerseniz bahçede de rahatça konaklarlar. Gelmeden önce bize haber verin, hayvanınıza göre en uygun çözümü birlikte ayarlayalım.",
+      },
+      {
+        q: "Check-in / check-out saatleri?",
+        a: "Giriş gün içinde, en geç akşam 21:00–22:00; çıkış 12:00. Farklı bir saate ihtiyacınız olursa yazın, elimizden geleni yaparız.",
+      },
+      {
+        q: "Kahvaltı var mı?",
+        a: "Açık hava bölümümüzde serpme kahvaltı sunuyoruz. Konaklamanıza kahvaltı eklemek için rezervasyon sırasında bize belirtmeniz yeterli.",
+      },
+      {
+        q: "Kapora / iptal koşulları?",
+        a: "Rezervasyonu kesinleştirmek için kapora alıyoruz. İptal koşulları duruma göre değişebilir; talebinizin ardından detayları sizinle netleştiririz.",
+      },
+      {
+        q: "Havalimanından nasıl gelirim?",
+        a: "Antalya Havalimanı yaklaşık 2,5 saat uzaklıkta. İsterseniz ulaşım konusunda yardımcı oluyoruz — talebinizde belirtin, sizi yönlendirelim.",
+      },
+      {
+        q: "Kamp alanında elektrik var mı?",
+        a: "Kamp ve karavan alanıyla ilgili (elektrik dahil) ihtiyaçlarınızda elimizden geldiğince yardımcı oluyoruz. Gelmeden önce bize danışmanız yeterli.",
+      },
     ],
   },
   cta: {
@@ -307,12 +325,30 @@ const en: Dict = {
   faq: {
     title: "Frequently asked",
     items: [
-      "Do you accept pets?",
-      "Check-in / check-out times?",
-      "Is breakfast included?",
-      "Deposit / cancellation policy?",
-      "How do I get here from the airport?",
-      "Is there electricity at the campsite?",
+      {
+        q: "Do you accept pets?",
+        a: "Yes, your companions are welcome. Small pets can stay in the room, or comfortably in the garden if you prefer. Just let us know in advance and we'll arrange the best option for your pet.",
+      },
+      {
+        q: "Check-in / check-out times?",
+        a: "Check-in during the day, by 9–10 pm at the latest; check-out at 12:00. If you need a different time, let us know and we'll do our best.",
+      },
+      {
+        q: "Is breakfast available?",
+        a: "We serve a Turkish spread (serpme) breakfast in our open-air section. Just tell us during booking to add breakfast to your stay.",
+      },
+      {
+        q: "Deposit / cancellation policy?",
+        a: "We take a deposit to confirm the booking. Cancellation terms vary case by case; we'll clarify the details with you after your request.",
+      },
+      {
+        q: "How do I get here from the airport?",
+        a: "Antalya Airport is about 2.5 hours away. We're happy to help with transport — mention it in your request and we'll guide you.",
+      },
+      {
+        q: "Is there electricity at the campsite?",
+        a: "We help as much as we can with camping and caravan needs, including electricity. Just check with us before you arrive.",
+      },
     ],
   },
   cta: {
@@ -504,12 +540,30 @@ const de: Dict = {
   faq: {
     title: "Häufige Fragen",
     items: [
-      "Sind Haustiere erlaubt?",
-      "Check-in / Check-out Zeiten?",
-      "Ist Frühstück inklusive?",
-      "Anzahlung / Stornobedingungen?",
-      "Wie komme ich vom Flughafen hierher?",
-      "Gibt es Strom auf dem Campingplatz?",
+      {
+        q: "Sind Haustiere erlaubt?",
+        a: "Ja, Ihre Begleiter sind willkommen. Kleine Haustiere dürfen mit ins Zimmer oder auf Wunsch bequem in den Garten. Sagen Sie uns vorab Bescheid, dann finden wir die beste Lösung für Ihr Tier.",
+      },
+      {
+        q: "Check-in / Check-out Zeiten?",
+        a: "Anreise tagsüber, spätestens bis 21–22 Uhr; Abreise um 12:00 Uhr. Wenn Sie eine andere Zeit brauchen, sagen Sie Bescheid – wir tun unser Bestes.",
+      },
+      {
+        q: "Gibt es Frühstück?",
+        a: "Im Außenbereich servieren wir ein türkisches Frühstück (Serpme). Sagen Sie es einfach bei der Buchung, um Frühstück hinzuzufügen.",
+      },
+      {
+        q: "Anzahlung / Stornobedingungen?",
+        a: "Zur Bestätigung der Buchung nehmen wir eine Anzahlung. Die Stornobedingungen richten sich nach dem Einzelfall; die Details klären wir nach Ihrer Anfrage mit Ihnen.",
+      },
+      {
+        q: "Wie komme ich vom Flughafen hierher?",
+        a: "Der Flughafen Antalya ist etwa 2,5 Stunden entfernt. Gerne helfen wir bei der Anreise – erwähnen Sie es in Ihrer Anfrage, wir leiten Sie weiter.",
+      },
+      {
+        q: "Gibt es Strom auf dem Campingplatz?",
+        a: "Bei Camping- und Wohnwagen-Bedürfnissen (auch Strom) helfen wir so gut wir können. Fragen Sie uns einfach vor Ihrer Anreise.",
+      },
     ],
   },
   cta: {
