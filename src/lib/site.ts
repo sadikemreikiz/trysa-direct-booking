@@ -20,6 +20,7 @@ export const stays = [
     price: "1.350 ₺",
     tone: "#c7b79a",
     photo: "Ambar-1",
+    img: "/img/rooms/ambar-1.jpg",
   },
   {
     slug: "ambar-2",
@@ -28,6 +29,7 @@ export const stays = [
     price: "1.350 ₺",
     tone: "#c2b193",
     photo: "Ambar-2",
+    img: "/img/rooms/ambar-2.jpg",
   },
   {
     slug: "ambar-3",
@@ -36,6 +38,7 @@ export const stays = [
     price: "1.150 ₺",
     tone: "#bcaa8a",
     photo: "Ambar-3",
+    img: "/img/rooms/ambar-3.jpg",
   },
   {
     slug: "kulube-1",
@@ -44,6 +47,7 @@ export const stays = [
     price: "1.500 ₺",
     tone: "#a7b29a",
     photo: "Kulübe-1",
+    img: "/img/rooms/kulube-1.jpg",
   },
   {
     slug: "kulube-2",
@@ -52,6 +56,7 @@ export const stays = [
     price: "1.500 ₺",
     tone: "#9fae93",
     photo: "Kulübe-2",
+    img: "/img/rooms/kulube-2.jpg",
   },
   {
     slug: "tiny-house",
@@ -60,6 +65,7 @@ export const stays = [
     price: "1.750 ₺",
     tone: "#cbb892",
     photo: "Tiny House",
+    img: "/img/rooms/tiny-house.jpg",
   },
   {
     slug: "kamp",
@@ -68,6 +74,7 @@ export const stays = [
     price: "Fiyat için sor",
     tone: "#b0a78e",
     photo: "Kamp alanı",
+    img: "",
   },
 ];
 

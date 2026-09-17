@@ -48,7 +48,14 @@ function Stars({ className = "" }: { className?: string }) {
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-pine">
-      <div className={`${container} flex min-h-[440px] flex-col justify-center py-16 md:min-h-[520px] md:py-24`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/img/hero.jpg"
+        alt=""
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-pine/75" />
+      <div className={`relative ${container} flex min-h-[440px] flex-col justify-center py-16 md:min-h-[520px] md:py-24`}>
         <p className="mb-4 text-xs font-bold tracking-[0.2em] text-[#c99a63]">
           DEMRE · DAVAZLAR · ANTALYA
         </p>
@@ -112,7 +119,13 @@ export function TwoPath() {
       <div className="grid gap-4 md:grid-cols-2 md:gap-7">
         <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_26px_rgba(44,58,46,0.08)]">
           <div className="relative h-48">
-            <Photo label="ahşap oda / tiny house" tone="#c7b79a" className="h-full" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/img/rooms/kulube-1.jpg"
+              alt="Trysa konaklama"
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-pine px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-ivory">
               KONAKLAMA
             </span>
@@ -190,7 +203,17 @@ export function Accommodation() {
             href="/rezervasyon"
             className="overflow-hidden rounded-2xl border border-line bg-white"
           >
-            <Photo label={s.photo} tone={s.tone} className="h-44" />
+            {s.img ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={s.img}
+                alt={s.title}
+                loading="lazy"
+                className="h-44 w-full object-cover"
+              />
+            ) : (
+              <Photo label={s.photo} tone={s.tone} className="h-44" />
+            )}
             <div className="p-5">
               <div className="font-display text-lg font-semibold md:text-xl">{s.title}</div>
               <p className="mt-1.5 text-sm text-muted">{s.desc}</p>
@@ -270,16 +293,15 @@ export function Gallery() {
         <a href="#" className="text-sm font-bold text-clay">Tümünü gör →</a>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        {galleryTiles.map((g) => (
-          <div
+        {galleryTiles.map((g, i) => (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             key={g.label}
-            className="flex h-28 items-end rounded-xl p-2 md:h-36"
-            style={{ backgroundColor: g.tone }}
-          >
-            <span className="rounded bg-white/60 px-1.5 py-0.5 text-[10px] text-ink/70">
-              {g.label}
-            </span>
-          </div>
+            src={`/img/gallery/g${i + 1}.jpg`}
+            alt={g.label}
+            loading="lazy"
+            className="h-28 w-full rounded-xl object-cover md:h-36"
+          />
         ))}
       </div>
     </section>
