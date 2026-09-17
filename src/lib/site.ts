@@ -9,6 +9,7 @@ export const site = {
   address: "Davazlar, Gölbaşı Mevkii, 07572 Demre / Antalya",
   rating: "4,9",
   reviewCount: 292,
+  superhost: true, // Airbnb Superhost rozeti — teyit edilince kalır; değilse false yap
 };
 
 // Her oda ayrı. Fiyatlar Airbnb'den; güncelini Emre teyit edecek.

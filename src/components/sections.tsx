@@ -67,10 +67,22 @@ export function Hero() {
           Likya&apos;nın unutulmuş kentinin yanında; konaklama ve ocakbaşı restoran
           bir arada. Yıl boyu açık.
         </p>
-        <div className="mt-6 inline-flex items-center gap-2 self-start rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5">
-          <Stars className="text-sm" />
-          <span className="text-sm font-bold text-ivory">{site.rating}</span>
-          <span className="text-xs text-[#b9c0ac]">· {site.reviewCount} Google yorumu</span>
+        <div className="mt-6 flex flex-wrap items-center gap-2.5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5">
+            <Stars className="text-sm" />
+            <span className="text-sm font-bold text-ivory">{site.rating}</span>
+            <span className="text-xs text-[#b9c0ac]">
+              · {site.reviewCount} Google yorumu
+            </span>
+          </div>
+          {site.superhost && (
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5">
+              <span className="text-sm text-[#ff5a5f]">◆</span>
+              <span className="text-xs font-bold text-ivory">
+                Airbnb Superhost
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </section>
