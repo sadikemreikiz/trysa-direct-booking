@@ -1,19 +1,13 @@
-import {
-  site,
-  stays,
-  amenities,
-  experiences,
-  distances,
-  galleryImages,
-  reviews,
-  faqs,
-} from "@/lib/site";
+import { site, stays, galleryImages } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
+import type { Dict, Locale } from "@/dictionaries";
 import type { GoogleReviewsData } from "@/lib/reviews";
 
 const container = "mx-auto max-w-6xl px-5 md:px-8";
 
-/* Fotoğraf yer tutucusu — gerçek fotoğraflar buraya gelecek */
+type T = { t: Dict };
+type TL = { t: Dict; lang: Locale };
+
 function Photo({
   label,
   tone,
@@ -35,7 +29,7 @@ function Photo({
           labelDark ? "bg-black/25 text-white/85" : "bg-white/60 text-ink/70"
         }`}
       >
-        FOTOĞRAF: {label}
+        FOTO: {label}
       </span>
     </div>
   );
@@ -46,7 +40,7 @@ function Stars({ className = "" }: { className?: string }) {
 }
 
 /* ---------- HERO ---------- */
-export function Hero() {
+export function Hero({ t }: T) {
   return (
     <section className="relative overflow-hidden bg-pine">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -58,29 +52,26 @@ export function Hero() {
       <div className="absolute inset-0 bg-pine/75" />
       <div className={`relative ${container} flex min-h-[440px] flex-col justify-center py-16 md:min-h-[520px] md:py-24`}>
         <p className="mb-4 text-xs font-bold tracking-[0.2em] text-[#c99a63]">
-          DEMRE · DAVAZLAR · ANTALYA
+          {t.hero.kicker}
         </p>
         <h1 className="max-w-2xl font-display text-4xl font-semibold leading-tight text-ivory md:text-6xl">
-          Antik Trysa&apos;nın eteğinde, doğayla baş başa
+          {t.hero.title}
         </h1>
         <p className="mt-4 max-w-xl text-base leading-relaxed text-[#d6dbcb] md:text-lg">
-          Likya&apos;nın unutulmuş kentinin yanında; konaklama ve ocakbaşı restoran
-          bir arada. Yıl boyu açık.
+          {t.hero.subtitle}
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-2.5">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5">
             <Stars className="text-sm" />
             <span className="text-sm font-bold text-ivory">{site.rating}</span>
             <span className="text-xs text-[#b9c0ac]">
-              · {site.reviewCount} Google yorumu
+              · {site.reviewCount} {t.hero.reviewsSuffix}
             </span>
           </div>
           {site.superhost && (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5">
               <span className="text-sm text-[#ff5a5f]">◆</span>
-              <span className="text-xs font-bold text-ivory">
-                Airbnb Superhost
-              </span>
+              <span className="text-xs font-bold text-ivory">{t.hero.superhost}</span>
             </div>
           )}
         </div>
@@ -89,8 +80,8 @@ export function Hero() {
   );
 }
 
-/* ---------- TARİH HIZLI KUTUSU ---------- */
-export function BookingBar() {
+/* ---------- BOOKING BAR ---------- */
+export function BookingBar({ t, lang }: TL) {
   const fld =
     "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink";
   const lbl = "block text-xs font-bold text-muted";
@@ -98,27 +89,26 @@ export function BookingBar() {
     <div className={`${container} relative z-20 -mt-8`}>
       <div className="rounded-2xl border border-line bg-white p-4 shadow-[0_14px_34px_rgba(44,58,46,0.14)] md:flex md:items-end md:gap-5">
         <label className="block flex-1">
-          <span className={lbl}>Giriş tarihi</span>
+          <span className={lbl}>{t.booking.checkin}</span>
           <input type="date" className={fld} />
         </label>
         <label className="mt-3 block flex-1 md:mt-0">
-          <span className={lbl}>Çıkış tarihi</span>
+          <span className={lbl}>{t.booking.checkout}</span>
           <input type="date" className={fld} />
         </label>
         <label className="mt-3 block flex-1 md:mt-0">
-          <span className={lbl}>Kişi</span>
+          <span className={lbl}>{t.booking.guests}</span>
           <select className={fld}>
-            <option>1 kişi</option>
-            <option>2 kişi</option>
-            <option>3 kişi</option>
-            <option>4+ kişi</option>
+            {t.booking.guestOptions.map((g) => (
+              <option key={g}>{g}</option>
+            ))}
           </select>
         </label>
         <a
-          href="/rezervasyon"
+          href={`/${lang}/rezervasyon`}
           className="mt-3 block rounded-xl bg-clay px-7 py-3 text-center text-sm font-bold text-white md:mt-0"
         >
-          Müsaitlik sor
+          {t.booking.ask}
         </a>
       </div>
     </div>
@@ -126,7 +116,7 @@ export function BookingBar() {
 }
 
 /* ---------- İKİ YOL ---------- */
-export function TwoPath() {
+export function TwoPath({ t, lang }: TL) {
   return (
     <section className={`${container} pt-8`}>
       <div className="grid gap-4 md:grid-cols-2 md:gap-7">
@@ -135,45 +125,41 @@ export function TwoPath() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/img/rooms/kulube-1/kapak.jpg"
-              alt="Trysa konaklama"
+              alt="Trysa"
               loading="lazy"
               className="h-full w-full object-cover"
             />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-pine px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-ivory">
-              KONAKLAMA
+              {t.twoPath.stayLabel}
             </span>
           </div>
           <div className="p-6 md:p-7">
-            <div className="font-display text-2xl font-semibold text-pine">Doğada kal</div>
-            <p className="mt-1.5 text-sm text-muted md:text-[15px]">
-              Ahşap odalar, tiny house &amp; kamp · gecelik 1.150 ₺&apos;den
-            </p>
+            <div className="font-display text-2xl font-semibold text-pine">{t.twoPath.stayTitle}</div>
+            <p className="mt-1.5 text-sm text-muted md:text-[15px]">{t.twoPath.staySub}</p>
             <a
-              href="/rezervasyon"
+              href={`/${lang}/rezervasyon`}
               className="mt-4 inline-block rounded-xl bg-clay px-6 py-3 text-sm font-bold text-white"
             >
-              Rezervasyon Talebi →
+              {t.twoPath.stayCta} →
             </a>
           </div>
         </div>
 
         <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_26px_rgba(44,58,46,0.08)]">
           <div className="relative h-48">
-            <Photo label="ocakbaşı / açık hava" tone="#4a5a45" className="h-full" labelDark />
+            <Photo label="ocakbaşı" tone="#4a5a45" className="h-full" labelDark />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-gold px-3 py-1.5 text-[11px] font-extrabold text-[#3a2e0a]">
-              ★ {site.rating} · {site.reviewCount} YORUM
+              ★ {site.rating} · {site.reviewCount} {t.twoPath.reviewsWord}
             </span>
           </div>
           <div className="p-6 md:p-7">
-            <div className="font-display text-2xl font-semibold text-pine">Sofraya otur</div>
-            <p className="mt-1.5 text-sm text-muted md:text-[15px]">
-              Likya sofrası, ızgara &amp; taze balık · dışarıya da açık
-            </p>
+            <div className="font-display text-2xl font-semibold text-pine">{t.twoPath.eatTitle}</div>
+            <p className="mt-1.5 text-sm text-muted md:text-[15px]">{t.twoPath.eatSub}</p>
             <a
-              href="/menu"
+              href={`/${lang}/menu`}
               className="mt-4 inline-block rounded-xl bg-pine px-6 py-3 text-sm font-bold text-ivory"
             >
-              Menüyü Gör →
+              {t.twoPath.eatCta} →
             </a>
           </div>
         </div>
@@ -183,16 +169,11 @@ export function TwoPath() {
 }
 
 /* ---------- NEDEN DİREKT ---------- */
-export function WhyDirect() {
-  const items = [
-    { t: "Komisyonsuz en iyi fiyat", d: "Aracı yok — direkt bize, en uygun fiyata." },
-    { t: "Direkt iletişim", d: "WhatsApp'tan anında yanıt, gerçek insanlar." },
-    { t: "Esneklik", d: "Özel isteklerini doğrudan bize iletebilirsin." },
-  ];
+export function WhyDirect({ t }: T) {
   return (
     <section className={`${container} pt-5`}>
       <div className="grid gap-6 rounded-2xl bg-pine p-6 md:grid-cols-3 md:p-8">
-        {items.map((i) => (
+        {t.why.items.map((i) => (
           <div key={i.t}>
             <div className="mb-1.5 font-display text-lg font-semibold text-white">{i.t}</div>
             <div className="text-sm text-[#b9c0ac]">{i.d}</div>
@@ -204,35 +185,34 @@ export function WhyDirect() {
 }
 
 /* ---------- KONAKLAMA ---------- */
-export function Accommodation() {
+export function Accommodation({ t, lang }: TL) {
   return (
     <section id="konaklama" className={`${container} scroll-mt-20 pt-10`}>
-      <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">Konaklama</h2>
-      <p className="mt-1 text-muted md:text-[15px]">Doğanın içinde, sade ve huzurlu seçenekler.</p>
+      <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.stay.title}</h2>
+      <p className="mt-1 text-muted md:text-[15px]">{t.stay.sub}</p>
       <div className="mt-6 grid gap-4 md:grid-cols-3 md:gap-6">
         {stays.map((s) => (
           <a
             key={s.slug}
-            href={s.img ? `/oda/${s.slug}` : "/rezervasyon"}
+            href={s.img ? `/${lang}/oda/${s.slug}` : `/${lang}/rezervasyon`}
             className="overflow-hidden rounded-2xl border border-line bg-white"
           >
             {s.img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={s.img}
-                alt={s.title}
-                loading="lazy"
-                className="h-44 w-full object-cover"
-              />
+              <img src={s.img} alt={s.title} loading="lazy" className="h-44 w-full object-cover" />
             ) : (
               <Photo label={s.photo} tone={s.tone} className="h-44" />
             )}
             <div className="p-5">
               <div className="font-display text-lg font-semibold md:text-xl">{s.title}</div>
-              <p className="mt-1.5 text-sm text-muted">{s.desc}</p>
+              <p className="mt-1.5 text-sm text-muted">
+                {t.room.descs[s.slug] ?? s.desc}
+              </p>
               <div className="mt-3.5 flex items-center justify-between">
-                <span className="text-lg font-bold text-pine">{s.price}</span>
-                <span className="text-sm font-bold text-clay">İncele →</span>
+                <span className="text-lg font-bold text-pine">
+                  {s.slug === "kamp" ? t.stay.fiyatSor : s.price}
+                </span>
+                <span className="text-sm font-bold text-clay">{t.stay.incele}</span>
               </div>
             </div>
           </a>
@@ -243,67 +223,53 @@ export function Accommodation() {
 }
 
 /* ---------- OLANAKLAR ---------- */
-export function Amenities() {
+export function Amenities({ t }: T) {
   return (
     <section className={`${container} pt-10`}>
-      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">Olanaklar</h2>
+      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">{t.amenities.title}</h2>
       <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 rounded-2xl border border-line bg-white p-5 md:grid-cols-4 md:p-7">
-        {amenities.map((a) => (
+        {t.amenities.list.map((a) => (
           <div key={a} className="flex items-center gap-2 text-sm text-pine/90 md:text-[15px]">
             <span className="text-clay">•</span> {a}
           </div>
         ))}
       </div>
-      <p className="mt-2 text-xs text-muted/70">* Kesin liste netleştirilecek.</p>
+      <p className="mt-2 text-xs text-muted/70">{t.amenities.note}</p>
     </section>
   );
 }
 
 /* ---------- RESTORAN ---------- */
-export function Restaurant() {
+export function Restaurant({ t, lang }: TL) {
   return (
     <section id="restoran" className={`${container} scroll-mt-20 pt-10`}>
-      <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">Restoran</h2>
-      <p className="mt-1 text-muted md:text-[15px]">
-        {site.reviewCount} yorumun geldiği mutfak — misafirlere ve dışarıya açık.
-      </p>
+      <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.restaurant.title}</h2>
+      <p className="mt-1 text-muted md:text-[15px]">{t.restaurant.sub}</p>
       <div className="mt-5 overflow-hidden rounded-2xl bg-pine md:flex">
         <div className="p-6 md:flex-1 md:p-11">
-          <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#c99a63]">
-            LİKYA SOFRASI
-          </div>
-          <h3 className="font-display text-2xl font-semibold text-ivory md:text-3xl">
-            Ocakbaşı &amp; ev yemekleri
-          </h3>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-[#d6dbcb] md:text-base">
-            Köy tavuğu, ızgaralar, taze balık, serpme kahvaltı ve gözleme. Açık hava
-            bölümünde, doğanın içinde.
-          </p>
+          <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#c99a63]">{t.restaurant.kicker}</div>
+          <h3 className="font-display text-2xl font-semibold text-ivory md:text-3xl">{t.restaurant.h}</h3>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-[#d6dbcb] md:text-base">{t.restaurant.desc}</p>
           <a
-            href="/menu"
+            href={`/${lang}/menu`}
             className="mt-5 inline-block rounded-xl bg-ivory px-5 py-3 text-sm font-bold text-pine"
           >
-            Menüyü gör
+            {t.restaurant.cta}
           </a>
         </div>
-        <Photo
-          label="restoran / açık hava"
-          tone="#4a5a45"
-          className="h-48 md:h-auto md:w-[420px]"
-          labelDark
-        />
+        <Photo label="restoran" tone="#4a5a45" className="h-48 md:h-auto md:w-[420px]" labelDark />
       </div>
     </section>
   );
 }
 
 /* ---------- GALERİ ---------- */
-export function Gallery() {
+export function Gallery({ t }: T) {
   return (
     <section id="galeri" className={`${container} scroll-mt-20 pt-10`}>
       <div className="flex items-baseline justify-between">
-        <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">Galeri</h2>
-        <a href="#" className="text-sm font-bold text-clay">Tümünü gör →</a>
+        <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.gallery.title}</h2>
+        <a href="#galeri" className="text-sm font-bold text-clay">{t.gallery.seeAll}</a>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         {galleryImages.map((g, i) => (
@@ -322,31 +288,18 @@ export function Gallery() {
 }
 
 /* ---------- TRYSA HİKAYESİ ---------- */
-export function TrysaStory() {
+export function TrysaStory({ t }: T) {
   return (
     <section id="trysa" className={`${container} scroll-mt-20 pt-10`}>
       <div className="overflow-hidden rounded-2xl bg-stone md:flex">
         <div className="p-6 md:flex-1 md:p-12">
-          <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">
-            TRYSA&apos;NIN HİKAYESİ
-          </div>
-          <h2 className="font-display text-2xl font-semibold leading-tight text-[#f1e9d8] md:text-3xl">
-            Likya&apos;nın unutulmuş kentinin eteğindesiniz
-          </h2>
-          <p className="mt-3.5 max-w-md text-sm leading-relaxed text-[#d8cfb8] md:text-base">
-            2.400 yıllık antik Trysa tam tepemizde. Dünyaca ünlü frizleri bugün
-            Viyana&apos;da sergileniyor — ama kentin kendisi hâlâ burada. Tesisten
-            yürüyerek harabelere çıkabilirsiniz.
-          </p>
-          <a
-            href="#"
-            className="mt-5 inline-block rounded-xl bg-[#d9a05b] px-5 py-3 text-sm font-bold text-[#2b2417]"
-          >
-            Trysa&apos;yı keşfet →
-          </a>
+          <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">{t.trysaStory.kicker}</div>
+          <h2 className="font-display text-2xl font-semibold leading-tight text-[#f1e9d8] md:text-3xl">{t.trysaStory.title}</h2>
+          <p className="mt-3.5 max-w-md text-sm leading-relaxed text-[#d8cfb8] md:text-base">{t.trysaStory.desc}</p>
+          <a href="#trysa" className="mt-5 inline-block rounded-xl bg-[#d9a05b] px-5 py-3 text-sm font-bold text-[#2b2417]">{t.trysaStory.cta}</a>
         </div>
         <div className="flex h-40 items-center justify-center bg-[#4a4335] text-xs text-[#b6a985] md:h-auto md:w-[420px]">
-          FOTOĞRAF: Trysa harabeleri / lahitler
+          FOTO: Trysa
         </div>
       </div>
     </section>
@@ -354,16 +307,16 @@ export function TrysaStory() {
 }
 
 /* ---------- DENEYİMLER ---------- */
-export function Experiences() {
+export function Experiences({ t }: T) {
   return (
     <section className={`${container} pt-10`}>
-      <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">Deneyimler</h2>
-      <p className="mt-1 text-muted md:text-[15px]">Sadece yatak değil — doğa, tarih ve aile.</p>
+      <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.experiences.title}</h2>
+      <p className="mt-1 text-muted md:text-[15px]">{t.experiences.sub}</p>
       <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
-        {experiences.map((e) => (
-          <div key={e.title} className="rounded-2xl border border-line bg-white p-4 md:p-5">
-            <div className="font-display text-base font-semibold text-pine md:text-xl">{e.title}</div>
-            <div className="mt-1 text-xs text-muted md:text-sm">{e.desc}</div>
+        {t.experiences.items.map((e) => (
+          <div key={e.t} className="rounded-2xl border border-line bg-white p-4 md:p-5">
+            <div className="font-display text-base font-semibold text-pine md:text-xl">{e.t}</div>
+            <div className="mt-1 text-xs text-muted md:text-sm">{e.d}</div>
           </div>
         ))}
       </div>
@@ -372,30 +325,28 @@ export function Experiences() {
 }
 
 /* ---------- MESAFELER ---------- */
-export function Distances() {
+export function Distances({ t }: T) {
   return (
     <section className={`${container} pt-10`}>
-      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">
-        Nasıl gelinir &amp; mesafeler
-      </h2>
+      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">{t.distances.title}</h2>
       <div className="mt-4 grid gap-4 md:grid-cols-2 md:gap-6">
         <div className="overflow-hidden rounded-2xl border border-line bg-white">
-          {distances.map((d, i) => (
+          {t.distances.places.map((d, i) => (
             <div
-              key={d.place}
+              key={d.p}
               className={`flex items-center justify-between px-4 py-3.5 ${
-                i < distances.length - 1 ? "border-b border-line/60" : ""
+                i < t.distances.places.length - 1 ? "border-b border-line/60" : ""
               }`}
             >
-              <span className="text-sm text-ink md:text-[15px]">{d.place}</span>
-              <span className="text-sm font-bold text-muted">{d.time}</span>
+              <span className="text-sm text-ink md:text-[15px]">{d.p}</span>
+              <span className="text-sm font-bold text-muted">{d.t}</span>
             </div>
           ))}
         </div>
         <div className="flex flex-col gap-2">
           <div className="min-h-[16rem] flex-1 overflow-hidden rounded-2xl border border-line">
             <iframe
-              title="Trysa konumu"
+              title="Trysa"
               src="https://maps.google.com/maps?q=36.262198,29.890923&hl=tr&z=15&output=embed"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
@@ -408,7 +359,7 @@ export function Distances() {
             rel="noopener noreferrer"
             className="self-start text-sm font-bold text-clay"
           >
-            Yol tarifi al →
+            {t.distances.yolTarifi}
           </a>
         </div>
       </div>
@@ -417,23 +368,22 @@ export function Distances() {
 }
 
 /* ---------- YORUMLAR ---------- */
-export function Reviews({ google }: { google?: GoogleReviewsData | null }) {
+export function Reviews({ t, google }: T & { google?: GoogleReviewsData | null }) {
   const items =
     google && google.reviews.length > 0
       ? google.reviews.map((r) => ({
           text: r.text,
           author: r.when ? `${r.author} · ${r.when}` : r.author,
         }))
-      : reviews;
+      : [];
+  if (items.length === 0) return null;
   return (
     <section className={`${container} pt-10`}>
       {google && google.count > 0 && (
         <div className="mb-4 flex items-center gap-2">
           <Stars className="text-base" />
-          <span className="font-bold text-pine">
-            {google.rating.toLocaleString("tr-TR")}
-          </span>
-          <span className="text-sm text-muted">· {google.count} Google yorumu</span>
+          <span className="font-bold text-pine">{google.rating.toLocaleString("tr-TR")}</span>
+          <span className="text-sm text-muted">· {google.count} {t.reviews.suffix}</span>
         </div>
       )}
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
@@ -452,14 +402,12 @@ export function Reviews({ google }: { google?: GoogleReviewsData | null }) {
 }
 
 /* ---------- SSS ---------- */
-export function Faq() {
+export function Faq({ t }: T) {
   return (
     <section id="sss" className={`${container} scroll-mt-20 pt-10`}>
-      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">
-        Sıkça sorulanlar
-      </h2>
+      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">{t.faq.title}</h2>
       <div className="mt-5 grid gap-3.5 md:grid-cols-2">
-        {faqs.map((q) => (
+        {t.faq.items.map((q) => (
           <div
             key={q}
             className="flex items-center justify-between rounded-xl border border-line bg-white px-5 py-4"
@@ -474,22 +422,18 @@ export function Faq() {
 }
 
 /* ---------- CTA ---------- */
-export function CtaBand() {
+export function CtaBand({ t, lang }: TL) {
   return (
     <section id="rezervasyon" className={`${container} scroll-mt-20 py-12`}>
       <div className="rounded-2xl bg-clay p-8 text-center md:p-11">
-        <h2 className="font-display text-2xl font-semibold text-white md:text-3xl">
-          Tarihlerini bize ilet
-        </h2>
-        <p className="mt-1.5 text-sm text-[#fbe6d8] md:text-base">
-          Talebini gönder, en kısa sürede biz dönelim.
-        </p>
+        <h2 className="font-display text-2xl font-semibold text-white md:text-3xl">{t.cta.title}</h2>
+        <p className="mt-1.5 text-sm text-[#fbe6d8] md:text-base">{t.cta.sub}</p>
         <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
           <a
-            href="/rezervasyon"
+            href={`/${lang}/rezervasyon`}
             className="rounded-xl bg-white px-8 py-4 text-base font-bold text-clay"
           >
-            Müsaitlik &amp; Rezervasyon
+            {t.cta.btn}
           </a>
           <a
             href={site.whatsapp}
@@ -498,7 +442,7 @@ export function CtaBand() {
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-8 py-4 text-base font-bold text-white"
           >
             <WhatsAppIcon className="h-5 w-5" />
-            WhatsApp&apos;tan yaz
+            {t.cta.whatsapp}
           </a>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { site } from "@/lib/site";
+import type { Dict } from "@/dictionaries";
 
-export default function Footer() {
+export default function Footer({ t }: { t: Dict }) {
   return (
     <footer id="iletisim" className="mt-auto bg-ink px-5 py-10 text-[#c9cdbf] md:px-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
@@ -11,17 +12,17 @@ export default function Footer() {
           <div className="space-y-1 text-sm leading-relaxed">
             <div>{site.address}</div>
             <div className="pt-1">
-              ☎ {site.phoneLabel} · WhatsApp mevcut
+              ☎ {site.phoneLabel} · {t.footer.whatsappNote}
             </div>
             <div>Instagram: {site.instagramLabel}</div>
           </div>
           <div className="mt-4 text-xs text-[#6e7364]">
-            © {new Date().getFullYear()} Trysa · Gizlilik / KVKK
+            © {new Date().getFullYear()} Trysa · {t.footer.rights}
           </div>
         </div>
         <div className="w-full overflow-hidden rounded-xl md:w-72">
           <iframe
-            title="Trysa konumu"
+            title="Trysa"
             src="https://maps.google.com/maps?q=36.262198,29.890923&hl=tr&z=14&output=embed"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

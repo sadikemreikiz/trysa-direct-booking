@@ -5,21 +5,14 @@ import { reservationSummary, type ReservationInput } from "@/lib/reservation";
 export type SubmitResult = { ok: boolean; error?: string; emailed?: boolean };
 
 /**
- * Rezervasyon talebini işler.
- * - Zorunlu alanları doğrular.
- * - RESEND_API_KEY tanımlıysa aileye e-posta gönderir (opsiyonel; sonradan eklenebilir).
- * - E-posta olmasa da talep WhatsApp'tan iletilir (istemci tarafı).
+ * Rezervasyon talebini işler. Zorunlu alanları doğrular; RESEND_API_KEY varsa
+ * aileye e-posta gönderir. E-posta olmasa da talep WhatsApp'tan iletilir.
  */
 export async function submitReservation(
   data: ReservationInput,
 ): Promise<SubmitResult> {
-  if (
-    !data.checkin ||
-    !data.checkout ||
-    !data.name.trim() ||
-    !data.phone.trim()
-  ) {
-    return { ok: false, error: "Lütfen tarih, ad ve telefon alanlarını doldur." };
+  if (!data.checkin || !data.checkout || !data.name.trim() || !data.phone.trim()) {
+    return { ok: false, error: "Eksik alan" };
   }
 
   const apiKey = process.env.RESEND_API_KEY;

@@ -1,22 +1,24 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
+import LangSwitcher from "./LangSwitcher";
+import type { Dict, Locale } from "@/dictionaries";
 
-const nav = [
-  { label: "Konaklama", href: "#konaklama" },
-  { label: "Restoran", href: "#restoran" },
-  { label: "Trysa", href: "#trysa" },
-  { label: "Galeri", href: "#galeri" },
-  { label: "SSS", href: "#sss" },
-  { label: "İletişim", href: "#iletisim" },
-];
+export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
+  const nav = [
+    { label: t.nav.konaklama, href: `/${lang}#konaklama` },
+    { label: t.nav.restoran, href: `/${lang}#restoran` },
+    { label: t.nav.trysa, href: `/${lang}#trysa` },
+    { label: t.nav.galeri, href: `/${lang}#galeri` },
+    { label: t.nav.sss, href: `/${lang}#sss` },
+    { label: t.nav.iletisim, href: `/${lang}#iletisim` },
+  ];
 
-export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-ivory/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 md:px-8">
         <Link
-          href="/"
+          href={`/${lang}`}
           className="font-display text-2xl font-bold tracking-wide text-pine"
         >
           TRYSA
@@ -31,11 +33,7 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-1 text-xs font-bold sm:flex">
-            <span className="rounded-full bg-pine px-2.5 py-1 text-ivory">TR</span>
-            <span className="px-1.5 py-1 text-muted">EN</span>
-            <span className="px-1.5 py-1 text-muted">DE</span>
-          </div>
+          <LangSwitcher current={lang} />
           <a
             href={site.whatsapp}
             target="_blank"
@@ -46,10 +44,10 @@ export default function Header() {
             <span className="hidden sm:inline">WhatsApp</span>
           </a>
           <Link
-            href="/rezervasyon"
+            href={`/${lang}/rezervasyon`}
             className="rounded-xl bg-clay px-4 py-2 text-sm font-bold text-white"
           >
-            Rezervasyon
+            {t.nav.rezervasyon}
           </Link>
         </div>
       </div>

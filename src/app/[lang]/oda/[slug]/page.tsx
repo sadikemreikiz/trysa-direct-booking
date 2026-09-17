@@ -4,26 +4,31 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
-import { stays, amenities } from "@/lib/site";
+import { stays } from "@/lib/site";
 import { getRoomPhotos } from "@/lib/roomPhotos";
+import { getDictionary, isLocale, defaultLocale, locales } from "@/dictionaries";
 
-type Params = { params: Promise<{ slug: string }> };
+type Params = { params: Promise<{ lang: string; slug: string }> };
 
 export function generateStaticParams() {
-  return stays.filter((s) => s.img).map((s) => ({ slug: s.slug }));
+  const rooms = stays.filter((s) => s.img);
+  return locales.flatMap((lang) => rooms.map((s) => ({ lang, slug: s.slug })));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
-  const { slug } = await params;
+  const { lang, slug } = await params;
+  const t = getDictionary(isLocale(lang) ? lang : defaultLocale);
   const room = stays.find((s) => s.slug === slug);
   return {
     title: room ? room.title : "Oda",
-    description: room?.desc,
+    description: room ? t.room.descs[room.slug] : undefined,
   };
 }
 
 export default async function RoomPage({ params }: Params) {
-  const { slug } = await params;
+  const { lang, slug } = await params;
+  if (!isLocale(lang)) notFound();
+  const t = getDictionary(lang);
   const room = stays.find((s) => s.slug === slug);
   if (!room || !room.img) notFound();
 
@@ -32,14 +37,14 @@ export default async function RoomPage({ params }: Params) {
 
   return (
     <>
-      <Header />
+      <Header t={t} lang={lang} />
       <main className="flex-1 pb-24 md:pb-0">
         <div className="mx-auto max-w-5xl px-5 py-8 md:px-8">
           <Link
-            href="/#konaklama"
+            href={`/${lang}#konaklama`}
             className="text-sm font-semibold text-muted hover:text-clay"
           >
-            ← Tüm odalar
+            {t.room.all}
           </Link>
 
           <div className="mt-4 flex flex-wrap items-end justify-between gap-3">
@@ -47,17 +52,16 @@ export default async function RoomPage({ params }: Params) {
               <h1 className="font-display text-3xl font-semibold text-pine md:text-4xl">
                 {room.title}
               </h1>
-              <p className="mt-1 text-muted">{room.desc}</p>
+              <p className="mt-1 text-muted">{t.room.descs[room.slug] ?? room.desc}</p>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted">gecelik</div>
+              <div className="text-sm text-muted">{t.room.gecelik}</div>
               <div className="font-display text-2xl font-bold text-pine">
                 {room.price}
               </div>
             </div>
           </div>
 
-          {/* Kapak */}
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -67,7 +71,6 @@ export default async function RoomPage({ params }: Params) {
             />
           )}
 
-          {/* Diğer fotoğraflar */}
           {rest.length > 0 && (
             <div className="mt-3 grid grid-cols-2 gap-3 md:grid-cols-3">
               {rest.map((src, i) => (
@@ -75,7 +78,7 @@ export default async function RoomPage({ params }: Params) {
                 <img
                   key={src}
                   src={src}
-                  alt={`${room.title} fotoğraf ${i + 2}`}
+                  alt={`${room.title} ${i + 2}`}
                   loading="lazy"
                   className="h-40 w-full rounded-xl object-cover md:h-52"
                 />
@@ -83,37 +86,33 @@ export default async function RoomPage({ params }: Params) {
             </div>
           )}
 
-          {/* Olanaklar */}
           <h2 className="mt-10 font-display text-2xl font-semibold text-pine">
-            Olanaklar
+            {t.room.amenitiesTitle}
           </h2>
           <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 rounded-2xl border border-line bg-white p-5 md:grid-cols-4 md:p-6">
-            {amenities.map((a) => (
+            {t.amenities.list.map((a) => (
               <div key={a} className="flex items-center gap-2 text-sm text-pine/90">
                 <span className="text-clay">•</span> {a}
               </div>
             ))}
           </div>
 
-          {/* CTA */}
           <div className="mt-8 rounded-2xl bg-clay p-6 text-center md:p-8">
             <h2 className="font-display text-2xl font-semibold text-white">
-              {room.title} için tarih uygun mu?
+              {room.title} {t.room.ctaTitle}
             </h2>
-            <p className="mt-1.5 text-sm text-[#fbe6d8]">
-              Talebini gönder, müsaitliği teyit edip dönelim.
-            </p>
+            <p className="mt-1.5 text-sm text-[#fbe6d8]">{t.room.ctaSub}</p>
             <Link
-              href="/rezervasyon"
+              href={`/${lang}/rezervasyon`}
               className="mt-4 inline-block rounded-xl bg-white px-8 py-3.5 text-base font-bold text-clay"
             >
-              Rezervasyon Talebi
+              {t.room.ctaBtn}
             </Link>
           </div>
         </div>
       </main>
-      <Footer />
-      <MobileBar />
+      <Footer t={t} />
+      <MobileBar t={t} lang={lang} />
     </>
   );
 }

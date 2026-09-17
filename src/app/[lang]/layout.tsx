@@ -1,0 +1,86 @@
+import type { Metadata } from "next";
+import { Fraunces, Manrope } from "next/font/google";
+import { SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
+import { locales, isLocale, getDictionary, defaultLocale } from "@/dictionaries";
+import "../globals.css";
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export function generateStaticParams() {
+  return locales.map((lang) => ({ lang }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  const loc = isLocale(lang) ? lang : defaultLocale;
+  const t = getDictionary(loc);
+  const title =
+    loc === "tr"
+      ? "Trysa — Demre'de doğada ahşap oda, tiny house & kamp"
+      : loc === "de"
+        ? "Trysa — Übernachten in der Natur in Demre, Antalya"
+        : "Trysa — Nature stay in Demre, Antalya (cabins, tiny house, camping)";
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: { default: title, template: "%s · Trysa" },
+    description: t.hero.subtitle,
+    alternates: {
+      canonical: `/${loc}`,
+      languages: { tr: "/tr", en: "/en", de: "/de" },
+    },
+    robots: SITE_INDEXABLE
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
+    openGraph: {
+      title,
+      description: t.hero.subtitle,
+      url: `${SITE_URL}/${loc}`,
+      siteName: "Trysa",
+      locale: loc === "tr" ? "tr_TR" : loc === "de" ? "de_DE" : "en_US",
+      type: "website",
+      images: [{ url: "/img/hero.jpg", width: 1200, height: 900, alt: "Trysa" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: t.hero.subtitle,
+      images: ["/img/hero.jpg"],
+    },
+  };
+}
+
+export default async function RootLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang } = await params;
+  const htmlLang = isLocale(lang) ? lang : defaultLocale;
+  return (
+    <html
+      lang={htmlLang}
+      className={`${fraunces.variable} ${manrope.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col bg-ivory text-ink">
+        {children}
+      </body>
+    </html>
+  );
+}

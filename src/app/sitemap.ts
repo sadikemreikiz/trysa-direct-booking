@@ -1,18 +1,13 @@
 import type { MetadataRoute } from "next";
 import { stays } from "@/lib/site";
 import { SITE_URL } from "@/lib/seo";
+import { locales } from "@/i18n-config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const pages = ["", "/menu", "/rezervasyon"].map((p) => ({
-    url: `${SITE_URL}${p}`,
-    lastModified: now,
-  }));
-  const rooms = stays
-    .filter((s) => s.img)
-    .map((s) => ({
-      url: `${SITE_URL}/oda/${s.slug}`,
-      lastModified: now,
-    }));
-  return [...pages, ...rooms];
+  const rooms = stays.filter((s) => s.img).map((s) => `/oda/${s.slug}`);
+  const paths = ["", "/menu", "/rezervasyon", ...rooms];
+  return locales.flatMap((l) =>
+    paths.map((p) => ({ url: `${SITE_URL}/${l}${p}`, lastModified: now })),
+  );
 }
