@@ -18,11 +18,13 @@ import {
   CtaBand,
 } from "@/components/sections";
 import { getGoogleReviews } from "@/lib/reviews";
+import JsonLd from "@/components/JsonLd";
 
 export default async function Home() {
   const googleReviews = await getGoogleReviews();
   return (
     <>
+      <JsonLd rating={googleReviews?.rating} count={googleReviews?.count} />
       <Header />
       <main className="flex-1 pb-20 md:pb-0">
         <Hero />
