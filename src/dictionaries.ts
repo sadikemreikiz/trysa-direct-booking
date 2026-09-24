@@ -207,6 +207,10 @@ const tr = {
     doneTitle: "Talebin hazır!",
     doneSub:
       "Son bir adım: talebini WhatsApp'tan bize ilet, en kısa sürede müsaitliği teyit edelim.",
+    doneTitleSent: "Talebini aldık!",
+    doneSubSent:
+      "Talebin bize ulaştı — en kısa sürede müsaitliği teyit edeceğiz. Dilersen WhatsApp'tan da hızlıca yazabilirsin.",
+    waOptional: "WhatsApp'tan da yaz",
     summaryTitle: "TALEBİNİN ÖZETİ",
     sumDate: "Tarih",
     sumGuests: "Kişi",
@@ -424,6 +428,10 @@ const en: Dict = {
     doneTitle: "Your request is ready!",
     doneSub:
       "One last step: send your request via WhatsApp and we'll confirm availability shortly.",
+    doneTitleSent: "We've got your request!",
+    doneSubSent:
+      "Your request reached us — we'll confirm availability shortly. You can also message us on WhatsApp for a faster reply.",
+    waOptional: "Also message on WhatsApp",
     summaryTitle: "YOUR REQUEST",
     sumDate: "Dates",
     sumGuests: "Guests",
@@ -639,6 +647,10 @@ const de: Dict = {
     doneTitle: "Deine Anfrage ist bereit!",
     doneSub:
       "Ein letzter Schritt: Sende deine Anfrage per WhatsApp, wir bestätigen die Verfügbarkeit in Kürze.",
+    doneTitleSent: "Wir haben deine Anfrage!",
+    doneSubSent:
+      "Deine Anfrage ist bei uns eingegangen — wir bestätigen die Verfügbarkeit in Kürze. Du kannst uns für eine schnellere Antwort auch per WhatsApp schreiben.",
+    waOptional: "Auch per WhatsApp schreiben",
     summaryTitle: "DEINE ANFRAGE",
     sumDate: "Daten",
     sumGuests: "Gäste",

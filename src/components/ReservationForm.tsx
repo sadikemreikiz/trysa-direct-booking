@@ -41,6 +41,7 @@ export default function ReservationForm({
   const [data, setData] = useState<ReservationInput>(empty);
   const [kvkk, setKvkk] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
+  const [emailed, setEmailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -74,9 +75,11 @@ export default function ReservationForm({
     }
     setStatus("sending");
     try {
-      await submitReservation(data);
+      const res = await submitReservation(data);
+      setEmailed(Boolean(res?.emailed));
     } catch {
       /* e-posta başarısız olsa da WhatsApp ile devam ederiz */
+      setEmailed(false);
     }
     setStatus("done");
   }
@@ -99,9 +102,11 @@ export default function ReservationForm({
           </svg>
         </div>
         <h1 className="font-display text-3xl font-semibold text-pine">
-          {t.reservation.doneTitle}
+          {emailed ? t.reservation.doneTitleSent : t.reservation.doneTitle}
         </h1>
-        <p className="mx-auto mt-3 max-w-sm text-muted">{t.reservation.doneSub}</p>
+        <p className="mx-auto mt-3 max-w-sm text-muted">
+          {emailed ? t.reservation.doneSubSent : t.reservation.doneSub}
+        </p>
 
         <div className="mx-auto mt-6 rounded-2xl border border-line bg-white p-5 text-left text-sm">
           <div className="mb-3 text-xs font-bold tracking-widest text-clay">
@@ -126,7 +131,7 @@ export default function ReservationForm({
           className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-6 py-4 text-base font-bold text-white"
         >
           <WhatsAppIcon className="h-5 w-5" />
-          {t.reservation.sendWhatsapp}
+          {emailed ? t.reservation.waOptional : t.reservation.sendWhatsapp}
         </a>
         <Link
           href={`/${lang}`}
