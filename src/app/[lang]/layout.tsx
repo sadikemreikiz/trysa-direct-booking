@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
 import { locales, isLocale, getDictionary, defaultLocale } from "@/dictionaries";
 import "../globals.css";
@@ -80,6 +81,8 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-ivory text-ink">
         {children}
+        {/* Ziyaretçi ölçümü (Vercel Web Analytics) — çerezsiz, sadece canlıda veri toplar */}
+        <Analytics />
       </body>
     </html>
   );
