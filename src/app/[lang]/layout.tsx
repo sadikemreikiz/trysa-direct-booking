@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import ClickTracker from "@/components/ClickTracker";
 import { SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
 import { locales, isLocale, getDictionary, defaultLocale } from "@/dictionaries";
 import "../globals.css";
@@ -83,6 +84,8 @@ export default async function RootLayout({
         {children}
         {/* Ziyaretçi ölçümü (Vercel Web Analytics) — çerezsiz, sadece canlıda veri toplar */}
         <Analytics />
+        {/* Dönüşüm ölçümü: WhatsApp / telefon tıklamaları → kendi veritabanımız */}
+        <ClickTracker />
       </body>
     </html>
   );

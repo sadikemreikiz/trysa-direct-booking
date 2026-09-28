@@ -8,13 +8,14 @@ import { rangeHasLockedDay } from "@/lib/availability";
 import { WhatsAppIcon } from "./icons";
 import type { Dict, Locale } from "@/dictionaries";
 
-const roomUnits = [
-  "Ambar-1",
-  "Ambar-2",
-  "Ambar-3",
-  "Kulübe-1",
-  "Kulübe-2",
-  "Tiny House",
+// Ekranda görünen ad → veritabanındaki kalıcı ünite kimliği (slug)
+const roomUnits: [label: string, slug: string][] = [
+  ["Ambar-1", "ambar-1"],
+  ["Ambar-2", "ambar-2"],
+  ["Ambar-3", "ambar-3"],
+  ["Kulübe-1", "kulube-1"],
+  ["Kulübe-2", "kulube-2"],
+  ["Tiny House", "tiny-house"],
 ];
 
 const empty: ReservationInput = {
@@ -42,13 +43,19 @@ export default function ReservationForm({
   const [kvkk, setKvkk] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [emailed, setEmailed] = useState(false);
+  const [reference, setReference] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
   const lockedDates = lockedByType[data.unit] ?? [];
   const dateBlocked = rangeHasLockedDay(data.checkin, data.checkout, lockedDates);
 
-  const units = [...roomUnits, t.reservation.unitKamp, t.reservation.uninameEmin];
+  const unitOptions: [label: string, slug: string][] = [
+    ...roomUnits,
+    [t.reservation.unitKamp, "kamp"],
+    [t.reservation.uninameEmin, ""],
+  ];
+  const units = unitOptions.map(([label]) => label);
 
   const fld =
     "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink outline-none focus:border-clay";
@@ -75,8 +82,15 @@ export default function ReservationForm({
     }
     setStatus("sending");
     try {
-      const res = await submitReservation(data);
-      setEmailed(Boolean(res?.emailed));
+      const unitSlug = unitOptions.find(([label]) => label === data.unit)?.[1] ?? "";
+      const res = await submitReservation(data, { unitSlug, locale: lang, consent: kvkk });
+      if (!res.ok) {
+        setError(res.error === "required" ? t.reservation.errRequired : t.reservation.errInvalid);
+        setStatus("idle");
+        return;
+      }
+      setEmailed(Boolean(res.emailed));
+      setReference(res.reference ?? null);
     } catch {
       /* e-posta başarısız olsa da WhatsApp ile devam ederiz */
       setEmailed(false);
@@ -121,7 +135,8 @@ export default function ReservationForm({
                 : ""
             }`}
           />
-          <Row k={t.reservation.sumStay} v={data.unit} last />
+          <Row k={t.reservation.sumStay} v={data.unit} last={!reference} />
+          {reference && <Row k={t.reservation.refLabel} v={reference} last />}
         </div>
 
         <a

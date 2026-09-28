@@ -25,6 +25,6 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // _next, API ve uzantılı dosyalar (sitemap.xml, robots.txt, /img/...) hariç
-  matcher: ["/((?!_next|.*\\..*).*)"],
+  // _next, /api ve uzantılı dosyalar (sitemap.xml, robots.txt, /img/...) hariç
+  matcher: ["/((?!_next|api/|.*\\..*).*)"],
 };
