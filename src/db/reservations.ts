@@ -12,6 +12,7 @@ import { z } from "zod";
 import type { Db } from "./index";
 import { analyticsEvents, outbox, reservationEvents, reservations, units } from "./schema";
 import type { EmailResult } from "@/lib/email";
+import type { PushMessage } from "@/lib/push";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_NIGHTS = 60;
@@ -115,16 +116,21 @@ export async function createReservation(
       actor: "guest",
     });
 
-    const [message] = await tx
+    // İki bağımsız bildirim: aileye e-posta + panel kullanıcılarının telefonuna bildirim.
+    // Ayrı satırlar oldukları için biri başarısız olursa sadece o tekrar denenir.
+    const [message, push] = await tx
       .insert(outbox)
-      .values({ kind: "reservation_notification", payload: { reservationId: reservation.id } })
+      .values([
+        { kind: "reservation_notification", payload: { reservationId: reservation.id } },
+        { kind: "reservation_push", payload: { reservationId: reservation.id } },
+      ])
       .returning({ id: outbox.id });
 
     await tx
       .insert(analyticsEvents)
       .values({ name: "reservation_submitted", path: `/${d.locale}/rezervasyon`, locale: d.locale });
 
-    return { reservation, outboxId: message.id };
+    return { reservation, outboxId: message.id, pushOutboxId: push.id };
   });
 }
 
@@ -140,6 +146,35 @@ export function backoffMs(attempts: number): number {
 }
 
 type Sender = (subject: string, text: string) => Promise<EmailResult>;
+
+/** Outbox türüne göre gönderim kanalları (testlerde sahte olarak verilir). */
+export type OutboxHandlers = {
+  email: Sender;
+  push: (message: PushMessage) => Promise<EmailResult>;
+};
+
+function shortDate(iso: string): string {
+  const [, m, d] = iso.split("-");
+  const months = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
+  return `${Number(d)} ${months[Number(m) - 1]}`;
+}
+
+/** Panel kullanıcılarının telefonuna gidecek kısa bildirim. */
+export async function buildReservationPush(db: Db, reservationId: string): Promise<PushMessage> {
+  const [row] = await db
+    .select({ r: reservations, unitName: units.name })
+    .from(reservations)
+    .leftJoin(units, eq(units.id, reservations.unitId))
+    .where(eq(reservations.id, reservationId));
+  if (!row) throw new Error(`Rezervasyon bulunamadı: ${reservationId}`);
+  const { r, unitName } = row;
+  const guests = r.adults + r.children;
+  return {
+    title: `🔔 Yeni talep · ${r.guestName}`,
+    body: `${unitName ?? "Oda seçmedi"} · ${shortDate(r.checkIn)} – ${shortDate(r.checkOut)} · ${guests} kişi`,
+    url: `/panel/talep/${r.id}`,
+  };
+}
 
 /** Rezervasyon satırından aileye gidecek e-postayı üretir. */
 export async function buildReservationEmail(db: Db, reservationId: string) {
@@ -180,7 +215,7 @@ export type DeliveryResult = "sent" | "retry_scheduled" | "failed" | "skipped";
 export async function deliverOutboxMessage(
   db: Db,
   id: number,
-  send: Sender,
+  handlers: OutboxHandlers,
   now: Date = new Date(),
 ): Promise<DeliveryResult> {
   const [claimed] = await db
@@ -196,8 +231,14 @@ export async function deliverOutboxMessage(
   let result: EmailResult;
   try {
     const { reservationId } = claimed.payload as { reservationId: string };
-    const email = await buildReservationEmail(db, reservationId);
-    result = await send(email.subject, email.text);
+    if (claimed.kind === "reservation_notification") {
+      const email = await buildReservationEmail(db, reservationId);
+      result = await handlers.email(email.subject, email.text);
+    } else if (claimed.kind === "reservation_push") {
+      result = await handlers.push(await buildReservationPush(db, reservationId));
+    } else {
+      result = { ok: false, error: `Bilinmeyen outbox türü: ${claimed.kind}` };
+    }
   } catch (e) {
     result = { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
@@ -223,7 +264,12 @@ export async function deliverOutboxMessage(
 }
 
 /** Zamanı gelmiş bekleyen mesajları sırayla gönderir (tekrar deneme taraması). */
-export async function deliverDueOutbox(db: Db, send: Sender, now: Date = new Date(), limit = 10) {
+export async function deliverDueOutbox(
+  db: Db,
+  handlers: OutboxHandlers,
+  now: Date = new Date(),
+  limit = 10,
+) {
   const due = await db
     .select({ id: outbox.id })
     .from(outbox)
@@ -231,6 +277,6 @@ export async function deliverDueOutbox(db: Db, send: Sender, now: Date = new Dat
     .orderBy(asc(outbox.nextAttemptAt))
     .limit(limit);
   const results: DeliveryResult[] = [];
-  for (const { id } of due) results.push(await deliverOutboxMessage(db, id, send, now));
+  for (const { id } of due) results.push(await deliverOutboxMessage(db, id, handlers, now));
   return results;
 }

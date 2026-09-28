@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { site } from "@/lib/site";
-import type { Dict } from "@/dictionaries";
+import type { Dict, Locale } from "@/dictionaries";
 
-export default function Footer({ t }: { t: Dict }) {
+export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
   return (
     <footer id="iletisim" className="mt-auto bg-ink px-5 py-10 text-[#c9cdbf] md:px-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
@@ -17,7 +18,10 @@ export default function Footer({ t }: { t: Dict }) {
             <div>Instagram: {site.instagramLabel}</div>
           </div>
           <div className="mt-4 text-xs text-[#6e7364]">
-            © {new Date().getFullYear()} Trysa · {t.footer.rights}
+            © {new Date().getFullYear()} Trysa ·{" "}
+            <Link href={`/${lang}/gizlilik`} className="underline hover:text-ivory">
+              {t.footer.rights}
+            </Link>
           </div>
         </div>
         <div className="w-full overflow-hidden rounded-xl md:w-72">

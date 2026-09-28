@@ -67,7 +67,7 @@ export default async function MenuPage({
           <p className="mt-6 text-xs text-muted/70">{t.menu.note}</p>
         </div>
       </main>
-      <Footer t={t} />
+      <Footer t={t} lang={lang} />
       <MobileBar t={t} lang={lang} />
     </>
   );

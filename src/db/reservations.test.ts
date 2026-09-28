@@ -8,6 +8,7 @@ import {
   deliverDueOutbox,
   deliverOutboxMessage,
   MAX_ATTEMPTS,
+  type OutboxHandlers,
   ReservationValidationError,
   type ReservationRequest,
 } from "./reservations";
@@ -185,12 +186,17 @@ describe("çift rezervasyon koruması (veritabanı kısıtı)", () => {
   });
 });
 
+/** Sahte gönderim kanalları: e-posta verilen fonksiyonla, bildirim varsayılan olarak başarılı. */
+function via(email: ReturnType<typeof vi.fn>, push = vi.fn().mockResolvedValue({ ok: true })) {
+  return { email, push } as unknown as OutboxHandlers;
+}
+
 describe("outbox teslimi", () => {
   it("başarılı gönderimde mesajı 'sent' yapar ve e-postada referans kodu olur", async () => {
     const { reservation, outboxId } = await createReservation(db, valid, { now: NOW });
     const send = vi.fn().mockResolvedValue({ ok: true });
 
-    expect(await deliverOutboxMessage(db, outboxId, send, NOW)).toBe("sent");
+    expect(await deliverOutboxMessage(db, outboxId, via(send), NOW)).toBe("sent");
 
     const [subject, text] = send.mock.calls[0];
     expect(subject).toContain(reservation.reference);
@@ -199,11 +205,38 @@ describe("outbox teslimi", () => {
     expect(row).toMatchObject({ status: "sent", attempts: 1, lastError: null });
   });
 
+  it("telefon bildirimi ayrı bir mesaj olarak panel linkiyle gider", async () => {
+    const { reservation, pushOutboxId } = await createReservation(db, valid, { now: NOW });
+    const email = vi.fn();
+    const push = vi.fn().mockResolvedValue({ ok: true });
+
+    expect(await deliverOutboxMessage(db, pushOutboxId, via(email, push), NOW)).toBe("sent");
+
+    expect(email).not.toHaveBeenCalled();
+    expect(push).toHaveBeenCalledWith({
+      title: "🔔 Yeni talep · Ayşe Yılmaz",
+      body: "Ambar-1 · 10 Kas – 12 Kas · 2 kişi",
+      url: `/panel/talep/${reservation.id}`,
+    });
+  });
+
+  it("e-posta başarısız olursa sadece e-posta tekrar denenir, bildirim etkilenmez", async () => {
+    const { outboxId, pushOutboxId } = await createReservation(db, valid, { now: NOW });
+    const failingEmail = vi.fn().mockResolvedValue({ ok: false, error: "Resend 500" });
+    const results = await deliverDueOutbox(db, via(failingEmail), NOW);
+    expect(results.sort()).toEqual(["retry_scheduled", "sent"]);
+
+    const rows = await db.select().from(outbox);
+    const byId = new Map(rows.map((r) => [r.id, r]));
+    expect(byId.get(outboxId)?.status).toBe("pending");
+    expect(byId.get(pushOutboxId)?.status).toBe("sent");
+  });
+
   it("başarısız gönderimi üstel beklemeyle yeniden planlar", async () => {
     const { outboxId } = await createReservation(db, valid, { now: NOW });
     const send = vi.fn().mockResolvedValue({ ok: false, error: "Resend 500" });
 
-    expect(await deliverOutboxMessage(db, outboxId, send, NOW)).toBe("retry_scheduled");
+    expect(await deliverOutboxMessage(db, outboxId, via(send), NOW)).toBe("retry_scheduled");
 
     const [row] = await db.select().from(outbox).where(eq(outbox.id, outboxId));
     expect(row.status).toBe("pending");
@@ -212,13 +245,13 @@ describe("outbox teslimi", () => {
   });
 
   it("zamanı gelmeden tekrar denemez, gelince dener", async () => {
-    const { outboxId } = await createReservation(db, valid, { now: NOW });
-    const fail = vi.fn().mockResolvedValue({ ok: false, error: "x" });
-    await deliverOutboxMessage(db, outboxId, fail, NOW);
-
+    const { outboxId, pushOutboxId } = await createReservation(db, valid, { now: NOW });
     const ok = vi.fn().mockResolvedValue({ ok: true });
-    expect(await deliverDueOutbox(db, ok, new Date(NOW.getTime() + 60_000))).toEqual([]);
-    expect(await deliverDueOutbox(db, ok, new Date(NOW.getTime() + backoffMs(1)))).toEqual(["sent"]);
+    await deliverOutboxMessage(db, pushOutboxId, via(ok), NOW);
+    await deliverOutboxMessage(db, outboxId, via(vi.fn().mockResolvedValue({ ok: false, error: "x" })), NOW);
+
+    expect(await deliverDueOutbox(db, via(ok), new Date(NOW.getTime() + 60_000))).toEqual([]);
+    expect(await deliverDueOutbox(db, via(ok), new Date(NOW.getTime() + backoffMs(1)))).toEqual(["sent"]);
   });
 
   it(`${MAX_ATTEMPTS} denemeden sonra 'failed' olarak bırakır`, async () => {
@@ -227,7 +260,7 @@ describe("outbox teslimi", () => {
     let t = NOW.getTime();
     const results = [];
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
-      results.push(await deliverOutboxMessage(db, outboxId, send, new Date(t)));
+      results.push(await deliverOutboxMessage(db, outboxId, via(send), new Date(t)));
       t += backoffMs(i + 1);
     }
     expect(results.at(-1)).toBe("failed");
@@ -240,10 +273,10 @@ describe("outbox teslimi", () => {
     const slow = vi.fn(
       () => new Promise<{ ok: true }>((r) => (release = () => r({ ok: true }))),
     );
-    const first = deliverOutboxMessage(db, outboxId, slow, NOW);
+    const first = deliverOutboxMessage(db, outboxId, via(slow), NOW);
     await vi.waitFor(() => expect(slow).toHaveBeenCalled());
 
-    expect(await deliverOutboxMessage(db, outboxId, slow, NOW)).toBe("skipped");
+    expect(await deliverOutboxMessage(db, outboxId, via(slow), NOW)).toBe("skipped");
     release();
     expect(await first).toBe("sent");
     expect(slow).toHaveBeenCalledTimes(1);

@@ -33,7 +33,7 @@ export default async function ReservationPage({
       <main className="flex-1 pb-24 md:pb-0">
         <ReservationForm t={t} lang={lang} lockedByType={lockedByType} />
       </main>
-      <Footer t={t} />
+      <Footer t={t} lang={lang} />
       <MobileBar t={t} lang={lang} />
     </>
   );

@@ -7,7 +7,8 @@ export default function robots(): MetadataRoute.Robots {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
   return {
-    rules: { userAgent: "*", allow: "/" },
+    // Yönetim paneli ve API arama motorlarına kapalı.
+    rules: { userAgent: "*", allow: "/", disallow: ["/panel", "/api/"] },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

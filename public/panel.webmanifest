@@ -1,0 +1,15 @@
+{
+  "name": "Trysa Panel",
+  "short_name": "Trysa",
+  "description": "Trysa rezervasyon talepleri",
+  "start_url": "/panel",
+  "scope": "/panel",
+  "display": "standalone",
+  "background_color": "#f6f1e7",
+  "theme_color": "#2c3a2e",
+  "lang": "tr",
+  "icons": [
+    { "src": "/panel-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/panel-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

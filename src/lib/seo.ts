@@ -1,6 +1,5 @@
-// Site adresi: alan adı alınınca NEXT_PUBLIC_SITE_URL env'ini o domaine çevir.
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://trysa-sadikemreikiz.vercel.app";
+// Site adresi (canlıda NEXT_PUBLIC_SITE_URL ile de ayarlı).
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trysacamping.com";
 
 // Google'a görünürlük: launch'ta SITE_INDEXABLE=true yap (Vercel env) → indexlenir.
 // Şimdilik kapalı (staging Google'da çıkmasın).

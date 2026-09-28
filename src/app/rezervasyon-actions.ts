@@ -9,6 +9,7 @@ import {
   ReservationValidationError,
 } from "@/db/reservations";
 import { sendNotificationEmail } from "@/lib/email";
+import { sendPushToStaff, type PushMessage } from "@/lib/push";
 import { reservationSummary, type ReservationInput } from "@/lib/reservation";
 import type { Locale } from "@/i18n-config";
 
@@ -37,15 +38,22 @@ export async function submitReservation(
   const db = getDb();
   if (db) {
     try {
-      const { reservation, outboxId } = await createReservation(db, {
+      const { reservation, outboxId, pushOutboxId } = await createReservation(db, {
         ...data,
         unit: meta.unitSlug,
         locale: meta.locale,
         consent: meta.consent as true,
       });
-      const delivery = await deliverOutboxMessage(db, outboxId, sendNotificationEmail);
+      const handlers = {
+        email: sendNotificationEmail,
+        push: (m: PushMessage) => sendPushToStaff(db, m),
+      };
+      const [delivery] = await Promise.all([
+        deliverOutboxMessage(db, outboxId, handlers),
+        deliverOutboxMessage(db, pushOutboxId, handlers),
+      ]);
       // Yanıt döndükten sonra: daha önce başarısız olmuş bildirimleri tekrar dene.
-      after(() => deliverDueOutbox(db, sendNotificationEmail).catch(console.error));
+      after(() => deliverDueOutbox(db, handlers).catch(console.error));
       return { ok: true, emailed: delivery === "sent", reference: reservation.reference };
     } catch (e) {
       if (e instanceof ReservationValidationError) {

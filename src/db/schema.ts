@@ -156,5 +156,115 @@ export const analyticsEvents = pgTable(
   ],
 );
 
+/* ------------------------------------------------------------------------ */
+/* Panel girişi — Better Auth çekirdek tabloları (isimler kütüphanenin beklediği gibi) */
+/* ------------------------------------------------------------------------ */
+
+const authTimestamps = {
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+};
+
+export const user = pgTable("user", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  image: text("image"),
+  ...authTimestamps,
+});
+
+export const session = pgTable(
+  "session",
+  {
+    id: text("id").primaryKey(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    token: text("token").notNull().unique(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    ...authTimestamps,
+  },
+  (t) => [index("session_user_idx").on(t.userId)],
+);
+
+export const account = pgTable(
+  "account",
+  {
+    id: text("id").primaryKey(),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    accessToken: text("access_token"),
+    refreshToken: text("refresh_token"),
+    idToken: text("id_token"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", { withTimezone: true }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", { withTimezone: true }),
+    scope: text("scope"),
+    password: text("password"),
+    ...authTimestamps,
+  },
+  (t) => [index("account_user_idx").on(t.userId)],
+);
+
+export const verification = pgTable(
+  "verification",
+  {
+    id: text("id").primaryKey(),
+    identifier: text("identifier").notNull(),
+    value: text("value").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    ...authTimestamps,
+  },
+  (t) => [index("verification_identifier_idx").on(t.identifier)],
+);
+
+/* ------------------------------------------------------------------------ */
+/* Panel yetkisi ve bildirimler                                              */
+/* ------------------------------------------------------------------------ */
+
+export const staffRole = pgEnum("staff_role", [
+  "admin", // her şeyi görür, erişim isteklerini onaylar (Emre)
+  "staff", // talepleri yönetir, sade görünüm (dayı)
+]);
+
+export const staffStatus = pgEnum("staff_status", ["pending", "approved", "revoked"]);
+
+/** Kim panele girebilir? Google girişi tek başına yetmez; burada onaylı olmak gerekir. */
+export const staff = pgTable("staff", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  role: staffRole("role").notNull().default("staff"),
+  status: staffStatus("status").notNull().default("pending"),
+  decidedBy: text("decided_by").references(() => user.id),
+  decidedAt: timestamp("decided_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Telefona bildirim (Web Push) abonelikleri — cihaz başına bir satır. */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull().unique(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("push_subscriptions_user_idx").on(t.userId)],
+);
+
 export type Reservation = typeof reservations.$inferSelect;
 export type Unit = typeof units.$inferSelect;
+export type StaffRole = (typeof staffRole.enumValues)[number];

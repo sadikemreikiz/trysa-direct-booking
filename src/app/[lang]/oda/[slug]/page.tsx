@@ -111,7 +111,7 @@ export default async function RoomPage({ params }: Params) {
           </div>
         </div>
       </main>
-      <Footer t={t} />
+      <Footer t={t} lang={lang} />
       <MobileBar t={t} lang={lang} />
     </>
   );

@@ -52,7 +52,7 @@ export default async function Home({
         <Faq t={t} />
         <CtaBand t={t} lang={lang} />
       </main>
-      <Footer t={t} />
+      <Footer t={t} lang={lang} />
       <MobileBar t={t} lang={lang} />
     </>
   );

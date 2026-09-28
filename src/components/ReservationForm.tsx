@@ -309,7 +309,12 @@ export default function ReservationForm({
             checked={kvkk}
             onChange={(e) => setKvkk(e.target.checked)}
           />
-          <span>{t.reservation.kvkk}</span>
+          <span>
+            {t.reservation.kvkk}{" "}
+            <Link href={`/${lang}/gizlilik`} target="_blank" className="underline">
+              {t.footer.rights}
+            </Link>
+          </span>
         </label>
 
         {error && (
