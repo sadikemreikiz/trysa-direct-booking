@@ -156,6 +156,16 @@ export const analyticsEvents = pgTable(
   ],
 );
 
+/**
+ * Kötüye kullanım sınırı (spam koruması): anahtar başına sabit pencerede sayaç.
+ * Anahtar IP'nin kendisi değil, gizli anahtarla alınmış özetidir (HMAC); satırlar 2 gün sonra silinir.
+ */
+export const rateLimits = pgTable("rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
+});
+
 /* ------------------------------------------------------------------------ */
 /* Panel girişi — Better Auth çekirdek tabloları (isimler kütüphanenin beklediği gibi) */
 /* ------------------------------------------------------------------------ */

@@ -5,7 +5,7 @@
  */
 import type { Locale } from "@/i18n-config";
 
-export const PRIVACY_UPDATED = "2026-09-28";
+export const PRIVACY_UPDATED = "2026-09-30";
 export const PRIVACY_CONTACT = "trysarestaurantcamping@gmail.com";
 
 type Section = { h: string; p: string[] };
@@ -23,6 +23,7 @@ export const privacy: Record<Locale, Privacy> = {
         p: [
           "Rezervasyon formu: ad soyad, telefon numarası, isteğe bağlı e-posta adresi, konaklama tarihleri, kişi sayısı, seçilen konaklama ve varsa notunuz. Ayrıca onay verdiğiniz an ve formu hangi dilde doldurduğunuz kaydedilir.",
           "Site kullanımı: çerez kullanmayan, kimliğinizi belirlemeyen ziyaret istatistikleri (hangi sayfaların görüntülendiği, ülke, cihaz türü) ve WhatsApp / telefon butonlarına tıklanma sayısı. IP adresinizi veya cihaz kimliğinizi bu amaçla saklamıyoruz.",
+          "Kötüye kullanımı (spam) önlemek: formu ve butonları aşırı sık kullanan otomatik programları durdurmak için IP adresinizin geri çevrilemeyen şifreli bir özeti en fazla 2 gün tutulur, sonra silinir. IP adresinizin kendisi saklanmaz ve bu kayıt başka bir amaçla kullanılmaz (hukuki sebep: meşru menfaat).",
         ],
       },
       {
@@ -70,6 +71,7 @@ export const privacy: Record<Locale, Privacy> = {
         p: [
           "Booking form: your name, phone number, optional email address, travel dates, number of guests, chosen accommodation and any note you add. We also record when you gave consent and the language you used.",
           "Site usage: cookie-free statistics that do not identify you (pages viewed, country, device type) and how often the WhatsApp / phone buttons are tapped. We do not store your IP address or device ID for this.",
+          "Abuse (spam) prevention: to stop automated programs that submit the form or tap the buttons excessively, a non-reversible encrypted digest of your IP address is kept for at most 2 days and then deleted. Your IP address itself is not stored and this record is not used for any other purpose (legal basis: legitimate interest).",
         ],
       },
       {
@@ -117,6 +119,7 @@ export const privacy: Record<Locale, Privacy> = {
         p: [
           "Buchungsformular: Name, Telefonnummer, optional E-Mail-Adresse, Reisedaten, Personenzahl, gewählte Unterkunft und deine Nachricht. Außerdem speichern wir den Zeitpunkt deiner Einwilligung und die verwendete Sprache.",
           "Nutzung der Website: cookiefreie Statistiken ohne Personenbezug (aufgerufene Seiten, Land, Gerätetyp) sowie die Anzahl der Klicks auf WhatsApp / Telefon. IP-Adressen oder Geräte-IDs speichern wir dafür nicht.",
+          "Schutz vor Missbrauch (Spam): Um automatisierte Programme zu stoppen, die das Formular oder die Buttons übermäßig nutzen, wird ein nicht umkehrbarer verschlüsselter Hashwert deiner IP-Adresse höchstens 2 Tage gespeichert und dann gelöscht. Deine IP-Adresse selbst wird nicht gespeichert und dieser Eintrag für keinen anderen Zweck verwendet (Rechtsgrundlage: berechtigtes Interesse).",
         ],
       },
       {

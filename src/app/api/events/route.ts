@@ -1,9 +1,14 @@
 import { getDb } from "@/db";
 import { clientEventSchema, recordClientEvent } from "@/db/analytics";
+import { hitRateLimit } from "@/db/rate-limit";
+import { clientKey } from "@/lib/client-key";
+
+/** Aynı kişiden saatte en fazla bu kadar olay sayılır (bot istatistikleri şişirmesin). */
+const EVENTS_PER_HOUR = 30;
 
 /**
  * Dönüşüm olayı toplama (WhatsApp / telefon tıklaması). navigator.sendBeacon ile çağrılır.
- * Kişisel veri saklanmaz; bilinmeyen olay adları reddedilir.
+ * Kişisel veri saklanmaz; bilinmeyen olay adları reddedilir. Sınır aşılırsa olay sessizce sayılmaz.
  */
 export async function POST(request: Request) {
   const body = await request.text();
@@ -21,7 +26,10 @@ export async function POST(request: Request) {
   const db = getDb();
   if (db) {
     try {
-      await recordClientEvent(db, parsed.data);
+      const key = `ev:${clientKey(request.headers)}`;
+      if (await hitRateLimit(db, key, { limit: EVENTS_PER_HOUR, windowMs: 3_600_000 })) {
+        await recordClientEvent(db, parsed.data);
+      }
     } catch (e) {
       console.error("Ölçüm olayı yazılamadı", e);
     }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { submitReservation } from "@/app/rezervasyon-actions";
 import { whatsappUrl, type ReservationInput } from "@/lib/reservation";
@@ -45,6 +45,9 @@ export default function ReservationForm({
   const [emailed, setEmailed] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Bot tuzakları: gizli alan + formun ne kadar sürede doldurulduğu
+  const [hp, setHp] = useState("");
+  const openedAt = useRef<number | null>(null);
 
   const today = new Date().toISOString().slice(0, 10);
   const lockedDates = lockedByType[data.unit] ?? [];
@@ -83,14 +86,21 @@ export default function ReservationForm({
     setStatus("sending");
     try {
       const unitSlug = unitOptions.find(([label]) => label === data.unit)?.[1] ?? "";
-      const res = await submitReservation(data, { unitSlug, locale: lang, consent: kvkk });
+      const res = await submitReservation(data, {
+        unitSlug,
+        locale: lang,
+        consent: kvkk,
+        trap: { hp, elapsedMs: openedAt.current ? Date.now() - openedAt.current : 0 },
+      });
       if (!res.ok) {
         setError(
           res.error === "required"
             ? t.reservation.errRequired
             : res.error === "blocked"
               ? t.reservation.blockedMsg
-              : t.reservation.errInvalid,
+              : res.error === "rate_limited"
+                ? t.reservation.errRateLimited
+                : t.reservation.errInvalid,
         );
         setStatus("idle");
         return;
@@ -181,8 +191,25 @@ export default function ReservationForm({
 
       <form
         onSubmit={onSubmit}
+        onFocus={() => {
+          openedAt.current ??= Date.now();
+        }}
         className="mt-6 space-y-4 rounded-2xl border border-line bg-white p-5 md:p-7"
       >
+        {/* Gizli alan: insanlar görmez, botlar doldurur. */}
+        <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+          <label>
+            Website
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={hp}
+              onChange={(e) => setHp(e.target.value)}
+            />
+          </label>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block">
             <span className={lbl}>{t.reservation.checkin}</span>
