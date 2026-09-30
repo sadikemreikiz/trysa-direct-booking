@@ -162,7 +162,7 @@ type Sender = (subject: string, text: string) => Promise<EmailResult>;
 export type OutboxHandlers = {
   email: Sender;
   push: (message: PushMessage) => Promise<EmailResult>;
-  guestEmail: (to: string, subject: string, text: string) => Promise<EmailResult>;
+  guestEmail: (to: string, subject: string, text: string, html?: string) => Promise<EmailResult>;
 };
 
 function shortDate(iso: string): string {
@@ -258,7 +258,7 @@ export async function deliverOutboxMessage(
         result = { ok: true }; // e-posta silinmiş (ör. saklama süresi) — gönderilecek bir şey yok
       } else {
         const ack = buildGuestAck({ ...row.r, unitName: row.unitName });
-        result = await handlers.guestEmail(row.r.email, ack.subject, ack.text);
+        result = await handlers.guestEmail(row.r.email, ack.subject, ack.text, ack.html);
       }
     } else {
       result = { ok: false, error: `Bilinmeyen outbox türü: ${claimed.kind}` };

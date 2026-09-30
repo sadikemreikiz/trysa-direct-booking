@@ -20,7 +20,13 @@ export function guestEmailEnabled(): boolean {
   return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM);
 }
 
-async function sendEmail(message: { to: string; subject: string; text: string; replyTo?: string }): Promise<EmailResult> {
+async function sendEmail(message: {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  replyTo?: string;
+}): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return { ok: false, error: "RESEND_API_KEY tanımlı değil" };
 
@@ -36,6 +42,7 @@ async function sendEmail(message: { to: string; subject: string; text: string; r
         to: [message.to],
         subject: message.subject,
         text: message.text,
+        ...(message.html ? { html: message.html } : {}),
         ...(message.replyTo ? { reply_to: message.replyTo } : {}),
       }),
     });
@@ -52,7 +59,7 @@ export function sendNotificationEmail(subject: string, text: string): Promise<Em
 }
 
 /** Misafire e-posta; cevaplarsa aileye gider. */
-export function sendGuestEmail(to: string, subject: string, text: string): Promise<EmailResult> {
+export function sendGuestEmail(to: string, subject: string, text: string, html?: string): Promise<EmailResult> {
   if (!guestEmailEnabled()) return Promise.resolve({ ok: false, error: "RESEND_FROM tanımlı değil" });
-  return sendEmail({ to, subject, text, replyTo: familyAddress() });
+  return sendEmail({ to, subject, text, html, replyTo: familyAddress() });
 }

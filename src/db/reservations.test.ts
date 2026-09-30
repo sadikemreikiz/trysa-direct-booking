@@ -308,10 +308,28 @@ describe("misafire talep e-postası", () => {
     const handlers = via(vi.fn(), undefined, guestEmail);
 
     expect(await deliverOutboxMessage(db, guestAckOutboxId!, handlers, NOW)).toBe("sent");
-    const [to, subject, text] = guestEmail.mock.calls[0];
+    const [to, subject, text, html] = guestEmail.mock.calls[0];
     expect(to).toBe("hans@example.com");
     expect(subject).toContain(reservation.reference);
     expect(text).toMatch(/^Hallo Hans,/);
     expect(text).toContain("noch keine Bestätigung");
+    expect(text).toContain("https://trysacamping.com/anfahrt");
+    // Markalı HTML: logo, misafirin dili, yol tarifi düğmesi
+    expect(html).toContain('<html lang="de">');
+    expect(html).toContain("/email-logo.png");
+    expect(html).toContain('href="https://trysacamping.com/anfahrt"');
+  });
+
+  it("HTML e-postada misafirin yazdığı ad kaçışlanır (HTML enjeksiyonu yok)", async () => {
+    const { guestAckOutboxId } = await createReservation(
+      db,
+      { ...valid, name: '<img src=x onerror="alert(1)">', email: "x@example.com" },
+      { now: NOW, guestAck: true },
+    );
+    const guestEmail = vi.fn().mockResolvedValue({ ok: true });
+    await deliverOutboxMessage(db, guestAckOutboxId!, via(vi.fn(), undefined, guestEmail), NOW);
+    const html: string = guestEmail.mock.calls[0][3];
+    expect(html).not.toContain("<img src=x");
+    expect(html).toContain("&lt;img");
   });
 });
