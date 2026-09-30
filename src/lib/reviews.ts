@@ -2,8 +2,10 @@
  * Google Places API (New) ile gerçek Google yorumlarını çeker.
  * Env: GOOGLE_PLACES_API_KEY (gerekli), GOOGLE_PLACE_ID (opsiyonel; yoksa isimden bulunur).
  * Anahtar yoksa null döner → site statik örnek yorumlara düşer.
- * Google API en fazla ~5 öne çıkan yorum verir; saatte bir yenilenir.
+ * Google API en fazla ~5 öne çıkan yorum verir; günde bir yenilenir.
  */
+import type { Locale } from "@/i18n-config";
+import { site } from "./site";
 
 export type GoogleReview = {
   author: string;
@@ -55,6 +57,27 @@ async function resolvePlaceId(): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+export type RatingSummary = { rating: number; count: number };
+
+/** Sitede gösterilen puan ve yorum sayısı: Google'dan canlı, ulaşılamazsa son bilinen değer. */
+export async function getRatingSummary(): Promise<RatingSummary> {
+  const google = await getGoogleReviews();
+  if (google && google.count > 0) return { rating: google.rating, count: google.count };
+  return site.ratingFallback;
+}
+
+/** "4,9" (tr/de) veya "4.9" (en) */
+export function formatRating(rating: number, lang: Locale): string {
+  return new Intl.NumberFormat(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(rating);
+}
+
+/** Metindeki {rating} ve {count} yerlerini doldurur. */
+export function fillRating(template: string, summary: RatingSummary, lang: Locale): string {
+  return template
+    .replaceAll("{rating}", formatRating(summary.rating, lang))
+    .replaceAll("{count}", new Intl.NumberFormat(lang).format(summary.count));
 }
 
 export async function getGoogleReviews(): Promise<GoogleReviewsData | null> {

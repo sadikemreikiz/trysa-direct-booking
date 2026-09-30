@@ -69,7 +69,7 @@ const tr = {
   },
   restaurant: {
     title: "Restoran",
-    sub: "292 yorumun geldiği mutfak — misafirlere ve dışarıya açık.",
+    sub: "{count} yorumun geldiği mutfak — misafirlere ve dışarıya açık.",
     kicker: "LİKYA SOFRASI",
     h: "Ocakbaşı & ev yemekleri",
     desc: "Köy tavuğu, ızgaralar, taze balık, serpme kahvaltı ve gözleme. Açık hava bölümünde, doğanın içinde.",
@@ -181,7 +181,7 @@ const tr = {
     title: "Rezervasyon Talebi",
     intro:
       "Tarihlerini ve birkaç bilgini bırak, en kısa sürede biz dönelim. Bu bir ön talep — onayımızla kesinleşir, şimdi ödeme yok.",
-    chipReviews: "★ 4,9 · 292 yorum",
+    chipReviews: "★ {rating} · {count} yorum",
     chipNoFee: "Komisyonsuz",
     checkin: "Giriş tarihi",
     checkout: "Çıkış tarihi",
@@ -293,7 +293,7 @@ const en: Dict = {
   },
   restaurant: {
     title: "Restaurant",
-    sub: "The kitchen behind our 292 reviews — open to guests and visitors.",
+    sub: "The kitchen behind our {count} reviews — open to guests and visitors.",
     kicker: "LYCIAN TABLE",
     h: "Grill & home cooking",
     desc: "Free-range chicken, grills, fresh fish, Turkish breakfast and gözleme. In the open-air section, surrounded by nature.",
@@ -405,7 +405,7 @@ const en: Dict = {
     title: "Booking request",
     intro:
       "Leave your dates and a few details and we'll get back to you shortly. This is a pre-request — confirmed once we approve, no payment now.",
-    chipReviews: "★ 4.9 · 292 reviews",
+    chipReviews: "★ {rating} · {count} reviews",
     chipNoFee: "No commission",
     checkin: "Check-in",
     checkout: "Check-out",
@@ -515,7 +515,7 @@ const de: Dict = {
   },
   restaurant: {
     title: "Restaurant",
-    sub: "Die Küche hinter unseren 292 Bewertungen — für Gäste und Besucher.",
+    sub: "Die Küche hinter unseren {count} Bewertungen — für Gäste und Besucher.",
     kicker: "LYKISCHE KÜCHE",
     h: "Grill & Hausmannskost",
     desc: "Freilandhähnchen, Grillgerichte, frischer Fisch, türkisches Frühstück und Gözleme. Im Außenbereich, mitten in der Natur.",
@@ -627,7 +627,7 @@ const de: Dict = {
     title: "Buchungsanfrage",
     intro:
       "Hinterlasse deine Daten und ein paar Angaben, wir melden uns schnellstmöglich. Dies ist eine Voranfrage — mit unserer Bestätigung verbindlich, jetzt keine Zahlung.",
-    chipReviews: "★ 4,9 · 292 Bewertungen",
+    chipReviews: "★ {rating} · {count} Bewertungen",
     chipNoFee: "Keine Provision",
     checkin: "Anreise",
     checkout: "Abreise",

@@ -19,7 +19,7 @@ import {
   Faq,
   CtaBand,
 } from "@/components/sections";
-import { getGoogleReviews } from "@/lib/reviews";
+import { getGoogleReviews, getRatingSummary } from "@/lib/reviews";
 import { getDictionary, isLocale } from "@/dictionaries";
 
 export default async function Home({
@@ -30,20 +30,20 @@ export default async function Home({
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
-  const googleReviews = await getGoogleReviews();
+  const [googleReviews, rating] = await Promise.all([getGoogleReviews(), getRatingSummary()]);
 
   return (
     <>
       <JsonLd rating={googleReviews?.rating} count={googleReviews?.count} />
       <Header t={t} lang={lang} />
       <main className="flex-1 pb-20 md:pb-0">
-        <Hero t={t} />
+        <Hero t={t} lang={lang} rating={rating} />
         <BookingBar t={t} lang={lang} />
-        <TwoPath t={t} lang={lang} />
+        <TwoPath t={t} lang={lang} rating={rating} />
         <WhyDirect t={t} />
         <Accommodation t={t} lang={lang} />
         <Amenities t={t} />
-        <Restaurant t={t} lang={lang} />
+        <Restaurant t={t} lang={lang} rating={rating} />
         <Gallery t={t} />
         <TrysaStory t={t} />
         <Experiences t={t} />

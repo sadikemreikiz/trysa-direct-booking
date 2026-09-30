@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import ReservationForm from "@/components/ReservationForm";
 import { getGuestLockedDates } from "@/lib/guest-availability";
+import { fillRating, getRatingSummary } from "@/lib/reviews";
 import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
 
 export async function generateMetadata({
@@ -25,13 +26,18 @@ export default async function ReservationPage({
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
-  const lockedByType = await getGuestLockedDates();
+  const [lockedByType, rating] = await Promise.all([getGuestLockedDates(), getRatingSummary()]);
 
   return (
     <>
       <Header t={t} lang={lang} />
       <main className="flex-1 pb-24 md:pb-0">
-        <ReservationForm t={t} lang={lang} lockedByType={lockedByType} />
+        <ReservationForm
+          t={t}
+          lang={lang}
+          lockedByType={lockedByType}
+          reviewsChip={fillRating(t.reservation.chipReviews, rating, lang)}
+        />
       </main>
       <Footer t={t} lang={lang} />
       <MobileBar t={t} lang={lang} />

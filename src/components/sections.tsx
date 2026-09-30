@@ -1,12 +1,13 @@
 import { site, stays, galleryImages } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
 import type { Dict, Locale } from "@/dictionaries";
-import type { GoogleReviewsData } from "@/lib/reviews";
+import { fillRating, formatRating, type GoogleReviewsData, type RatingSummary } from "@/lib/reviews";
 
 const container = "mx-auto max-w-6xl px-5 md:px-8";
 
 type T = { t: Dict };
 type TL = { t: Dict; lang: Locale };
+type TLR = TL & { rating: RatingSummary };
 
 function Photo({
   label,
@@ -40,7 +41,7 @@ function Stars({ className = "" }: { className?: string }) {
 }
 
 /* ---------- HERO ---------- */
-export function Hero({ t }: T) {
+export function Hero({ t, lang, rating }: TLR) {
   return (
     <section className="relative overflow-hidden bg-pine">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -63,9 +64,9 @@ export function Hero({ t }: T) {
         <div className="mt-6 flex flex-wrap items-center gap-2.5">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5">
             <Stars className="text-sm" />
-            <span className="text-sm font-bold text-ivory">{site.rating}</span>
+            <span className="text-sm font-bold text-ivory">{formatRating(rating.rating, lang)}</span>
             <span className="text-xs text-[#b9c0ac]">
-              · {site.reviewCount} {t.hero.reviewsSuffix}
+              · {fillRating("{count}", rating, lang)} {t.hero.reviewsSuffix}
             </span>
           </div>
           {site.superhost && (
@@ -116,7 +117,7 @@ export function BookingBar({ t, lang }: TL) {
 }
 
 /* ---------- İKİ YOL ---------- */
-export function TwoPath({ t, lang }: TL) {
+export function TwoPath({ t, lang, rating }: TLR) {
   return (
     <section className={`${container} pt-8`}>
       <div className="grid gap-4 md:grid-cols-2 md:gap-7">
@@ -149,7 +150,7 @@ export function TwoPath({ t, lang }: TL) {
           <div className="relative h-48">
             <Photo label="ocakbaşı" tone="#4a5a45" className="h-full" labelDark />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-gold px-3 py-1.5 text-[11px] font-extrabold text-[#3a2e0a]">
-              ★ {site.rating} · {site.reviewCount} {t.twoPath.reviewsWord}
+              ★ {fillRating("{rating} · {count}", rating, lang)} {t.twoPath.reviewsWord}
             </span>
           </div>
           <div className="p-6 md:p-7">
@@ -240,11 +241,11 @@ export function Amenities({ t }: T) {
 }
 
 /* ---------- RESTORAN ---------- */
-export function Restaurant({ t, lang }: TL) {
+export function Restaurant({ t, lang, rating }: TLR) {
   return (
     <section id="restoran" className={`${container} scroll-mt-20 pt-10`}>
       <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.restaurant.title}</h2>
-      <p className="mt-1 text-muted md:text-[15px]">{t.restaurant.sub}</p>
+      <p className="mt-1 text-muted md:text-[15px]">{fillRating(t.restaurant.sub, rating, lang)}</p>
       <div className="mt-5 overflow-hidden rounded-2xl bg-pine md:flex">
         <div className="p-6 md:flex-1 md:p-11">
           <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#c99a63]">{t.restaurant.kicker}</div>

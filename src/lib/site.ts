@@ -7,8 +7,8 @@ export const site = {
   instagram: "https://instagram.com/trysarestaurant",
   instagramLabel: "@trysarestaurant",
   address: "Davazlar, Gölbaşı Mevkii, 07572 Demre / Antalya",
-  rating: "4,9",
-  reviewCount: 292,
+  /** Google puanı canlı gelir (lib/reviews); bu sadece Google'a ulaşılamazsa gösterilen son bilinen değer (2026-09-30). */
+  ratingFallback: { rating: 4.9, count: 292 },
   superhost: true, // Airbnb Superhost rozeti — teyit edilince kalır; değilse false yap
 };
 

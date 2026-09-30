@@ -34,10 +34,13 @@ export default function ReservationForm({
   t,
   lang,
   lockedByType = {},
+  reviewsChip,
 }: {
   t: Dict;
   lang: Locale;
   lockedByType?: Record<string, string[]>;
+  /** Google puanı ve yorum sayısı, ör. "★ 4,9 · 292 yorum" (sunucuda doldurulur) */
+  reviewsChip: string;
 }) {
   const [data, setData] = useState<ReservationInput>(empty);
   const [kvkk, setKvkk] = useState(false);
@@ -182,7 +185,7 @@ export default function ReservationForm({
       <p className="mt-2 max-w-xl text-muted">{t.reservation.intro}</p>
       <div className="mt-4 flex flex-wrap gap-2">
         <span className="rounded-full bg-[#f7e7c4] px-3 py-1.5 text-xs font-bold text-[#7a5a1e]">
-          {t.reservation.chipReviews}
+          {reviewsChip}
         </span>
         <span className="rounded-full bg-[#e4eadd] px-3 py-1.5 text-xs font-bold text-pine">
           {t.reservation.chipNoFee}
