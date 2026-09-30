@@ -6,9 +6,13 @@ import {
   availabilityForRange,
   cancelReservation,
   confirmReservation,
+  createManualReservation,
   declineReservation,
   getReservationDetail,
+  ManualReservationError,
   TransitionError,
+  type ManualReservationInput,
+  type UnitAvailability,
 } from "@/db/panel";
 import { AuthorizationError, decideAccess } from "@/db/staff";
 import { getLockedDatesByType } from "@/lib/availability";
@@ -66,6 +70,51 @@ export async function confirmAction(id: string, unitId: number, note: string): P
   const result = await run(id, () => confirmReservation(db, id, staff.userId, unitId, { note }));
   refreshGuestForm();
   return result;
+}
+
+/** Elle ekleme formu: seçilen tarihlerde hangi odalar boş? */
+export async function availabilityAction(checkIn: string, checkOut: string): Promise<UnitAvailability[]> {
+  const { db } = await requireApprovedStaff();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(checkIn) || !/^\d{4}-\d{2}-\d{2}$/.test(checkOut) || checkOut <= checkIn) {
+    return [];
+  }
+  return availabilityForRange(db, checkIn, checkOut, await getLockedDatesByType());
+}
+
+export async function createManualAction(
+  input: ManualReservationInput,
+): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
+  const { db, staff } = await requireApprovedStaff();
+
+  const availability = await availabilityForRange(db, input.checkIn, input.checkOut, await getLockedDatesByType());
+  const unit = availability.find((u) => u.id === input.unitId);
+  if (!unit) return { ok: false, error: MESSAGES.unit_required };
+  if (!unit.free) {
+    return {
+      ok: false,
+      error: unit.reason === "airbnb" ? "Bu oda bu tarihlerde Airbnb'de dolu." : MESSAGES.conflict,
+    };
+  }
+
+  try {
+    const reservation = await createManualReservation(db, staff.userId, input);
+    revalidatePath("/panel");
+    refreshGuestForm();
+    return { ok: true, id: reservation.id };
+  } catch (e) {
+    if (e instanceof ManualReservationError) {
+      return {
+        ok: false,
+        error:
+          e.code === "conflict"
+            ? MESSAGES.conflict
+            : e.code === "unit_unknown"
+              ? MESSAGES.unit_required
+              : "Bilgilerde eksik var: tarih, oda ve misafir adı gerekli.",
+      };
+    }
+    throw e;
+  }
 }
 
 export async function declineAction(id: string, note: string): Promise<ActionResult> {

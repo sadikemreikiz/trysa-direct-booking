@@ -6,7 +6,9 @@
  * anda işlem yaparsa ikincisi "zaten işlendi" hatası alır, veri tutarlı kalır.
  */
 import { and, asc, desc, eq, gte, inArray, lt, gt, ne } from "drizzle-orm";
+import { z } from "zod";
 import type { Db } from "./index";
+import { generateReference } from "./reservations";
 import { reservationEvents, reservations, units, user, type Reservation } from "./schema";
 
 export type ReservationStatus = Reservation["status"];
@@ -222,6 +224,95 @@ export function cancelReservation(
   opts: { note?: string; now?: Date } = {},
 ) {
   return transition(db, id, "cancelled", actorUserId, opts);
+}
+
+/* ------------------------- Elle rezervasyon ekleme ------------------------ */
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Telefonla / WhatsApp'tan / kapıdan gelen rezervasyon — panelden doğrudan onaylı girilir. */
+export const manualReservationSchema = z
+  .object({
+    unitId: z.number().int().positive(),
+    checkIn: z.string().regex(ISO_DATE),
+    checkOut: z.string().regex(ISO_DATE),
+    adults: z.number().int().min(1).max(20),
+    children: z.number().int().min(0).max(20),
+    guestName: z.string().trim().min(1).max(120),
+    /** Kapıdan gelen misafir telefon vermeyebilir */
+    phone: z.string().trim().max(40),
+    note: z.string().trim().max(2000),
+    source: z.enum(["phone", "whatsapp", "walk_in"]),
+  })
+  .refine((d) => d.checkOut > d.checkIn, { path: ["checkOut"], message: "checkout_before_checkin" })
+  .refine((d) => (Date.parse(d.checkOut) - Date.parse(d.checkIn)) / 86_400_000 <= 60, {
+    path: ["checkOut"],
+    message: "stay_too_long",
+  });
+
+export type ManualReservationInput = z.input<typeof manualReservationSchema>;
+
+export class ManualReservationError extends Error {
+  constructor(public readonly code: "invalid" | "conflict" | "unit_unknown") {
+    super(code);
+  }
+}
+
+export async function createManualReservation(
+  db: Db,
+  actorUserId: string,
+  raw: ManualReservationInput,
+  opts: { now?: Date } = {},
+) {
+  const now = opts.now ?? new Date();
+  const parsed = manualReservationSchema.safeParse(raw);
+  if (!parsed.success) throw new ManualReservationError("invalid");
+  const d = parsed.data;
+
+  try {
+    return await db.transaction(async (tx) => {
+      const [unit] = await tx
+        .select({ id: units.id })
+        .from(units)
+        .where(and(eq(units.id, d.unitId), eq(units.isActive, true)));
+      if (!unit) throw new ManualReservationError("unit_unknown");
+
+      const [reservation] = await tx
+        .insert(reservations)
+        .values({
+          reference: generateReference(),
+          unitId: d.unitId,
+          checkIn: d.checkIn,
+          checkOut: d.checkOut,
+          adults: d.adults,
+          children: d.children,
+          guestName: d.guestName,
+          phone: d.phone,
+          note: d.note || null,
+          locale: "tr",
+          source: d.source,
+          status: "confirmed",
+          // Misafir verisini işletme doğrudan aldı (sözleşme ilişkisi); kayıt anı.
+          consentAt: now,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .returning();
+
+      await tx.insert(reservationEvents).values({
+        reservationId: reservation.id,
+        type: "created",
+        toStatus: "confirmed",
+        actor: `user:${actorUserId}`,
+        createdAt: now,
+      });
+      return reservation;
+    });
+  } catch (e) {
+    if (e instanceof ManualReservationError) throw e;
+    if (isExclusionViolation(e)) throw new ManualReservationError("conflict");
+    throw e;
+  }
 }
 
 export async function addReservationNote(db: Db, id: string, actorUserId: string, note: string) {

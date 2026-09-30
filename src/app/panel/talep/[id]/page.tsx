@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { availabilityForRange, getReservationDetail } from "@/db/panel";
 import PanelHeader from "@/components/panel/PanelHeader";
 import ReservationActions from "@/components/panel/ReservationActions";
-import { formatDay, localeFlag, nights } from "@/components/panel/format";
+import { formatDay, localeFlag, nights, sourceLabel } from "@/components/panel/format";
 import { getLockedDatesByType } from "@/lib/availability";
 import { requireApprovedStaff } from "@/lib/panel-session";
 
@@ -46,6 +46,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
       <section className="rounded-2xl bg-white p-5">
         <div className="text-xs font-bold tracking-widest text-clay">
           {r.reference} · {statusLabel[r.status]}
+          {r.source !== "website" && ` · ${sourceLabel[r.source]}`}
         </div>
         <h1 className="mt-1 font-display text-3xl font-semibold text-pine">
           {localeFlag[r.locale]} {r.guestName}
@@ -57,12 +58,12 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
             k={r.status === "confirmed" ? "Oda" : "İstediği"}
             v={unitName ?? "Oda seçmedi"}
           />
-          <Row k="Telefon" v={r.phone} />
+          {r.phone && <Row k="Telefon" v={r.phone} />}
           {r.email && <Row k="E-posta" v={r.email} />}
         </dl>
         {r.note && (
           <p className="mt-4 rounded-xl bg-cream p-3 text-base text-ink">
-            <span className="font-bold">Misafirin notu:</span> {r.note}
+            <span className="font-bold">{r.source === "website" ? "Misafirin notu" : "Not"}:</span> {r.note}
           </p>
         )}
       </section>
@@ -94,7 +95,9 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
             </div>
             <div className="font-semibold text-ink">
               {e.type === "created"
-                ? "Talep geldi"
+                ? e.actor === "guest"
+                  ? "Talep geldi"
+                  : "Elle eklendi"
                 : e.type === "status_changed"
                   ? `${statusLabel[e.fromStatus ?? ""] ?? ""} → ${statusLabel[e.toStatus ?? ""] ?? ""}`
                   : "Not eklendi"}

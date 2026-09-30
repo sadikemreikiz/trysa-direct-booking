@@ -10,9 +10,11 @@ import {
   confirmedDaysByUnit,
   confirmedStaysForUnit,
   confirmReservation,
+  createManualReservation,
   declineReservation,
   getReservationDetail,
   listPanelReservations,
+  ManualReservationError,
   mergeLockedDays,
   TransitionError,
 } from "./panel";
@@ -237,6 +239,58 @@ describe("müsaitlik", () => {
       "Ambar-1": ["2026-11-10", "2026-11-11", "2026-11-12"],
       "Ambar-2": [],
       "Kulübe-1": ["2026-11-11"],
+    });
+  });
+});
+
+describe("elle rezervasyon ekleme", () => {
+  const manual = {
+    unitId: 2,
+    checkIn: "2026-11-10",
+    checkOut: "2026-11-12",
+    adults: 2,
+    children: 1,
+    guestName: "Mehmet (telefon)",
+    phone: "",
+    note: "Kapora alındı",
+    source: "phone" as const,
+  };
+
+  it("doğrudan onaylı kaydeder, kaynağı ve kimin eklediğini tutar", async () => {
+    const u = await makeUser("u1", "a@example.com");
+    const r = await createManualReservation(db, u, manual, { now: NOW });
+    expect(r).toMatchObject({ status: "confirmed", source: "phone", unitId: 2, phone: "", note: "Kapora alındı" });
+    expect(r.reference).toMatch(/^TRY-/);
+
+    const detail = await getReservationDetail(db, r.id);
+    expect(detail?.events).toHaveLength(1);
+    expect(detail?.events[0]).toMatchObject({ type: "created", toStatus: "confirmed", actor: "user:u1" });
+
+    // Airbnb takvimine ve misafir formuna da yansır
+    expect(await confirmedStaysForUnit(db, "ambar-2", "2026-11-01")).toHaveLength(1);
+  });
+
+  it("aynı odaya çakışan onaylı rezervasyonu engeller", async () => {
+    const u = await makeUser("u1", "a@example.com");
+    const site = await request({ unit: "ambar-2", checkin: "2026-11-11", checkout: "2026-11-14" });
+    await confirmReservation(db, site.id, u, 2);
+
+    await expect(createManualReservation(db, u, manual, { now: NOW })).rejects.toMatchObject({ code: "conflict" });
+    // Başka oda sorun değil
+    await expect(createManualReservation(db, u, { ...manual, unitId: 3 }, { now: NOW })).resolves.toBeTruthy();
+  });
+
+  it("eksik/geçersiz bilgiyi reddeder", async () => {
+    const u = await makeUser("u1", "a@example.com");
+    for (const bad of [
+      { ...manual, guestName: "  " },
+      { ...manual, checkOut: "2026-11-10" },
+      { ...manual, adults: 0 },
+    ]) {
+      await expect(createManualReservation(db, u, bad, { now: NOW })).rejects.toBeInstanceOf(ManualReservationError);
+    }
+    await expect(createManualReservation(db, u, { ...manual, unitId: 99 }, { now: NOW })).rejects.toMatchObject({
+      code: "unit_unknown",
     });
   });
 });

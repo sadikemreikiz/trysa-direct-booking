@@ -3,7 +3,7 @@ import { listPanelReservations } from "@/db/panel";
 import { todayInDemre } from "@/db/reservations";
 import PanelHeader from "@/components/panel/PanelHeader";
 import PushToggle from "@/components/panel/PushToggle";
-import { formatDay, localeFlag, nights, SLOW_RESPONSE_MS, timeAgo } from "@/components/panel/format";
+import { formatDay, localeFlag, nights, SLOW_RESPONSE_MS, sourceLabel, timeAgo } from "@/components/panel/format";
 import { requireApprovedStaff } from "@/lib/panel-session";
 import { vapidPublicKey } from "@/lib/push";
 
@@ -17,6 +17,12 @@ export default async function PanelHome() {
       <PanelHeader staff={staff} />
       <p className="mb-4 text-muted">Merhaba {staff.name.split(" ")[0]} 👋</p>
       <PushToggle vapidPublicKey={vapidPublicKey()} />
+      <Link
+        href="/panel/yeni"
+        className="mt-4 flex w-full items-center justify-center rounded-2xl border-2 border-pine bg-white px-5 py-3.5 text-lg font-bold text-pine"
+      >
+        + Rezervasyon ekle
+      </Link>
 
       <h2 className="mb-3 mt-7 text-xs font-bold tracking-widest text-clay">
         YENİ TALEPLER {pending.length > 0 && `(${pending.length})`}
@@ -56,7 +62,7 @@ export default async function PanelHome() {
 
       <h2 className="mb-3 mt-8 text-xs font-bold tracking-widest text-clay">ONAYLI · YAKLAŞAN</h2>
       {upcoming.length === 0 ? (
-        <p className="rounded-2xl bg-white p-5 text-center text-muted">Siteden onaylı rezervasyon yok</p>
+        <p className="rounded-2xl bg-white p-5 text-center text-muted">Yaklaşan onaylı rezervasyon yok</p>
       ) : (
         <ul className="space-y-2">
           {upcoming.map(({ r, unitName }) => (
@@ -64,6 +70,9 @@ export default async function PanelHome() {
               <Link href={`/panel/talep/${r.id}`} className="block rounded-2xl bg-white p-4">
                 <div className="font-bold text-ink">
                   ✅ {unitName} · {r.guestName}
+                  {r.source !== "website" && (
+                    <span className="ml-1.5 text-sm font-normal text-muted">{sourceLabel[r.source]}</span>
+                  )}
                 </div>
                 <div className="text-sm text-muted">
                   {formatDay(r.checkIn)} – {formatDay(r.checkOut)} · {r.reference}

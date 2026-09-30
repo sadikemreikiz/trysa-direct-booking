@@ -84,12 +84,12 @@ export default function ReservationActions({ reservation: r, unitName, availabil
                       ? "border-pine bg-[#e4eadd] text-pine"
                       : u.free
                         ? "border-line bg-white text-ink"
-                        : "border-line bg-[#f1ece2] text-muted line-through"
+                        : "border-line bg-[#f1ece2] text-muted"
                   }`}
                 >
-                  {u.name}
+                  <span className={u.free ? "" : "line-through"}>{u.name}</span>
                   {!u.free && (
-                    <span className="block text-xs font-normal no-underline">
+                    <span className="block text-xs font-normal">
                       {u.reason === "airbnb" ? "Airbnb'de dolu" : "Dolu"}
                     </span>
                   )}
@@ -134,7 +134,7 @@ export default function ReservationActions({ reservation: r, unitName, availabil
           <div className="rounded-2xl bg-[#e4eadd] p-4 text-lg font-bold text-pine">
             ✅ Onaylandı · {unitName}
           </div>
-          <WhatsAppButton href={waHref("confirmed")} label="Onay mesajını gönder" />
+          {r.phone && <WhatsAppButton href={waHref("confirmed")} label="Onay mesajını gönder" />}
           <button
             type="button"
             disabled={pending}

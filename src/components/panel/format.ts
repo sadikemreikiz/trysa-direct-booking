@@ -27,4 +27,12 @@ export function timeAgo(date: Date, now: Date = new Date()): string {
 /** Bu kadar süredir cevapsız bekleyen talep kırmızıyla vurgulanır. */
 export const SLOW_RESPONSE_MS = 3 * 60 * 60 * 1000;
 
+/** Rezervasyon nereden geldi (site dışı olanlar panelde elle eklenir). */
+export const sourceLabel: Record<string, string> = {
+  website: "🌐 Site",
+  phone: "📞 Telefon",
+  whatsapp: "💬 WhatsApp",
+  walk_in: "🚶 Kapıdan",
+};
+
 export const localeFlag: Record<string, string> = { tr: "🇹🇷", en: "🇬🇧", de: "🇩🇪" };
