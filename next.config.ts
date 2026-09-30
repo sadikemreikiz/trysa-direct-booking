@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { place } from "./src/lib/site";
 
 const isDev = process.env.NODE_ENV === "development";
 // Vercel önizleme sürümlerinde yorum/araç çubuğu (vercel.live) yüklenir; canlıda yok.
@@ -39,6 +40,14 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Site ve panelin ayrı kök düzenleri var → tüm uygulama için tek 404 sayfası (app/global-not-found.tsx)
   experimental: { globalNotFound: true },
+  // Kısa yol tarifi linkleri: kartvizit, WhatsApp mesajı, tabela → Google Haritalar navigasyonu
+  async redirects() {
+    return ["/yol", "/konum", "/directions", "/anfahrt"].map((source) => ({
+      source,
+      destination: place.directionsUrl,
+      permanent: false,
+    }));
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

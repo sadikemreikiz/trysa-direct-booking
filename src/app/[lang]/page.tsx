@@ -47,7 +47,7 @@ export default async function Home({
         <Gallery t={t} />
         <TrysaStory t={t} />
         <Experiences t={t} />
-        <Distances t={t} />
+        <Distances t={t} lang={lang} />
         <Reviews t={t} google={googleReviews} />
         <Faq t={t} />
         <CtaBand t={t} lang={lang} />

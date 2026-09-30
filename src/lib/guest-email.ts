@@ -2,7 +2,7 @@
  * Misafire kendi dilinde "talebini aldık" e-postası. Bu henüz ONAY değildir; aile
  * müsaitliği teyit edince misafire WhatsApp/telefonla döner (bkz. lib/whatsapp).
  */
-import { site } from "./site";
+import { place, site } from "./site";
 
 type Locale = "tr" | "en" | "de";
 
@@ -39,6 +39,7 @@ const TEMPLATES: Record<Locale, (v: { name: string; ref: string; dates: string; 
       "",
       "Bu henüz bir onay değil: müsaitliği kontrol edip en kısa sürede sana telefon ya da WhatsApp'tan döneceğiz.",
       `Acelen varsa bize WhatsApp'tan yazabilirsin: ${site.whatsapp}`,
+      `Bizi bulmak için yol tarifi: https://${place.shortLink.tr}`,
       "",
       "Görüşmek üzere,",
       "Trysa Restaurant Camping · Demre",
@@ -57,6 +58,7 @@ const TEMPLATES: Record<Locale, (v: { name: string; ref: string; dates: string; 
       "",
       "This is not a confirmation yet: we'll check availability and get back to you by phone or WhatsApp as soon as possible.",
       `In a hurry? Message us on WhatsApp: ${site.whatsapp}`,
+      `Directions to find us: https://${place.shortLink.en}`,
       "",
       "See you soon,",
       "Trysa Restaurant Camping · Demre, Turkey",
@@ -75,6 +77,7 @@ const TEMPLATES: Record<Locale, (v: { name: string; ref: string; dates: string; 
       "",
       "Das ist noch keine Bestätigung: Wir prüfen die Verfügbarkeit und melden uns so schnell wie möglich per Telefon oder WhatsApp.",
       `Eilig? Schreib uns auf WhatsApp: ${site.whatsapp}`,
+      `So findest du uns: https://${place.shortLink.de}`,
       "",
       "Bis bald,",
       "Trysa Restaurant Camping · Demre, Türkei",

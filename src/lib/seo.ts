@@ -8,8 +8,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trysacampin
 export const BUSINESS_NAME = "Trysa Restaurant Camping";
 
 /** Google İşletme Profili (Place ID ile) — yapısal veride site ↔ profil bağı. */
-export const GOOGLE_MAPS_URL =
-  "https://www.google.com/maps/search/?api=1&query=Trysa%20Restaurant%20Camping&query_place_id=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk";
+export const GOOGLE_MAPS_URL = "https://maps.google.com/?cid=1839563921786307451";
 
 // Google'a görünürlük: launch'ta SITE_INDEXABLE=true yap (Vercel env) → indexlenir.
 // Şimdilik kapalı (staging Google'da çıkmasın).

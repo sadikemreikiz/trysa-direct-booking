@@ -1,5 +1,5 @@
 import { BUSINESS_NAME, GOOGLE_MAPS_URL, SITE_URL } from "@/lib/seo";
-import { site } from "@/lib/site";
+import { place, site } from "@/lib/site";
 
 /** Google'ın işletmeyi (konaklama + restoran, puan, konum) anlaması için yapısal veri. */
 export default function JsonLd({
@@ -34,8 +34,8 @@ export default function JsonLd({
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 36.262198,
-      longitude: 29.890923,
+      latitude: place.lat,
+      longitude: place.lng,
     },
     image: `${SITE_URL}/img/hero.jpg`,
     hasMenu: `${SITE_URL}/${lang}/menu`,

@@ -1,4 +1,4 @@
-import { site, stays, galleryImages } from "@/lib/site";
+import { place, site, stays, galleryImages } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
 import type { Dict, Locale } from "@/dictionaries";
 import { responsiveImage } from "@/lib/images";
@@ -339,7 +339,7 @@ export function Experiences({ t }: T) {
 }
 
 /* ---------- MESAFELER ---------- */
-export function Distances({ t }: T) {
+export function Distances({ t, lang }: TL) {
   return (
     <section className={`${container} pt-10`}>
       <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">{t.distances.title}</h2>
@@ -361,14 +361,14 @@ export function Distances({ t }: T) {
           <div className="min-h-[16rem] flex-1 overflow-hidden rounded-2xl border border-line">
             <iframe
               title="Trysa"
-              src="https://maps.google.com/maps?q=36.262198,29.890923&hl=tr&z=15&output=embed"
+              src={`https://maps.google.com/maps?q=${place.lat},${place.lng}&hl=${lang}&z=15&output=embed`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="h-64 w-full border-0 md:h-full"
             />
           </div>
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=36.262198,29.890923"
+            href={place.directionsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="self-start text-sm font-bold text-clay"

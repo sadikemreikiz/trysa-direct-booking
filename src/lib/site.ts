@@ -12,6 +12,27 @@ export const site = {
   superhost: true, // Airbnb Superhost rozeti — teyit edilince kalır; değilse false yap
 };
 
+/**
+ * Konum — misafirlerin en çok zorlandığı konu. Tek kaynak: Google İşletme Profili
+ * (Places API ile doğrulandı, 2026-09-30). Site, kartvizit, WhatsApp ve e-posta buradan alır.
+ */
+export const place = {
+  lat: 36.2624282,
+  lng: 29.8912955,
+  /** Google Haritalar'a yazınca tam noktayı bulur */
+  plusCode: "7V6R+XG Demre",
+  /** İşletme kaydı (fotoğraf, yorum, yol tarifi) */
+  googleMapsUrl: "https://maps.google.com/?cid=1839563921786307451",
+  /**
+   * Doğrudan yol tarifi (navigasyon). destination koordinat (boşluksuz — yönlendirme başlığında
+   * boşluk bazı telefonlarda bozuluyor); place_id sayesinde Google işletmenin adını gösterir.
+   */
+  directionsUrl:
+    "https://www.google.com/maps/dir/?api=1&destination=36.2624282,29.8912955&destination_place_id=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk",
+  /** Kısa yol tarifi linkleri (next.config.ts yönlendirir) — misafirin diline göre */
+  shortLink: { tr: "trysacamping.com/yol", en: "trysacamping.com/directions", de: "trysacamping.com/anfahrt" },
+};
+
 // Her oda ayrı. Fiyatlar Airbnb'den; güncelini Emre teyit edecek.
 export const stays = [
   {

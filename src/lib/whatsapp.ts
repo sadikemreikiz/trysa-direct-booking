@@ -14,6 +14,8 @@ export function toWhatsAppNumber(phone: string): string {
   return digits;
 }
 
+import { place } from "./site";
+
 export type MessageKind = "reply" | "confirmed" | "declined";
 type Locale = "tr" | "en" | "de";
 
@@ -31,7 +33,7 @@ const TEMPLATES: Record<Locale, Record<MessageKind, (v: Vars) => string>> = {
     reply: (v) =>
       `Merhaba ${v.name}, Trysa'dan yazıyoruz 🌿 ${v.dates} tarihleri için rezervasyon talebinizi (${v.ref}) aldık.`,
     confirmed: (v) =>
-      `Merhaba ${v.name}, ${v.dates} tarihleri için ${v.unit} rezervasyonunuz onaylandı ✅ (${v.ref}). Sizi ağırlamayı dört gözle bekliyoruz! — Trysa`,
+      `Merhaba ${v.name}, ${v.dates} tarihleri için ${v.unit} rezervasyonunuz onaylandı ✅ (${v.ref}). Sizi ağırlamayı dört gözle bekliyoruz!\n\n📍 Yol tarifi: https://${place.shortLink.tr}\n— Trysa`,
     declined: (v) =>
       `Merhaba ${v.name}, ${v.dates} tarihleri için maalesef yerimiz dolu 🙏 Farklı tarihlerde yardımcı olmaktan memnuniyet duyarız. — Trysa`,
   },
@@ -39,7 +41,7 @@ const TEMPLATES: Record<Locale, Record<MessageKind, (v: Vars) => string>> = {
     reply: (v) =>
       `Hello ${v.name}, this is Trysa 🌿 We've received your booking request (${v.ref}) for ${v.dates}.`,
     confirmed: (v) =>
-      `Hello ${v.name}, your stay in ${v.unit} for ${v.dates} is confirmed ✅ (${v.ref}). We look forward to welcoming you! — Trysa`,
+      `Hello ${v.name}, your stay in ${v.unit} for ${v.dates} is confirmed ✅ (${v.ref}). We look forward to welcoming you!\n\n📍 Directions: https://${place.shortLink.en}\n— Trysa`,
     declined: (v) =>
       `Hello ${v.name}, unfortunately we're fully booked for ${v.dates} 🙏 We'd be happy to help with other dates. — Trysa`,
   },
@@ -47,7 +49,7 @@ const TEMPLATES: Record<Locale, Record<MessageKind, (v: Vars) => string>> = {
     reply: (v) =>
       `Hallo ${v.name}, hier ist Trysa 🌿 Wir haben deine Buchungsanfrage (${v.ref}) für ${v.dates} erhalten.`,
     confirmed: (v) =>
-      `Hallo ${v.name}, dein Aufenthalt in ${v.unit} vom ${v.dates} ist bestätigt ✅ (${v.ref}). Wir freuen uns auf dich! — Trysa`,
+      `Hallo ${v.name}, dein Aufenthalt in ${v.unit} vom ${v.dates} ist bestätigt ✅ (${v.ref}). Wir freuen uns auf dich!\n\n📍 Anfahrt: https://${place.shortLink.de}\n— Trysa`,
     declined: (v) =>
       `Hallo ${v.name}, leider sind wir vom ${v.dates} ausgebucht 🙏 Gerne helfen wir dir mit anderen Terminen. — Trysa`,
   },

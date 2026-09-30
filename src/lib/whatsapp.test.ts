@@ -26,7 +26,7 @@ describe("guestMessage", () => {
   it("misafirin dilinde, ilk adıyla yazar", () => {
     const text = guestMessage("confirmed", r, "Kulübe-1");
     expect(text).toBe(
-      "Hallo Hans, dein Aufenthalt in Kulübe-1 vom 3. Dezember – 7. Dezember ist bestätigt ✅ (TRY-7K3Q9). Wir freuen uns auf dich! — Trysa",
+      "Hallo Hans, dein Aufenthalt in Kulübe-1 vom 3. Dezember – 7. Dezember ist bestätigt ✅ (TRY-7K3Q9). Wir freuen uns auf dich!\n\n📍 Anfahrt: https://trysacamping.com/anfahrt\n— Trysa",
     );
   });
 

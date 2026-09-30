@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
+import { place, site } from "@/lib/site";
 import type { Dict, Locale } from "@/dictionaries";
 
 export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
@@ -27,7 +27,7 @@ export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
         <div className="w-full overflow-hidden rounded-xl md:w-72">
           <iframe
             title="Trysa"
-            src="https://maps.google.com/maps?q=36.262198,29.890923&hl=tr&z=14&output=embed"
+            src={`https://maps.google.com/maps?q=${place.lat},${place.lng}&hl=${lang}&z=14&output=embed`}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
             className="h-32 w-full border-0"
