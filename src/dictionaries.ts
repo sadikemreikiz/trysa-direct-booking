@@ -52,6 +52,7 @@ const tr = {
     incele: "İncele →",
     gecelik: "gecelik",
     fiyatSor: "Fiyat için sor",
+    kampTitle: "Kamp & Karavan Alanı",
   },
   amenities: {
     title: "Olanaklar",
@@ -75,11 +76,12 @@ const tr = {
     desc: "Köy tavuğu, ızgaralar, taze balık, serpme kahvaltı ve gözleme. Açık hava bölümünde, doğanın içinde.",
     cta: "Menüyü gör",
   },
-  gallery: { title: "Galeri", seeAll: "Tümünü gör →" },
+  gallery: { title: "Galeri" },
   trysaStory: {
     kicker: "TRYSA'NIN HİKAYESİ",
-    title: "Likya'nın unutulmuş kentinin eteğindesiniz",
-    desc: "2.400 yıllık antik Trysa tam tepemizde. Dünyaca ünlü frizleri bugün Viyana'da sergileniyor — ama kentin kendisi hâlâ burada. Tesisten yürüyerek harabelere çıkabilirsiniz.",
+    title: "Likya'nın unutulmuş kentinin eteğindesin",
+    desc: "2.400 yıllık antik Trysa tam tepemizde. Dünyaca ünlü frizleri bugün Viyana'da sergileniyor — ama kentin kendisi hâlâ burada. Tesisten yürüyerek harabelere çıkabilirsin.",
+    link: "https://tr.wikipedia.org/wiki/Trysa",
     cta: "Trysa'yı keşfet →",
   },
   experiences: {
@@ -276,6 +278,7 @@ const en: Dict = {
     incele: "View →",
     gecelik: "per night",
     fiyatSor: "Ask for price",
+    kampTitle: "Camping & Caravan Area",
   },
   amenities: {
     title: "Amenities",
@@ -299,11 +302,12 @@ const en: Dict = {
     desc: "Free-range chicken, grills, fresh fish, Turkish breakfast and gözleme. In the open-air section, surrounded by nature.",
     cta: "See the menu",
   },
-  gallery: { title: "Gallery", seeAll: "See all →" },
+  gallery: { title: "Gallery" },
   trysaStory: {
     kicker: "THE STORY OF TRYSA",
     title: "You're at the foot of Lycia's forgotten city",
     desc: "The 2,400-year-old ancient city of Trysa sits right above us. Its world-famous friezes are now displayed in Vienna — but the city itself is still here. You can walk up to the ruins from the property.",
+    link: "https://en.wikipedia.org/wiki/Trysa",
     cta: "Discover Trysa →",
   },
   experiences: {
@@ -498,6 +502,7 @@ const de: Dict = {
     incele: "Ansehen →",
     gecelik: "pro Nacht",
     fiyatSor: "Preis anfragen",
+    kampTitle: "Camping- & Wohnmobilplatz",
   },
   amenities: {
     title: "Ausstattung",
@@ -521,11 +526,12 @@ const de: Dict = {
     desc: "Freilandhähnchen, Grillgerichte, frischer Fisch, türkisches Frühstück und Gözleme. Im Außenbereich, mitten in der Natur.",
     cta: "Zur Speisekarte",
   },
-  gallery: { title: "Galerie", seeAll: "Alle ansehen →" },
+  gallery: { title: "Galerie" },
   trysaStory: {
     kicker: "DIE GESCHICHTE VON TRYSA",
-    title: "Sie sind am Fuße von Lykiens vergessener Stadt",
-    desc: "Das 2.400 Jahre alte antike Trysa liegt direkt über uns. Seine weltberühmten Friese sind heute in Wien zu sehen — die Stadt selbst ist jedoch noch hier. Vom Gelände aus können Sie zu den Ruinen wandern.",
+    title: "Du bist am Fuße von Lykiens vergessener Stadt",
+    desc: "Das 2.400 Jahre alte antike Trysa liegt direkt über uns. Seine weltberühmten Friese sind heute in Wien zu sehen — die Stadt selbst ist jedoch noch hier. Vom Gelände aus kannst du zu den Ruinen wandern.",
+    link: "https://de.wikipedia.org/wiki/Heroon_von_Trysa",
     cta: "Trysa entdecken →",
   },
   experiences: {

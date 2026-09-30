@@ -1,6 +1,7 @@
 import { site, stays, galleryImages } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
 import type { Dict, Locale } from "@/dictionaries";
+import { responsiveImage } from "@/lib/images";
 import { fillRating, formatRating, type GoogleReviewsData, type RatingSummary } from "@/lib/reviews";
 
 const container = "mx-auto max-w-6xl px-5 md:px-8";
@@ -46,8 +47,9 @@ export function Hero({ t, lang, rating }: TLR) {
     <section className="relative overflow-hidden bg-pine">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/img/hero.jpg"
+        {...responsiveImage("/img/hero.jpg", "100vw")}
         alt=""
+        fetchPriority="high"
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-pine/75" />
@@ -125,7 +127,7 @@ export function TwoPath({ t, lang, rating }: TLR) {
           <div className="relative h-48">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/img/rooms/kulube-1/kapak.jpg"
+              {...responsiveImage("/img/rooms/kulube-1/kapak.jpg", "(min-width: 768px) 50vw, 100vw")}
               alt="Trysa"
               loading="lazy"
               className="h-full w-full object-cover"
@@ -200,12 +202,17 @@ export function Accommodation({ t, lang }: TL) {
           >
             {s.img ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={s.img} alt={s.title} loading="lazy" className="h-44 w-full object-cover" />
+              <img
+                {...responsiveImage(s.img, "(min-width: 768px) 33vw, 100vw")}
+                alt={s.title}
+                loading="lazy"
+                className="h-44 w-full object-cover"
+              />
             ) : (
               <Photo label={s.photo} tone={s.tone} className="h-44" />
             )}
             <div className="p-5">
-              <div className="font-display text-lg font-semibold md:text-xl">{s.title}</div>
+              <div className="font-display text-lg font-semibold md:text-xl">{s.slug === "kamp" ? t.stay.kampTitle : s.title}</div>
               <p className="mt-1.5 text-sm text-muted">
                 {t.room.descs[s.slug] ?? s.desc}
               </p>
@@ -270,14 +277,13 @@ export function Gallery({ t }: T) {
     <section id="galeri" className={`${container} scroll-mt-20 pt-10`}>
       <div className="flex items-baseline justify-between">
         <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.gallery.title}</h2>
-        <a href="#galeri" className="text-sm font-bold text-clay">{t.gallery.seeAll}</a>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         {galleryImages.map((g, i) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={i}
-            src={g.src}
+            {...responsiveImage(g.src, "(min-width: 768px) 25vw, 50vw")}
             alt={g.label}
             loading="lazy"
             className="h-28 w-full rounded-xl object-cover md:h-36"
@@ -297,7 +303,14 @@ export function TrysaStory({ t }: T) {
           <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">{t.trysaStory.kicker}</div>
           <h2 className="font-display text-2xl font-semibold leading-tight text-[#f1e9d8] md:text-3xl">{t.trysaStory.title}</h2>
           <p className="mt-3.5 max-w-md text-sm leading-relaxed text-[#d8cfb8] md:text-base">{t.trysaStory.desc}</p>
-          <a href="#trysa" className="mt-5 inline-block rounded-xl bg-[#d9a05b] px-5 py-3 text-sm font-bold text-[#2b2417]">{t.trysaStory.cta}</a>
+          <a
+            href={t.trysaStory.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-block rounded-xl bg-[#d9a05b] px-5 py-3 text-sm font-bold text-[#2b2417]"
+          >
+            {t.trysaStory.cta}
+          </a>
         </div>
         <div className="flex h-40 items-center justify-center bg-[#4a4335] text-xs text-[#b6a985] md:h-auto md:w-[420px]">
           FOTO: Trysa
