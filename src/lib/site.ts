@@ -29,6 +29,8 @@ export const place = {
    */
   directionsUrl:
     "https://www.google.com/maps/dir/?api=1&destination=36.2624282,29.8912955&destination_place_id=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk",
+  /** Google'da "yorum yaz" ekranı (yorum kartı QR'ı buraya gider: trysacamping.com/yorum) */
+  reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk",
   /** Kısa yol tarifi linkleri (next.config.ts yönlendirir) — misafirin diline göre */
   shortLink: { tr: "trysacamping.com/yol", en: "trysacamping.com/directions", de: "trysacamping.com/anfahrt" },
 };

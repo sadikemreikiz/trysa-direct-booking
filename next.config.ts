@@ -40,13 +40,14 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   // Site ve panelin ayrı kök düzenleri var → tüm uygulama için tek 404 sayfası (app/global-not-found.tsx)
   experimental: { globalNotFound: true },
-  // Kısa yol tarifi linkleri: kartvizit, WhatsApp mesajı, tabela → Google Haritalar navigasyonu
+  // Kısa linkler (kartvizit, masa kartı, WhatsApp mesajı, tabela):
+  //   yol tarifi → Google Haritalar navigasyonu, yorum → Google'da "yorum yaz" ekranı
   async redirects() {
-    return ["/yol", "/konum", "/directions", "/anfahrt"].map((source) => ({
-      source,
-      destination: place.directionsUrl,
-      permanent: false,
-    }));
+    const to = (destination: string) => (source: string) => ({ source, destination, permanent: false });
+    return [
+      ...["/yol", "/konum", "/directions", "/anfahrt"].map(to(place.directionsUrl)),
+      ...["/yorum", "/review", "/bewertung"].map(to(place.reviewUrl)),
+    ];
   },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
