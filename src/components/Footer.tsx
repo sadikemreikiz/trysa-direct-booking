@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { place, site } from "@/lib/site";
 import type { Dict, Locale } from "@/dictionaries";
+import LogoMark from "./LogoMark";
 
 export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
   return (
     <footer id="iletisim" className="mt-auto bg-ink px-5 py-10 text-[#c9cdbf] md:px-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div>
-          <div className="mb-3 font-display text-xl font-bold tracking-wide text-ivory">
+          <div className="mb-3 flex items-center gap-2 font-display text-xl font-bold tracking-wide text-ivory">
+            <LogoMark id="logo-footer" className="h-6 w-auto" />
             TRYSA
           </div>
           <div className="space-y-1 text-sm leading-relaxed">

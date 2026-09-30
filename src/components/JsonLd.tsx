@@ -38,6 +38,7 @@ export default function JsonLd({
       longitude: place.lng,
     },
     image: `${SITE_URL}/img/hero.jpg`,
+    logo: `${SITE_URL}/logo.png`,
     hasMenu: `${SITE_URL}/${lang}/menu`,
     amenityFeature: [
       "Ücretsiz WiFi",

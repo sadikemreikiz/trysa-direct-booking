@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <path id="f" d="M3 80 L 34.2 31.6 Q 38 25.8 41.8 31.6 L 73 80 Z"/>
+    <path id="b" d="M45 80 L 66.6 47.2 Q 69.5 42.8 72.4 47.2 L 97 80 Z"/>
+    <mask id="mb" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><rect width="100" height="100" fill="#fff"/><use href="#f" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/></mask>
+    <mask id="ms" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100"><rect width="100" height="100" fill="#fff"/><use href="#f" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/><use href="#b" fill="#000" stroke="#000" stroke-width="5" stroke-linejoin="round"/></mask>
+    <clipPath id="c"><circle cx="50" cy="50" r="50"/></clipPath>
+  </defs>
+  <circle cx="50" cy="50" r="50" fill="#2c3a2e"/>
+  <g clip-path="url(#c)">
+    <g transform="translate(-6 6) scale(1.12)">
+      <circle cx="63" cy="39" r="16" fill="#c1622f" mask="url(#ms)"/>
+      <use href="#b" fill="#f6f1e7" mask="url(#mb)"/>
+      <use href="#f" fill="#f6f1e7"/>
+      <rect x="-10" y="79.5" width="130" height="40" fill="#f6f1e7"/>
+    </g>
+  </g>
+</svg>

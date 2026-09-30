@@ -2,6 +2,7 @@ import Link from "next/link";
 import { site } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
 import LangSwitcher from "./LangSwitcher";
+import LogoMark from "./LogoMark";
 import type { Dict, Locale } from "@/dictionaries";
 
 export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
@@ -19,8 +20,10 @@ export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 md:px-8">
         <Link
           href={`/${lang}`}
-          className="font-display text-2xl font-bold tracking-wide text-pine"
+          aria-label="Trysa Restaurant Camping"
+          className="flex items-center gap-2 font-display text-2xl font-bold tracking-wide text-pine"
         >
+          <LogoMark id="logo-header" className="h-7 w-auto" />
           TRYSA
         </Link>
 
@@ -38,14 +41,15 @@ export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
             href={site.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl bg-whatsapp px-3 py-2 text-sm font-bold text-white"
+            // Telefonda alttaki sabit çubukta (MobileBar) zaten var
+            className="hidden items-center gap-2 rounded-xl bg-whatsapp px-3 py-2 text-sm font-bold text-white md:inline-flex"
           >
             <WhatsAppIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">WhatsApp</span>
+            <span className="hidden lg:inline">WhatsApp</span>
           </a>
           <Link
             href={`/${lang}/rezervasyon`}
-            className="rounded-xl bg-clay px-4 py-2 text-sm font-bold text-white"
+            className="hidden rounded-xl bg-clay px-4 py-2 text-sm font-bold text-white md:inline-block"
           >
             {t.nav.rezervasyon}
           </Link>
