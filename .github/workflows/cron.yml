@@ -1,0 +1,22 @@
+# Bakım işlerini (bildirim tekrar denemesi, cevapsız talep hatırlatması, veri silme)
+# 15 dakikada bir tetikler. Vercel Hobby planı cron'u günde bire sınırladığı için burada.
+# Gerekli repo sırları: SITE_URL (ör. https://trysacamping.com) ve CRON_SECRET (Vercel'dekiyle aynı).
+name: cron
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: /api/cron çağır
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl --fail-with-body --silent --show-error --max-time 60 \
+            -H "Authorization: Bearer $CRON_SECRET" "$SITE_URL/api/cron"

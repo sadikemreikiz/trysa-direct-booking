@@ -76,6 +76,10 @@ export const reservations = pgTable(
     consentAt: timestamp("consent_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    /** Uzun süre cevapsız kaldığı için yöneticiye hatırlatma gönderildiği an */
+    escalatedAt: timestamp("escalated_at", { withTimezone: true }),
+    /** Saklama süresi dolduğu için kişisel verilerin silindiği an (bkz. db/maintenance) */
+    anonymizedAt: timestamp("anonymized_at", { withTimezone: true }),
   },
   (t) => [
     check("reservations_dates_order", sql`${t.checkOut} > ${t.checkIn}`),
