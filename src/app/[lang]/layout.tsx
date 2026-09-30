@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ClickTracker from "@/components/ClickTracker";
-import { SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
+import { openGraphBase, pageAlternates, SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
 import { locales, isLocale, getDictionary, defaultLocale } from "@/dictionaries";
 import "../globals.css";
 
@@ -41,22 +41,11 @@ export async function generateMetadata({
     metadataBase: new URL(SITE_URL),
     title: { default: title, template: "%s · Trysa" },
     description: t.hero.subtitle,
-    alternates: {
-      canonical: `/${loc}`,
-      languages: { tr: "/tr", en: "/en", de: "/de" },
-    },
+    alternates: pageAlternates(loc, ""),
     robots: SITE_INDEXABLE
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    openGraph: {
-      title,
-      description: t.hero.subtitle,
-      url: `${SITE_URL}/${loc}`,
-      siteName: "Trysa",
-      locale: loc === "tr" ? "tr_TR" : loc === "de" ? "de_DE" : "en_US",
-      type: "website",
-      images: [{ url: "/img/hero.jpg", width: 1200, height: 900, alt: "Trysa" }],
-    },
+    openGraph: { ...openGraphBase(loc), title, description: t.hero.subtitle, url: `${SITE_URL}/${loc}` },
     twitter: {
       card: "summary_large_image",
       title,

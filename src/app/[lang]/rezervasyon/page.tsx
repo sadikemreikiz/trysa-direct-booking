@@ -6,6 +6,7 @@ import MobileBar from "@/components/MobileBar";
 import ReservationForm from "@/components/ReservationForm";
 import { getGuestLockedDates } from "@/lib/guest-availability";
 import { fillRating, getRatingSummary } from "@/lib/reviews";
+import { pageMetadata } from "@/lib/seo";
 import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
 
 export async function generateMetadata({
@@ -14,8 +15,9 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  const t = getDictionary(isLocale(lang) ? lang : defaultLocale);
-  return { title: t.reservation.title, description: t.reservation.intro };
+  const loc = isLocale(lang) ? lang : defaultLocale;
+  const t = getDictionary(loc);
+  return pageMetadata(loc, "/rezervasyon", { title: t.reservation.title, description: t.reservation.intro });
 }
 
 export default async function ReservationPage({

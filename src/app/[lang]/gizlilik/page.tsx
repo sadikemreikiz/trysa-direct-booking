@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
 import { privacy, PRIVACY_CONTACT, PRIVACY_UPDATED } from "@/lib/privacy";
+import { pageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -11,7 +12,10 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  return { title: privacy[isLocale(lang) ? lang : defaultLocale].title };
+  const loc = isLocale(lang) ? lang : defaultLocale;
+  const p = privacy[loc];
+  const description = p.intro.length > 155 ? `${p.intro.slice(0, 152).trimEnd()}…` : p.intro;
+  return pageMetadata(loc, "/gizlilik", { title: p.title, description });
 }
 
 export default async function PrivacyPage({ params }: { params: Promise<{ lang: string }> }) {

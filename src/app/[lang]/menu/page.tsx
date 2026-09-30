@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import { menu } from "@/lib/menu";
+import { pageMetadata } from "@/lib/seo";
 import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
 
 export async function generateMetadata({
@@ -12,8 +13,9 @@ export async function generateMetadata({
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  const t = getDictionary(isLocale(lang) ? lang : defaultLocale);
-  return { title: t.menu.title, description: t.menu.sub };
+  const loc = isLocale(lang) ? lang : defaultLocale;
+  const t = getDictionary(loc);
+  return pageMetadata(loc, "/menu", { title: t.menu.title, description: t.menu.sub });
 }
 
 export default async function MenuPage({

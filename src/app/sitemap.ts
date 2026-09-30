@@ -7,7 +7,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const rooms = stays.filter((s) => s.img).map((s) => `/oda/${s.slug}`);
   const paths = ["", "/menu", "/rezervasyon", "/gizlilik", ...rooms];
+  // Her adres, diğer dillerdeki karşılıklarını da bildirir (Google dil sürümlerini eşleştirir).
   return locales.flatMap((l) =>
-    paths.map((p) => ({ url: `${SITE_URL}/${l}${p}`, lastModified: now })),
+    paths.map((p) => ({
+      url: `${SITE_URL}/${l}${p}`,
+      lastModified: now,
+      alternates: { languages: Object.fromEntries(locales.map((x) => [x, `${SITE_URL}/${x}${p}`])) },
+    })),
   );
 }
