@@ -362,6 +362,34 @@ export function mergeLockedDays(
   return out;
 }
 
+/** Takvim görünümü: [from, to) aralığına değen onaylı ve bekleyen rezervasyonlar + üniteler. */
+export async function calendarData(db: Db, from: string, to: string) {
+  const allUnits = await db
+    .select({ id: units.id, slug: units.slug, name: units.name })
+    .from(units)
+    .where(eq(units.isActive, true))
+    .orderBy(asc(units.sortOrder));
+  const stays = await db
+    .select({
+      id: reservations.id,
+      unitId: reservations.unitId,
+      checkIn: reservations.checkIn,
+      checkOut: reservations.checkOut,
+      status: reservations.status,
+      guestName: reservations.guestName,
+    })
+    .from(reservations)
+    .where(
+      and(
+        inArray(reservations.status, ["pending", "confirmed"]),
+        lt(reservations.checkIn, to),
+        gt(reservations.checkOut, from),
+      ),
+    )
+    .orderBy(asc(reservations.checkIn));
+  return { units: allUnits, stays };
+}
+
 /** Onaylı rezervasyonlar — Airbnb'ye verilecek takvim (iCal) için. */
 export async function confirmedStaysForUnit(db: Db, unitSlug: string, fromDate: string) {
   return db

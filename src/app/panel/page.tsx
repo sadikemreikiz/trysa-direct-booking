@@ -17,12 +17,20 @@ export default async function PanelHome() {
       <PanelHeader staff={staff} />
       <p className="mb-4 text-muted">Merhaba {staff.name.split(" ")[0]} 👋</p>
       <PushToggle vapidPublicKey={vapidPublicKey()} />
-      <Link
-        href="/panel/yeni"
-        className="mt-4 flex w-full items-center justify-center rounded-2xl border-2 border-pine bg-white px-5 py-3.5 text-lg font-bold text-pine"
-      >
-        + Rezervasyon ekle
-      </Link>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Link
+          href="/panel/yeni"
+          className="flex items-center justify-center rounded-2xl border-2 border-pine bg-white px-3 py-3.5 text-base font-bold text-pine"
+        >
+          + Rezervasyon ekle
+        </Link>
+        <Link
+          href="/panel/takvim"
+          className="flex items-center justify-center rounded-2xl border-2 border-pine bg-white px-3 py-3.5 text-base font-bold text-pine"
+        >
+          📅 Takvim
+        </Link>
+      </div>
 
       <h2 className="mb-3 mt-7 text-xs font-bold tracking-widest text-clay">
         YENİ TALEPLER {pending.length > 0 && `(${pending.length})`}
