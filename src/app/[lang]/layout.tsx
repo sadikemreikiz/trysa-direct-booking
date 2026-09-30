@@ -3,7 +3,7 @@ import { Fraunces, Manrope } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ClickTracker from "@/components/ClickTracker";
 import { openGraphBase, pageAlternates, SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
-import { locales, isLocale, getDictionary, defaultLocale } from "@/dictionaries";
+import { locales, isLocale, defaultLocale } from "@/dictionaries";
 import "../globals.css";
 
 const fraunces = Fraunces({
@@ -29,7 +29,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const loc = isLocale(lang) ? lang : defaultLocale;
-  const t = getDictionary(loc);
   const title =
     loc === "tr"
       ? "Trysa Restaurant Camping — Demre'de doğada konaklama & ocakbaşı"
@@ -37,19 +36,27 @@ export async function generateMetadata({
         ? "Trysa Restaurant Camping — Natur, Unterkunft & Grill in Demre"
         : "Trysa Restaurant Camping — Nature stay & grill in Demre, Antalya";
 
+  // Arama sonucu açıklaması: işletmenin tam adı + ne sunduğu (Google bunu yoksa sayfadan rastgele metin toplar)
+  const description =
+    loc === "tr"
+      ? "Trysa Restaurant Camping, Demre: ahşap odalar, tiny house, kamp & karavan alanı ve ocakbaşı restoran — antik Trysa'nın eteğinde, yıl boyu açık."
+      : loc === "de"
+        ? "Trysa Restaurant Camping in Demre, Antalya: Holzzimmer, Tiny House, Camping- & Wohnmobilplatz und Grillrestaurant am antiken Trysa. Ganzjährig geöffnet."
+        : "Trysa Restaurant Camping in Demre, Antalya: wooden rooms, a tiny house, a camping & caravan area and a grill restaurant below ancient Trysa. Open all year.";
+
   return {
     metadataBase: new URL(SITE_URL),
     title: { default: title, template: "%s · Trysa" },
-    description: t.hero.subtitle,
+    description,
     alternates: pageAlternates(loc, ""),
     robots: SITE_INDEXABLE
       ? { index: true, follow: true }
       : { index: false, follow: false },
-    openGraph: { ...openGraphBase(loc), title, description: t.hero.subtitle, url: `${SITE_URL}/${loc}` },
+    openGraph: { ...openGraphBase(loc), title, description, url: `${SITE_URL}/${loc}` },
     twitter: {
       card: "summary_large_image",
       title,
-      description: t.hero.subtitle,
+      description,
       images: ["/img/hero.jpg"],
     },
   };

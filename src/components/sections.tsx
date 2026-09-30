@@ -10,29 +10,31 @@ type T = { t: Dict };
 type TL = { t: Dict; lang: Locale };
 type TLR = TL & { rating: RatingSummary };
 
-function Photo({
-  label,
-  tone,
-  className = "",
-  labelDark = false,
-}: {
-  label: string;
-  tone: string;
-  className?: string;
-  labelDark?: boolean;
-}) {
+/**
+ * Gerçek fotoğraf gelene kadar yer tutucu: yazısız, dekoratif desen + simge.
+ * data-nosnippet: Google arama sonucu açıklamasında bu alanı kullanmasın.
+ */
+function Photo({ tone, className = "", labelDark = false }: { tone: string; className?: string; labelDark?: boolean }) {
   return (
     <div
-      className={`relative flex items-end p-2.5 ${className}`}
-      style={{ backgroundColor: tone }}
+      aria-hidden="true"
+      data-nosnippet
+      className={`relative flex items-center justify-center ${className}`}
+      style={{
+        backgroundColor: tone,
+        backgroundImage:
+          "radial-gradient(circle at 20% 30%, rgba(255,255,255,0.10) 0 22%, transparent 23%), radial-gradient(circle at 80% 75%, rgba(0,0,0,0.10) 0 28%, transparent 29%)",
+      }}
     >
-      <span
-        className={`rounded px-2 py-1 text-[10px] ${
-          labelDark ? "bg-black/25 text-white/85" : "bg-white/60 text-ink/70"
-        }`}
+      <svg
+        viewBox="0 0 48 32"
+        className={`h-10 w-14 ${labelDark ? "text-white/25" : "text-black/15"}`}
+        fill="currentColor"
       >
-        FOTO: {label}
-      </span>
+        {/* dağ + güneş: doğa */}
+        <circle cx="36" cy="8" r="4" />
+        <path d="M0 32 L16 10 L26 22 L32 15 L48 32 Z" />
+      </svg>
     </div>
   );
 }
@@ -150,7 +152,7 @@ export function TwoPath({ t, lang, rating }: TLR) {
 
         <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_26px_rgba(44,58,46,0.08)]">
           <div className="relative h-48">
-            <Photo label="ocakbaşı" tone="#4a5a45" className="h-full" labelDark />
+            <Photo tone="#4a5a45" className="h-full" labelDark />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-gold px-3 py-1.5 text-[11px] font-extrabold text-[#3a2e0a]">
               ★ {fillRating("{rating} · {count}", rating, lang)} {t.twoPath.reviewsWord}
             </span>
@@ -209,7 +211,7 @@ export function Accommodation({ t, lang }: TL) {
                 className="h-44 w-full object-cover"
               />
             ) : (
-              <Photo label={s.photo} tone={s.tone} className="h-44" />
+              <Photo tone={s.tone} className="h-44" />
             )}
             <div className="p-5">
               <div className="font-display text-lg font-semibold md:text-xl">{s.slug === "kamp" ? t.stay.kampTitle : s.title}</div>
@@ -265,7 +267,7 @@ export function Restaurant({ t, lang, rating }: TLR) {
             {t.restaurant.cta}
           </a>
         </div>
-        <Photo label="restoran" tone="#4a5a45" className="h-48 md:h-auto md:w-[420px]" labelDark />
+        <Photo tone="#4a5a45" className="h-48 md:h-auto md:w-[420px]" labelDark />
       </div>
     </section>
   );
@@ -312,9 +314,7 @@ export function TrysaStory({ t }: T) {
             {t.trysaStory.cta}
           </a>
         </div>
-        <div className="flex h-40 items-center justify-center bg-[#4a4335] text-xs text-[#b6a985] md:h-auto md:w-[420px]">
-          FOTO: Trysa
-        </div>
+        <Photo tone="#4a4335" className="h-40 md:h-auto md:w-[420px]" labelDark />
       </div>
     </section>
   );
