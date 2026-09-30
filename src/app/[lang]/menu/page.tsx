@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
-import { menu } from "@/lib/menu";
+import { itemName, menu } from "@/lib/menu";
 import { pageMetadata } from "@/lib/seo";
 import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
 
@@ -56,8 +56,10 @@ export default async function MenuPage({
                       className="flex items-baseline justify-between gap-3 py-2.5"
                     >
                       <span className="text-[15px] text-ink">
-                        {it.n}
-                        {it.d && <span className="block text-xs text-muted">{it.d}</span>}
+                        {itemName(it, lang)}
+                        {/* Çeviride Türkçe adı da göster: misafir basılı menüde bulabilsin */}
+                        {lang !== "tr" && <span className="block text-xs text-muted" lang="tr">{it.n}</span>}
+                        {it.d?.[lang] && <span className="block text-xs text-muted">{it.d[lang]}</span>}
                       </span>
                       <span className="whitespace-nowrap font-semibold text-pine">
                         {it.p} ₺
