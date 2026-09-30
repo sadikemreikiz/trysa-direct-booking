@@ -34,7 +34,7 @@ export default async function Home({
 
   return (
     <>
-      <JsonLd rating={googleReviews?.rating} count={googleReviews?.count} />
+      <JsonLd rating={googleReviews?.rating} count={googleReviews?.count} lang={lang} />
       <Header t={t} lang={lang} />
       <main className="flex-1 pb-20 md:pb-0">
         <Hero t={t} lang={lang} rating={rating} />

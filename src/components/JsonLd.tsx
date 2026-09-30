@@ -1,17 +1,23 @@
-import { SITE_URL } from "@/lib/seo";
+import { BUSINESS_NAME, GOOGLE_MAPS_URL, SITE_URL } from "@/lib/seo";
+import { site } from "@/lib/site";
 
 /** Google'ın işletmeyi (konaklama + restoran, puan, konum) anlaması için yapısal veri. */
 export default function JsonLd({
   rating,
   count,
+  lang,
 }: {
   rating?: number;
   count?: number;
+  lang: string;
 }) {
-  const data = {
-    "@context": "https://schema.org",
+  const business = {
     "@type": ["LodgingBusiness", "Restaurant"],
-    name: "Trysa Restaurant Camping",
+    "@id": `${SITE_URL}/#business`,
+    name: BUSINESS_NAME,
+    alternateName: ["Trysa Camping", "Trysa Restaurant", "Trysa"],
+    // Google İşletme Profili ve sosyal hesaplar: site ile profilin aynı işletme olduğunu gösterir
+    sameAs: [GOOGLE_MAPS_URL, site.instagram],
     description:
       "Antik Trysa'nın eteğinde, Demre ile Kaş arasında doğayla iç içe konaklama: ahşap odalar, tiny house, kamp ve ocakbaşı restoran. Yıl boyu açık.",
     url: SITE_URL,
@@ -32,7 +38,7 @@ export default function JsonLd({
       longitude: 29.890923,
     },
     image: `${SITE_URL}/img/hero.jpg`,
-    hasMenu: `${SITE_URL}/menu`,
+    hasMenu: `${SITE_URL}/${lang}/menu`,
     amenityFeature: [
       "Ücretsiz WiFi",
       "Ücretsiz otopark",
@@ -54,6 +60,18 @@ export default function JsonLd({
         }
       : {}),
   };
+
+  // Sitenin adı (arama sonuçlarında URL'nin üstünde görünen ad) ve işletmeyle bağı
+  const website = {
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: BUSINESS_NAME,
+    alternateName: ["Trysa Camping", "Trysa"],
+    url: SITE_URL,
+    publisher: { "@id": `${SITE_URL}/#business` },
+  };
+
+  const data = { "@context": "https://schema.org", "@graph": [business, website] };
 
   return (
     <script

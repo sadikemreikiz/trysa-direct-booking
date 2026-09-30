@@ -32,10 +32,10 @@ export async function generateMetadata({
   const t = getDictionary(loc);
   const title =
     loc === "tr"
-      ? "Trysa — Demre'de doğada ahşap oda, tiny house & kamp"
+      ? "Trysa Restaurant Camping — Demre'de doğada konaklama & ocakbaşı"
       : loc === "de"
-        ? "Trysa — Übernachten in der Natur in Demre, Antalya"
-        : "Trysa — Nature stay in Demre, Antalya (cabins, tiny house, camping)";
+        ? "Trysa Restaurant Camping — Natur, Unterkunft & Grill in Demre"
+        : "Trysa Restaurant Camping — Nature stay & grill in Demre, Antalya";
 
   return {
     metadataBase: new URL(SITE_URL),

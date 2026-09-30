@@ -4,6 +4,13 @@ import { locales, type Locale } from "@/i18n-config";
 // Site adresi (canlıda NEXT_PUBLIC_SITE_URL ile de ayarlı).
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trysacamping.com";
 
+/** Google İşletme Profili'ndeki adla birebir aynı olmalı (arama eşleşmesi için). */
+export const BUSINESS_NAME = "Trysa Restaurant Camping";
+
+/** Google İşletme Profili (Place ID ile) — yapısal veride site ↔ profil bağı. */
+export const GOOGLE_MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=Trysa%20Restaurant%20Camping&query_place_id=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk";
+
 // Google'a görünürlük: launch'ta SITE_INDEXABLE=true yap (Vercel env) → indexlenir.
 // Şimdilik kapalı (staging Google'da çıkmasın).
 export const SITE_INDEXABLE = process.env.SITE_INDEXABLE === "true";
@@ -26,7 +33,7 @@ export function pageAlternates(lang: Locale, path: string) {
 /** Paylaşım önizlemesi (WhatsApp, Facebook…) için ortak alanlar; alt sayfalar başlık/adres ekler. */
 export function openGraphBase(lang: Locale) {
   return {
-    siteName: "Trysa",
+    siteName: BUSINESS_NAME,
     locale: lang === "tr" ? "tr_TR" : lang === "de" ? "de_DE" : "en_US",
     type: "website" as const,
     images: [{ url: "/img/hero.jpg", width: 1200, height: 900, alt: "Trysa" }],
