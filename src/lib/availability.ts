@@ -2,7 +2,7 @@
  * Airbnb iCal takvimlerinden müsaitlik hesaplar.
  * Amaç: sitede double-booking'i önlemek — bir tarih ancak o tipteki TÜM üniteler
  * doluysa engellenir (böylece boş oda varken müşteri yanlışlıkla geri çevrilmez).
- * Not: iCal senkronu anlık değildir (Airbnb birkaç saatte bir günceller).
+ * Not: iCal senkronu anlık değildir (Airbnb dışa aktarımı gecikmeli; biz 15 dakikada bir okuruz).
  * Env değişkenleri (virgülle ayrılmış .ics linkleri, GİZLİ, git'e girmez):
  * Her oda ayrı — her biri tek ünite, kendi env anahtarı.
  *   AIRBNB_ICAL_AMBAR1/2/3, AIRBNB_ICAL_KULUBE1/2, AIRBNB_ICAL_TINY
@@ -20,6 +20,9 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
   "Tiny House": { total: 1, envKey: "AIRBNB_ICAL_TINY" },
 };
 
+/** Airbnb takviminin yeniden okunma aralığı (panel takviminde de yazıyor). */
+export const AIRBNB_REFRESH_SECONDS = 15 * 60;
+
 function urlsFor(envKey: string): string[] {
   return (process.env[envKey] || "")
     .split(",")
@@ -35,7 +38,8 @@ function toISO(yyyymmdd: string): string {
 async function bookedSet(url: string): Promise<Set<string>> {
   const set = new Set<string>();
   try {
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    // Airbnb kendi dışa aktarımını da gecikmeli günceller; biz en geç 15 dakikada bir okuruz.
+    const res = await fetch(url, { next: { revalidate: AIRBNB_REFRESH_SECONDS } });
     if (!res.ok) return set;
     const text = await res.text();
     let start: string | null = null;

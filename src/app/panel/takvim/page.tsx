@@ -4,7 +4,7 @@ import { buildCalendar, daysOfMonth, shiftMonth, type Cell } from "@/components/
 import { formatDay } from "@/components/panel/format";
 import { calendarData, SHARED_UNIT_SLUG } from "@/db/panel";
 import { todayInDemre } from "@/db/reservations";
-import { getLockedDatesByType } from "@/lib/availability";
+import { AIRBNB_REFRESH_SECONDS, getLockedDatesByType } from "@/lib/availability";
 import { requireApprovedStaff } from "@/lib/panel-session";
 
 const monthTitle = new Intl.DateTimeFormat("tr-TR", { month: "long", year: "numeric", timeZone: "UTC" });
@@ -63,6 +63,10 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         <Legend className={cellStyle.pending} label="Bekleyen talep" />
         <Legend className={cellStyle.airbnb} label="Airbnb" />
       </div>
+      <p className="mb-3 text-xs text-muted">
+        Airbnb takvimi en geç {AIRBNB_REFRESH_SECONDS / 60} dakikada bir okunur. Airbnb geçmiş günleri paylaşmadığı için
+        geçmiş günler soluk gösterilir.
+      </p>
 
       <div className="overflow-hidden rounded-2xl bg-white">
         <div
@@ -79,11 +83,12 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         {calendar.map((day) => {
           const d = new Date(day.date);
           const isToday = day.date === today;
+          const isPast = day.date < today;
           const weekend = d.getUTCDay() === 0 || d.getUTCDay() === 6;
           return (
             <div
               key={day.date}
-              className={`grid border-b border-line/50 ${isToday ? "outline outline-2 -outline-offset-2 outline-clay" : ""}`}
+              className={`grid border-b border-line/50 ${isToday ? "outline outline-2 -outline-offset-2 outline-clay" : ""} ${isPast ? "bg-[#f1ece2] opacity-50" : ""}`}
               style={{ gridTemplateColumns: `3.25rem repeat(${units.length}, minmax(0, 1fr))` }}
             >
               <div className={`px-1.5 py-1.5 text-xs leading-tight ${weekend ? "font-bold text-clay" : "text-muted"}`}>

@@ -8,7 +8,7 @@
 import { and, asc, desc, eq, gte, inArray, lt, gt, ne } from "drizzle-orm";
 import { z } from "zod";
 import type { Db } from "./index";
-import { generateReference } from "./reservations";
+import { generateReference, todayInDemre } from "./reservations";
 import { reservationEvents, reservations, units, user, type Reservation } from "./schema";
 
 export type ReservationStatus = Reservation["status"];
@@ -253,7 +253,7 @@ export const manualReservationSchema = z
 export type ManualReservationInput = z.input<typeof manualReservationSchema>;
 
 export class ManualReservationError extends Error {
-  constructor(public readonly code: "invalid" | "conflict" | "unit_unknown") {
+  constructor(public readonly code: "invalid" | "conflict" | "unit_unknown" | "in_past") {
     super(code);
   }
 }
@@ -268,6 +268,8 @@ export async function createManualReservation(
   const parsed = manualReservationSchema.safeParse(raw);
   if (!parsed.success) throw new ManualReservationError("invalid");
   const d = parsed.data;
+  // Geçmişe kayıt yok: Airbnb geçmiş günleri paylaşmadığı için çakışma kontrol edilemez.
+  if (d.checkIn < todayInDemre(now)) throw new ManualReservationError("in_past");
 
   try {
     return await db.transaction(async (tx) => {

@@ -36,7 +36,7 @@ export default function ManualReservationForm({ today }: { today: string }) {
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const datesValid = Boolean(checkIn && checkOut && checkOut > checkIn);
+  const datesValid = Boolean(checkIn && checkOut && checkOut > checkIn && checkIn >= today);
 
   // Tarihler değişince boş odaları yeniden yükle
   useEffect(() => {
@@ -83,7 +83,13 @@ export default function ManualReservationForm({ today }: { today: string }) {
         <div className="grid grid-cols-2 gap-3">
           <label className="block">
             <span className={lbl}>Giriş</span>
-            <input type="date" className={fld} value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+            <input
+              type="date"
+              className={fld}
+              min={today}
+              value={checkIn}
+              onChange={(e) => setCheckIn(e.target.value)}
+            />
           </label>
           <label className="block">
             <span className={lbl}>Çıkış</span>
@@ -97,6 +103,9 @@ export default function ManualReservationForm({ today }: { today: string }) {
           </label>
         </div>
         {datesValid && <p className="mt-2 text-sm text-muted">{nights(checkIn, checkOut)} gece</p>}
+        {checkIn && checkIn < today && (
+          <p className="mt-2 text-sm font-semibold text-clay-dark">Geçmiş bir tarihe rezervasyon eklenemez.</p>
+        )}
       </section>
 
       {datesValid && (

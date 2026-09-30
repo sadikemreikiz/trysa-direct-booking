@@ -292,6 +292,13 @@ describe("elle rezervasyon ekleme", () => {
     await expect(createManualReservation(db, u, { ...manual, unitId: 99 }, { now: NOW })).rejects.toMatchObject({
       code: "unit_unknown",
     });
+    // Geçmişe kayıt yok (Airbnb geçmişi paylaşmadığı için çakışma kontrol edilemez); bugün olur
+    await expect(
+      createManualReservation(db, u, { ...manual, checkIn: "2026-09-28", checkOut: "2026-09-30" }, { now: NOW }),
+    ).rejects.toMatchObject({ code: "in_past" });
+    await expect(
+      createManualReservation(db, u, { ...manual, checkIn: "2026-10-01", checkOut: "2026-10-02" }, { now: NOW }),
+    ).resolves.toBeTruthy();
   });
 });
 

@@ -75,7 +75,7 @@ describe("panel istatistikleri", () => {
       phone: "",
       note: "",
       source: "phone",
-    });
+    }, { now: new Date("2026-10-01T00:00:00Z") });
     await db.insert(analyticsEvents).values([
       { name: "whatsapp_click", path: "/tr", createdAt: new Date("2026-10-01T10:00:00Z") },
       { name: "whatsapp_click", path: "/tr", createdAt: new Date("2026-10-02T10:00:00Z") },

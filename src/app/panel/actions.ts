@@ -15,6 +15,7 @@ import {
   type UnitAvailability,
 } from "@/db/panel";
 import { AuthorizationError, decideAccess } from "@/db/staff";
+import { todayInDemre } from "@/db/reservations";
 import { getLockedDatesByType } from "@/lib/availability";
 import { requireApprovedStaff } from "@/lib/panel-session";
 import { savePushSubscription } from "@/lib/push";
@@ -75,7 +76,12 @@ export async function confirmAction(id: string, unitId: number, note: string): P
 /** Elle ekleme formu: seçilen tarihlerde hangi odalar boş? */
 export async function availabilityAction(checkIn: string, checkOut: string): Promise<UnitAvailability[]> {
   const { db } = await requireApprovedStaff();
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(checkIn) || !/^\d{4}-\d{2}-\d{2}$/.test(checkOut) || checkOut <= checkIn) {
+  if (
+    !/^\d{4}-\d{2}-\d{2}$/.test(checkIn) ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(checkOut) ||
+    checkOut <= checkIn ||
+    checkIn < todayInDemre(new Date())
+  ) {
     return [];
   }
   return availabilityForRange(db, checkIn, checkOut, await getLockedDatesByType());
@@ -110,7 +116,9 @@ export async function createManualAction(
             ? MESSAGES.conflict
             : e.code === "unit_unknown"
               ? MESSAGES.unit_required
-              : "Bilgilerde eksik var: tarih, oda ve misafir adı gerekli.",
+              : e.code === "in_past"
+                ? "Geçmiş bir tarihe rezervasyon eklenemez."
+                : "Bilgilerde eksik var: tarih, oda ve misafir adı gerekli.",
       };
     }
     throw e;
