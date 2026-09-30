@@ -36,7 +36,7 @@ export const privacy: Record<Locale, Privacy> = {
       {
         h: "Verileriniz kimlerle paylaşılır?",
         p: [
-          "Verileriniz satılmaz ve reklam amacıyla kullanılmaz. Sadece hizmeti sunabilmemiz için gerekli teknik hizmet sağlayıcılarla paylaşılır: Vercel (site barındırma), Neon (veritabanı — sunucular Frankfurt, Almanya), Resend (işletmeye bildirim e-postası) ve Google (harita, yorumlar). Bu sağlayıcıların bazıları yurt dışında (AB ve ABD) bulunduğundan verileriniz yurt dışına aktarılabilir; bu aktarım yalnızca yukarıdaki amaçlarla ve formda verdiğiniz onaya dayanarak yapılır.",
+          "Verileriniz satılmaz ve reklam amacıyla kullanılmaz. Sadece hizmeti sunabilmemiz için gerekli teknik hizmet sağlayıcılarla paylaşılır: Vercel (site barındırma), Neon (veritabanı — sunucular Frankfurt, Almanya), Resend (işletmeye bildirim ve size talep onayı e-postası) ve Google (harita, yorumlar). Bu sağlayıcıların bazıları yurt dışında (AB ve ABD) bulunduğundan verileriniz yurt dışına aktarılabilir; bu aktarım yalnızca yukarıdaki amaçlarla ve formda verdiğiniz onaya dayanarak yapılır.",
           "WhatsApp'tan yazmayı seçerseniz o iletişim WhatsApp'ın kendi gizlilik koşullarına tabidir.",
         ],
       },
@@ -84,7 +84,7 @@ export const privacy: Record<Locale, Privacy> = {
       {
         h: "Who we share it with",
         p: [
-          "We never sell your data or use it for advertising. It is shared only with the technical providers we need to run the service: Vercel (hosting), Neon (database — servers in Frankfurt, Germany), Resend (notification emails to the business) and Google (maps, reviews). Some providers are located outside Türkiye (EU and USA), so your data may be transferred abroad for these purposes only.",
+          "We never sell your data or use it for advertising. It is shared only with the technical providers we need to run the service: Vercel (hosting), Neon (database — servers in Frankfurt, Germany), Resend (notification emails to the business and a request receipt to you) and Google (maps, reviews). Some providers are located outside Türkiye (EU and USA), so your data may be transferred abroad for these purposes only.",
           "If you choose to message us on WhatsApp, that conversation is subject to WhatsApp's own privacy terms.",
         ],
       },
@@ -132,7 +132,7 @@ export const privacy: Record<Locale, Privacy> = {
       {
         h: "Weitergabe",
         p: [
-          "Wir verkaufen deine Daten nicht und nutzen sie nicht für Werbung. Sie gehen nur an technische Dienstleister, die wir für den Betrieb benötigen: Vercel (Hosting), Neon (Datenbank — Server in Frankfurt), Resend (Benachrichtigungs-E-Mails an den Betrieb) und Google (Karten, Bewertungen). Einige Anbieter sitzen außerhalb der Türkei (EU und USA); eine Übermittlung erfolgt nur zu diesen Zwecken.",
+          "Wir verkaufen deine Daten nicht und nutzen sie nicht für Werbung. Sie gehen nur an technische Dienstleister, die wir für den Betrieb benötigen: Vercel (Hosting), Neon (Datenbank — Server in Frankfurt), Resend (Benachrichtigungen an den Betrieb und eine Eingangsbestätigung an dich) und Google (Karten, Bewertungen). Einige Anbieter sitzen außerhalb der Türkei (EU und USA); eine Übermittlung erfolgt nur zu diesen Zwecken.",
           "Wenn du uns per WhatsApp schreibst, gelten dafür die Datenschutzbestimmungen von WhatsApp.",
         ],
       },

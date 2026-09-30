@@ -12,6 +12,7 @@ import { z } from "zod";
 import type { Db } from "./index";
 import { analyticsEvents, outbox, reservationEvents, reservations, units } from "./schema";
 import type { EmailResult } from "@/lib/email";
+import { buildGuestAck } from "@/lib/guest-email";
 import type { PushMessage } from "@/lib/push";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -66,7 +67,8 @@ export function generateReference(): string {
 export async function createReservation(
   db: Db,
   raw: ReservationRequest,
-  opts: { now?: Date } = {},
+  /** guestAck: misafir e-posta verdiyse ona "talebini aldık" e-postası da kuyruğa eklenir */
+  opts: { now?: Date; guestAck?: boolean } = {},
 ) {
   const now = opts.now ?? new Date();
   const parsed = reservationRequestSchema.safeParse(raw);
@@ -126,11 +128,20 @@ export async function createReservation(
       ])
       .returning({ id: outbox.id });
 
+    let guestAckOutboxId: number | null = null;
+    if (opts.guestAck && d.email) {
+      const [ack] = await tx
+        .insert(outbox)
+        .values({ kind: "guest_ack", payload: { reservationId: reservation.id } })
+        .returning({ id: outbox.id });
+      guestAckOutboxId = ack.id;
+    }
+
     await tx
       .insert(analyticsEvents)
       .values({ name: "reservation_submitted", path: `/${d.locale}/rezervasyon`, locale: d.locale });
 
-    return { reservation, outboxId: message.id, pushOutboxId: push.id };
+    return { reservation, outboxId: message.id, pushOutboxId: push.id, guestAckOutboxId };
   });
 }
 
@@ -151,6 +162,7 @@ type Sender = (subject: string, text: string) => Promise<EmailResult>;
 export type OutboxHandlers = {
   email: Sender;
   push: (message: PushMessage) => Promise<EmailResult>;
+  guestEmail: (to: string, subject: string, text: string) => Promise<EmailResult>;
 };
 
 function shortDate(iso: string): string {
@@ -236,6 +248,18 @@ export async function deliverOutboxMessage(
       result = await handlers.email(email.subject, email.text);
     } else if (claimed.kind === "reservation_push") {
       result = await handlers.push(await buildReservationPush(db, reservationId));
+    } else if (claimed.kind === "guest_ack") {
+      const [row] = await db
+        .select({ r: reservations, unitName: units.name })
+        .from(reservations)
+        .leftJoin(units, eq(units.id, reservations.unitId))
+        .where(eq(reservations.id, reservationId));
+      if (!row?.r.email) {
+        result = { ok: true }; // e-posta silinmiş (ör. saklama süresi) — gönderilecek bir şey yok
+      } else {
+        const ack = buildGuestAck({ ...row.r, unitName: row.unitName });
+        result = await handlers.guestEmail(row.r.email, ack.subject, ack.text);
+      }
     } else {
       result = { ok: false, error: `Bilinmeyen outbox türü: ${claimed.kind}` };
     }

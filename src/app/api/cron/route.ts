@@ -3,7 +3,7 @@ import { getDb } from "@/db";
 import { anonymizeExpiredReservations, escalateStalePending } from "@/db/maintenance";
 import { pruneRateLimits } from "@/db/rate-limit";
 import { deliverDueOutbox } from "@/db/reservations";
-import { sendNotificationEmail } from "@/lib/email";
+import { sendGuestEmail, sendNotificationEmail } from "@/lib/email";
 import { sendPushToStaff } from "@/lib/push";
 
 /**
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
   if (!db) return Response.json({ skipped: "DATABASE_URL yok" });
 
   const push = (m: Parameters<typeof sendPushToStaff>[1]) => sendPushToStaff(db, m);
-  const outbox = await deliverDueOutbox(db, { email: sendNotificationEmail, push });
+  const outbox = await deliverDueOutbox(db, { email: sendNotificationEmail, push, guestEmail: sendGuestEmail });
   const escalated = await escalateStalePending(db, (m) => sendPushToStaff(db, m, { roles: ["admin"] }));
   const anonymized = await anonymizeExpiredReservations(db);
   await pruneRateLimits(db);

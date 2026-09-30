@@ -187,8 +187,12 @@ describe("çift rezervasyon koruması (veritabanı kısıtı)", () => {
 });
 
 /** Sahte gönderim kanalları: e-posta verilen fonksiyonla, bildirim varsayılan olarak başarılı. */
-function via(email: ReturnType<typeof vi.fn>, push = vi.fn().mockResolvedValue({ ok: true })) {
-  return { email, push } as unknown as OutboxHandlers;
+function via(
+  email: ReturnType<typeof vi.fn>,
+  push = vi.fn().mockResolvedValue({ ok: true }),
+  guestEmail = vi.fn().mockResolvedValue({ ok: true }),
+) {
+  return { email, push, guestEmail } as unknown as OutboxHandlers;
 }
 
 describe("outbox teslimi", () => {
@@ -280,5 +284,34 @@ describe("outbox teslimi", () => {
     release();
     expect(await first).toBe("sent");
     expect(slow).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("misafire talep e-postası", () => {
+  it("sadece istenirse ve misafir e-posta verdiyse kuyruğa girer", async () => {
+    expect((await createReservation(db, { ...valid, email: "a@example.com" }, { now: NOW })).guestAckOutboxId).toBeNull();
+    expect(
+      (await createReservation(db, { ...valid, email: "" }, { now: NOW, guestAck: true })).guestAckOutboxId,
+    ).toBeNull();
+    expect(
+      (await createReservation(db, { ...valid, email: "a@example.com" }, { now: NOW, guestAck: true })).guestAckOutboxId,
+    ).not.toBeNull();
+  });
+
+  it("misafirin dilinde, talep koduyla gönderilir", async () => {
+    const { reservation, guestAckOutboxId } = await createReservation(
+      db,
+      { ...valid, name: "Hans Müller", email: "hans@example.com", locale: "de" },
+      { now: NOW, guestAck: true },
+    );
+    const guestEmail = vi.fn().mockResolvedValue({ ok: true });
+    const handlers = via(vi.fn(), undefined, guestEmail);
+
+    expect(await deliverOutboxMessage(db, guestAckOutboxId!, handlers, NOW)).toBe("sent");
+    const [to, subject, text] = guestEmail.mock.calls[0];
+    expect(to).toBe("hans@example.com");
+    expect(subject).toContain(reservation.reference);
+    expect(text).toMatch(/^Hallo Hans,/);
+    expect(text).toContain("noch keine Bestätigung");
   });
 });

@@ -12,7 +12,7 @@ import {
 } from "@/db/reservations";
 import { rangeHasLockedDay } from "@/lib/availability";
 import { clientKey } from "@/lib/client-key";
-import { sendNotificationEmail } from "@/lib/email";
+import { guestEmailEnabled, sendGuestEmail, sendNotificationEmail } from "@/lib/email";
 import { getGuestLockedDates } from "@/lib/guest-availability";
 import { sendPushToStaff, type PushMessage } from "@/lib/push";
 import { reservationSummary, type ReservationInput } from "@/lib/reservation";
@@ -74,21 +74,21 @@ export async function submitReservation(
       console.error("Spam sınırı kontrol edilemedi, talep kabul ediliyor", e);
     }
     try {
-      const { reservation, outboxId, pushOutboxId } = await createReservation(db, {
-        ...data,
-        unit: meta.unitSlug,
-        locale: meta.locale,
-        consent: meta.consent as true,
-      });
+      const { reservation, outboxId, pushOutboxId } = await createReservation(
+        db,
+        { ...data, unit: meta.unitSlug, locale: meta.locale, consent: meta.consent as true },
+        { guestAck: guestEmailEnabled() },
+      );
       const handlers = {
         email: sendNotificationEmail,
         push: (m: PushMessage) => sendPushToStaff(db, m),
+        guestEmail: sendGuestEmail,
       };
       const [delivery] = await Promise.all([
         deliverOutboxMessage(db, outboxId, handlers),
         deliverOutboxMessage(db, pushOutboxId, handlers),
       ]);
-      // Yanıt döndükten sonra: daha önce başarısız olmuş bildirimleri tekrar dene.
+      // Yanıt döndükten sonra: misafirin e-postası ve daha önce başarısız olmuş bildirimler.
       after(() => deliverDueOutbox(db, handlers).catch(console.error));
       return { ok: true, emailed: delivery === "sent", reference: reservation.reference };
     } catch (e) {
