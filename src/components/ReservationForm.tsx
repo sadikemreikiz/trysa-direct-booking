@@ -85,7 +85,13 @@ export default function ReservationForm({
       const unitSlug = unitOptions.find(([label]) => label === data.unit)?.[1] ?? "";
       const res = await submitReservation(data, { unitSlug, locale: lang, consent: kvkk });
       if (!res.ok) {
-        setError(res.error === "required" ? t.reservation.errRequired : t.reservation.errInvalid);
+        setError(
+          res.error === "required"
+            ? t.reservation.errRequired
+            : res.error === "blocked"
+              ? t.reservation.blockedMsg
+              : t.reservation.errInvalid,
+        );
         setStatus("idle");
         return;
       }

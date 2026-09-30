@@ -37,6 +37,11 @@ async function run(id: string, fn: () => Promise<unknown>): Promise<ActionResult
   }
 }
 
+/** Onay/iptal misafir formundaki dolu günleri değiştirir → rezervasyon sayfasını yenile. */
+function refreshGuestForm() {
+  revalidatePath("/[lang]/rezervasyon", "page");
+}
+
 export async function confirmAction(id: string, unitId: number, note: string): Promise<ActionResult> {
   const { db, staff } = await requireApprovedStaff();
   const detail = await getReservationDetail(db, id);
@@ -58,7 +63,9 @@ export async function confirmAction(id: string, unitId: number, note: string): P
       error: unit.reason === "airbnb" ? "Bu oda bu tarihlerde Airbnb'de dolu." : MESSAGES.conflict,
     };
   }
-  return run(id, () => confirmReservation(db, id, staff.userId, unitId, { note }));
+  const result = await run(id, () => confirmReservation(db, id, staff.userId, unitId, { note }));
+  refreshGuestForm();
+  return result;
 }
 
 export async function declineAction(id: string, note: string): Promise<ActionResult> {
@@ -68,7 +75,9 @@ export async function declineAction(id: string, note: string): Promise<ActionRes
 
 export async function cancelAction(id: string, note: string): Promise<ActionResult> {
   const { db, staff } = await requireApprovedStaff();
-  return run(id, () => cancelReservation(db, id, staff.userId, { note }));
+  const result = await run(id, () => cancelReservation(db, id, staff.userId, { note }));
+  refreshGuestForm();
+  return result;
 }
 
 export async function noteAction(id: string, note: string): Promise<ActionResult> {

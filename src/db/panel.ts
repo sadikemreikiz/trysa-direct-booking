@@ -235,6 +235,42 @@ export async function addReservationNote(db: Db, id: string, actorUserId: string
   });
 }
 
+/**
+ * Sitede onaylanmış (direkt) rezervasyonların dolu günleri, ünite adına göre
+ * (Airbnb doluluğuyla aynı biçim: ad → YYYY-MM-DD[]). Kamp alanı ortak olduğu için hariç.
+ */
+export async function confirmedDaysByUnit(db: Db, fromDate: string): Promise<Record<string, string[]>> {
+  const rows = await db
+    .select({ name: units.name, slug: units.slug, checkIn: reservations.checkIn, checkOut: reservations.checkOut })
+    .from(reservations)
+    .innerJoin(units, eq(units.id, reservations.unitId))
+    .where(and(eq(reservations.status, "confirmed"), gt(reservations.checkOut, fromDate)));
+
+  const out: Record<string, Set<string>> = {};
+  for (const r of rows) {
+    if (r.slug === SHARED_UNIT_SLUG) continue;
+    const days = (out[r.name] ??= new Set());
+    for (let d = new Date(`${r.checkIn}T00:00:00Z`); d < new Date(`${r.checkOut}T00:00:00Z`); ) {
+      const day = d.toISOString().slice(0, 10);
+      if (day >= fromDate) days.add(day);
+      d = new Date(d.getTime() + 86_400_000);
+    }
+  }
+  return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, [...v].sort()]));
+}
+
+/** İki doluluk haritasını (ünite adı → günler) birleştirir. */
+export function mergeLockedDays(
+  a: Record<string, string[]>,
+  b: Record<string, string[]>,
+): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const key of new Set([...Object.keys(a), ...Object.keys(b)])) {
+    out[key] = [...new Set([...(a[key] ?? []), ...(b[key] ?? [])])].sort();
+  }
+  return out;
+}
+
 /** Onaylı rezervasyonlar — Airbnb'ye verilecek takvim (iCal) için. */
 export async function confirmedStaysForUnit(db: Db, unitSlug: string, fromDate: string) {
   return db

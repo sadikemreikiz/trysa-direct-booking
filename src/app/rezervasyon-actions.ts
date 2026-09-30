@@ -8,14 +8,16 @@ import {
   deliverOutboxMessage,
   ReservationValidationError,
 } from "@/db/reservations";
+import { rangeHasLockedDay } from "@/lib/availability";
 import { sendNotificationEmail } from "@/lib/email";
+import { getGuestLockedDates } from "@/lib/guest-availability";
 import { sendPushToStaff, type PushMessage } from "@/lib/push";
 import { reservationSummary, type ReservationInput } from "@/lib/reservation";
 import type { Locale } from "@/i18n-config";
 
 export type SubmitResult = {
   ok: boolean;
-  error?: "required" | "invalid";
+  error?: "required" | "invalid" | "blocked";
   emailed?: boolean;
   /** Misafire gösterilen talep kodu (veritabanına kaydedildiyse) */
   reference?: string;
@@ -33,6 +35,11 @@ export async function submitReservation(
 ): Promise<SubmitResult> {
   if (!data.checkin || !data.checkout || !data.name.trim() || !data.phone.trim()) {
     return { ok: false, error: "required" };
+  }
+  // Sayfa önbellekten gelmiş olabilir: seçilen oda bu arada dolduysa talebi baştan reddet.
+  if (meta.unitSlug && meta.unitSlug !== "kamp") {
+    const locked = (await getGuestLockedDates())[data.unit] ?? [];
+    if (rangeHasLockedDay(data.checkin, data.checkout, locked)) return { ok: false, error: "blocked" };
   }
 
   const db = getDb();

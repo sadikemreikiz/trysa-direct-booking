@@ -7,11 +7,13 @@ import {
   availabilityForRange,
   cancelReservation,
   canTransition,
+  confirmedDaysByUnit,
   confirmedStaysForUnit,
   confirmReservation,
   declineReservation,
   getReservationDetail,
   listPanelReservations,
+  mergeLockedDays,
   TransitionError,
 } from "./panel";
 import { createReservation, type ReservationRequest } from "./reservations";
@@ -207,6 +209,35 @@ describe("müsaitlik", () => {
     await confirmReservation(db, b.id, u, 1);
     const stays = await confirmedStaysForUnit(db, "ambar-1", "2026-11-20");
     expect(stays.map((s) => s.checkIn)).toEqual(["2026-12-01"]);
+  });
+
+  it("misafir formu için onaylı günleri ünite adına göre verir (çıkış günü ve kamp hariç)", async () => {
+    const u = await makeUser("u1", "a@example.com");
+    const a = await request({ checkin: "2026-11-10", checkout: "2026-11-12" });
+    const b = await request({ unit: "kulube-1", checkin: "2026-11-11", checkout: "2026-11-12" });
+    const kamp = await request({ unit: "kamp" });
+    await request({ unit: "ambar-2" }); // pending — dahil değil
+    await confirmReservation(db, a.id, u, 1);
+    await confirmReservation(db, b.id, u, 4);
+    await confirmReservation(db, kamp.id, u, 7);
+
+    expect(await confirmedDaysByUnit(db, "2026-11-11")).toEqual({
+      "Ambar-1": ["2026-11-11"], // 10'u geçmişte kaldı, 12 çıkış günü
+      "Kulübe-1": ["2026-11-11"],
+    });
+  });
+
+  it("Airbnb ve site doluluğunu birleştirir", () => {
+    expect(
+      mergeLockedDays(
+        { "Ambar-1": ["2026-11-12", "2026-11-10"], "Ambar-2": [] },
+        { "Ambar-1": ["2026-11-10", "2026-11-11"], "Kulübe-1": ["2026-11-11"] },
+      ),
+    ).toEqual({
+      "Ambar-1": ["2026-11-10", "2026-11-11", "2026-11-12"],
+      "Ambar-2": [],
+      "Kulübe-1": ["2026-11-11"],
+    });
   });
 });
 

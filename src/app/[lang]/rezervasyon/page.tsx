@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import ReservationForm from "@/components/ReservationForm";
-import { getLockedDatesByType } from "@/lib/availability";
+import { getGuestLockedDates } from "@/lib/guest-availability";
 import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
 
 export async function generateMetadata({
@@ -25,7 +25,7 @@ export default async function ReservationPage({
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
-  const lockedByType = await getLockedDatesByType();
+  const lockedByType = await getGuestLockedDates();
 
   return (
     <>
