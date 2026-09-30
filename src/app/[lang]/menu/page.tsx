@@ -57,9 +57,13 @@ export default async function MenuPage({
                     >
                       <span className="text-[15px] text-ink">
                         {itemName(it, lang)}
-                        {/* Çeviride Türkçe adı da göster: misafir basılı menüde bulabilsin */}
-                        {lang !== "tr" && <span className="block text-xs text-muted" lang="tr">{it.n}</span>}
-                        {it.d?.[lang] && <span className="block text-xs text-muted">{it.d[lang]}</span>}
+                        {it.d?.[lang] && <span className="block text-[13px] text-muted">{it.d[lang]}</span>}
+                        {/* Çeviride Türkçe adı da göster (eğik): misafir basılı menüde bulabilsin */}
+                        {lang !== "tr" && (
+                          <span className="mt-0.5 block text-xs italic text-muted/80" lang="tr">
+                            {it.n}
+                          </span>
+                        )}
                       </span>
                       <span className="whitespace-nowrap font-semibold text-pine">
                         {it.p} ₺

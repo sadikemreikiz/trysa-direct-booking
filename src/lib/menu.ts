@@ -33,13 +33,13 @@ export const menu: MenuCategory[] = [
       { n: "Köy Tavuğu Çorbası", en: "Free-range chicken soup", de: "Landhuhn-Suppe", p: "190" },
       {
         n: "Pişi Tabağı",
-        en: "Pişi plate (fried dough)",
-        de: "Pişi-Teller (frittiertes Teiggebäck)",
+        en: "Pişi plate",
+        de: "Pişi-Teller",
         p: "400",
         d: {
           tr: "Pişi, domates, salatalık, peynir, reçel",
-          en: "Pişi, tomato, cucumber, cheese, jam",
-          de: "Pişi, Tomate, Gurke, Käse, Marmelade",
+          en: "Fried dough bites, tomato, cucumber, cheese, jam",
+          de: "Frittiertes Teiggebäck, Tomate, Gurke, Käse, Marmelade",
         },
       },
     ],
