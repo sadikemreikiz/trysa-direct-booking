@@ -5,7 +5,7 @@ import path from "node:path";
 export function getRoomPhotos(slug: string): string[] {
   try {
     const dir = path.join(process.cwd(), "public", "img", "rooms", slug);
-    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".jpg"));
+    const files = fs.readdirSync(dir).filter((f) => f.endsWith(".jpg") && !f.endsWith(".sm.jpg"));
     const kapak = files.filter((f) => f === "kapak.jpg");
     const rest = files
       .filter((f) => f !== "kapak.jpg")

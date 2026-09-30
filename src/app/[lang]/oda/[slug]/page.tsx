@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import { stays } from "@/lib/site";
 import { getRoomPhotos } from "@/lib/roomPhotos";
+import { responsiveImage } from "@/lib/images";
+import { pageMetadata } from "@/lib/seo";
 import { getDictionary, isLocale, defaultLocale, locales } from "@/dictionaries";
 
 type Params = { params: Promise<{ lang: string; slug: string }> };
@@ -17,12 +19,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { lang, slug } = await params;
-  const t = getDictionary(isLocale(lang) ? lang : defaultLocale);
+  const loc = isLocale(lang) ? lang : defaultLocale;
+  const t = getDictionary(loc);
   const room = stays.find((s) => s.slug === slug);
-  return {
-    title: room ? room.title : "Oda",
-    description: room ? t.room.descs[room.slug] : undefined,
-  };
+  if (!room) return { title: "404" };
+  const meta = pageMetadata(loc, `/oda/${room.slug}`, { title: room.title, description: t.room.descs[room.slug] });
+  // Paylaşım önizlemesinde odanın kendi kapak fotoğrafı
+  if (room.img) meta.openGraph = { ...meta.openGraph, images: [{ url: room.img, alt: room.title }] };
+  return meta;
 }
 
 export default async function RoomPage({ params }: Params) {
@@ -65,7 +69,7 @@ export default async function RoomPage({ params }: Params) {
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={cover}
+              {...responsiveImage(cover, "(min-width: 768px) 1100px, 100vw")}
               alt={room.title}
               className="mt-5 h-64 w-full rounded-2xl object-cover md:h-[420px]"
             />
@@ -77,7 +81,7 @@ export default async function RoomPage({ params }: Params) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   key={src}
-                  src={src}
+                  {...responsiveImage(src, "(min-width: 768px) 33vw, 50vw")}
                   alt={`${room.title} ${i + 2}`}
                   loading="lazy"
                   className="h-40 w-full rounded-xl object-cover md:h-52"
