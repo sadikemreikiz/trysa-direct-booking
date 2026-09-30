@@ -37,6 +37,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Site ve panelin ayrı kök düzenleri var → tüm uygulama için tek 404 sayfası (app/global-not-found.tsx)
+  experimental: { globalNotFound: true },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
