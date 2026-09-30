@@ -35,7 +35,8 @@ export function openGraphBase(lang: Locale) {
     siteName: BUSINESS_NAME,
     locale: lang === "tr" ? "tr_TR" : lang === "de" ? "de_DE" : "en_US",
     type: "website" as const,
-    images: [{ url: "/img/hero.jpg", width: 1200, height: 900, alt: "Trysa" }],
+    // Paylaşım kartı (WhatsApp, Facebook…): logo + isim + kulübe fotoğrafı, 1200x630
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Trysa Restaurant Camping" }],
   };
 }
 
