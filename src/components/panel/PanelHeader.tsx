@@ -16,9 +16,14 @@ export default function PanelHeader({ staff, back }: { staff: StaffMember; back?
       )}
       <div className="flex items-center gap-4">
         {staff.role === "admin" && (
-          <Link href="/panel/erisim" className="text-sm font-semibold text-pine">
-            Ayarlar
-          </Link>
+          <>
+            <Link href="/panel/istatistik" className="text-sm font-semibold text-pine">
+              İstatistik
+            </Link>
+            <Link href="/panel/erisim" className="text-sm font-semibold text-pine">
+              Ayarlar
+            </Link>
+          </>
         )}
         <SignOutButton />
       </div>
