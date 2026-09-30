@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StaffMember } from "@/db/staff";
 import { SignOutButton } from "./AuthButtons";
+import LogoMark from "../LogoMark";
 
 export default function PanelHeader({ staff, back }: { staff: StaffMember; back?: boolean }) {
   return (
@@ -10,8 +11,12 @@ export default function PanelHeader({ staff, back }: { staff: StaffMember; back?
           ← Talepler
         </Link>
       ) : (
-        <Link href="/panel" className="font-display text-2xl font-semibold text-pine">
-          Trysa Panel
+        <Link
+          href="/panel"
+          className="flex items-center gap-2 whitespace-nowrap font-display text-2xl font-semibold text-pine"
+        >
+          <LogoMark id="logo-panel" className="h-6 w-auto" />
+          Trysa<span className="hidden sm:inline"> Panel</span>
         </Link>
       )}
       <div className="flex items-center gap-4">

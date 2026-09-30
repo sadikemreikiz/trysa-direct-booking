@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
+import LogoMark from "./LogoMark";
 
 /** Bulunamayan sayfa — ziyaretçinin dili bilinmediği için üç dilde kısa metin. */
 const TEXT = [
@@ -12,7 +13,8 @@ const TEXT = [
 export default function NotFoundContent() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-5 py-16 text-center">
-      <Link href="/" className="font-display text-3xl font-semibold tracking-wide text-pine">
+      <Link href="/" className="flex flex-col items-center gap-3 font-display text-3xl font-semibold tracking-wide text-pine">
+        <LogoMark id="logo-404" className="h-12 w-auto" />
         TRYSA
       </Link>
       <p className="mt-6 text-sm font-bold tracking-[0.2em] text-clay">404</p>

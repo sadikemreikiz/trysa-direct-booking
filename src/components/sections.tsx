@@ -286,7 +286,7 @@ export function Gallery({ t }: T) {
           <img
             key={i}
             {...responsiveImage(g.src, "(min-width: 768px) 25vw, 50vw")}
-            alt={g.label}
+            alt={g.label === "Doğa" ? t.gallery.nature : g.label}
             loading="lazy"
             className="h-28 w-full rounded-xl object-cover md:h-36"
           />
@@ -382,12 +382,13 @@ export function Distances({ t, lang }: TL) {
 }
 
 /* ---------- YORUMLAR ---------- */
-export function Reviews({ t, google }: T & { google?: GoogleReviewsData | null }) {
+export function Reviews({ t, lang, google }: TL & { google?: GoogleReviewsData | null }) {
   const items =
     google && google.reviews.length > 0
       ? google.reviews.map((r) => ({
           text: r.text,
           author: r.when ? `${r.author} · ${r.when}` : r.author,
+          translated: r.translated,
         }))
       : [];
   if (items.length === 0) return null;
@@ -396,7 +397,7 @@ export function Reviews({ t, google }: T & { google?: GoogleReviewsData | null }
       {google && google.count > 0 && (
         <div className="mb-4 flex items-center gap-2">
           <Stars className="text-base" />
-          <span className="font-bold text-pine">{google.rating.toLocaleString("tr-TR")}</span>
+          <span className="font-bold text-pine">{formatRating(google.rating, lang)}</span>
           <span className="text-sm text-muted">· {google.count} {t.reviews.suffix}</span>
         </div>
       )}
@@ -408,6 +409,7 @@ export function Reviews({ t, google }: T & { google?: GoogleReviewsData | null }
               “{r.text}”
             </p>
             <div className="mt-3 text-sm font-semibold text-muted">— {r.author}</div>
+            {r.translated && <div className="mt-1 text-xs text-muted/80">{t.reviews.translated}</div>}
           </div>
         ))}
       </div>

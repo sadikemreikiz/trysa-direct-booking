@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import LogoMark from "@/components/LogoMark";
 import { GoogleSignInButton } from "@/components/panel/AuthButtons";
 import { getPanelContext } from "@/lib/panel-session";
 
@@ -13,6 +14,7 @@ export default async function SignInPage({
 
   return (
     <div className="pt-16 text-center">
+      <LogoMark id="logo-giris" className="mx-auto mb-4 h-14 w-auto" />
       <div className="font-display text-4xl font-semibold text-pine">Trysa Panel</div>
       <p className="mx-auto mt-3 max-w-xs text-muted">
         Rezervasyon taleplerini buradan görür, onaylar ve misafire WhatsApp&apos;tan yazarsın.

@@ -76,7 +76,7 @@ const tr = {
     desc: "Köy tavuğu, ızgaralar, taze balık, serpme kahvaltı ve gözleme. Açık hava bölümünde, doğanın içinde.",
     cta: "Menüyü gör",
   },
-  gallery: { title: "Galeri" },
+  gallery: { title: "Galeri", nature: "Doğa" },
   trysaStory: {
     kicker: "TRYSA'NIN HİKAYESİ",
     title: "Likya'nın unutulmuş kentinin eteğindesin",
@@ -106,7 +106,7 @@ const tr = {
       { p: "Antalya Havalimanı", t: "~2,5 sa" },
     ],
   },
-  reviews: { suffix: "Google yorumu" },
+  reviews: { suffix: "Google yorumu", translated: "Google tarafından çevrildi" },
   faq: {
     title: "Sıkça sorulanlar",
     items: [
@@ -302,7 +302,7 @@ const en: Dict = {
     desc: "Free-range chicken, grills, fresh fish, Turkish breakfast and gözleme. In the open-air section, surrounded by nature.",
     cta: "See the menu",
   },
-  gallery: { title: "Gallery" },
+  gallery: { title: "Gallery", nature: "Nature" },
   trysaStory: {
     kicker: "THE STORY OF TRYSA",
     title: "You're at the foot of Lycia's forgotten city",
@@ -332,7 +332,7 @@ const en: Dict = {
       { p: "Antalya Airport", t: "~2.5 h" },
     ],
   },
-  reviews: { suffix: "Google reviews" },
+  reviews: { suffix: "Google reviews", translated: "Translated by Google" },
   faq: {
     title: "Frequently asked",
     items: [
@@ -526,7 +526,7 @@ const de: Dict = {
     desc: "Freilandhähnchen, Grillgerichte, frischer Fisch, türkisches Frühstück und Gözleme. Im Außenbereich, mitten in der Natur.",
     cta: "Zur Speisekarte",
   },
-  gallery: { title: "Galerie" },
+  gallery: { title: "Galerie", nature: "Natur" },
   trysaStory: {
     kicker: "DIE GESCHICHTE VON TRYSA",
     title: "Du bist am Fuße von Lykiens vergessener Stadt",
@@ -556,7 +556,7 @@ const de: Dict = {
       { p: "Flughafen Antalya", t: "~2,5 Std." },
     ],
   },
-  reviews: { suffix: "Google-Bewertungen" },
+  reviews: { suffix: "Google-Bewertungen", translated: "Von Google übersetzt" },
   faq: {
     title: "Häufige Fragen",
     items: [

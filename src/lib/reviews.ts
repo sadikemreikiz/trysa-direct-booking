@@ -3,6 +3,8 @@
  * Env: GOOGLE_PLACES_API_KEY (gerekli), GOOGLE_PLACE_ID (opsiyonel; yoksa isimden bulunur).
  * Anahtar yoksa null döner → site statik örnek yorumlara düşer.
  * Google API en fazla ~5 öne çıkan yorum verir; günde bir yenilenir.
+ * Dile göre istenir: Google önce o dilde yazılmış yorumları verir (EN sayfada İngilizce
+ * yorumlar); çevrilmiş olanlar `translated` ile işaretlenir.
  */
 import type { Locale } from "@/i18n-config";
 import { site } from "./site";
@@ -12,6 +14,8 @@ export type GoogleReview = {
   rating: number;
   text: string;
   when: string;
+  /** Google, yorumu sayfanın diline çevirdiyse true (altında "Google çevirisi" yazar) */
+  translated: boolean;
 };
 
 export type GoogleReviewsData = {
@@ -31,8 +35,8 @@ type PlaceResponse = {
   reviews?: {
     rating?: number;
     relativePublishTimeDescription?: string;
-    text?: { text?: string };
-    originalText?: { text?: string };
+    text?: { text?: string; languageCode?: string };
+    originalText?: { text?: string; languageCode?: string };
     authorAttribution?: { displayName?: string };
   }[];
 };
@@ -80,16 +84,19 @@ export function fillRating(template: string, summary: RatingSummary, lang: Local
     .replaceAll("{count}", new Intl.NumberFormat(lang).format(summary.count));
 }
 
-export async function getGoogleReviews(): Promise<GoogleReviewsData | null> {
+const ANONYMOUS: Record<Locale, string> = { tr: "Google kullanıcısı", en: "Google user", de: "Google-Nutzer" };
+
+export async function getGoogleReviews(lang: Locale = "tr"): Promise<GoogleReviewsData | null> {
   if (!KEY) return null;
   const placeId = await resolvePlaceId();
   if (!placeId) return null;
   try {
-    const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+    // languageCode adrese yazılır: her dil ayrı önbelleğe alınır
+    const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}?languageCode=${lang}`, {
       headers: {
         "X-Goog-Api-Key": KEY,
         "X-Goog-FieldMask": "rating,userRatingCount,reviews",
-        "Accept-Language": "tr",
+        "Accept-Language": lang,
       },
       next: { revalidate: 86_400 }, // günde bir yenile
     });
@@ -97,10 +104,13 @@ export async function getGoogleReviews(): Promise<GoogleReviewsData | null> {
     const data = (await res.json()) as PlaceResponse;
     const reviews: GoogleReview[] = (data.reviews ?? [])
       .map((r) => ({
-        author: r.authorAttribution?.displayName ?? "Google kullanıcısı",
+        author: r.authorAttribution?.displayName ?? ANONYMOUS[lang],
         rating: r.rating ?? 5,
         text: r.text?.text ?? r.originalText?.text ?? "",
         when: r.relativePublishTimeDescription ?? "",
+        translated: Boolean(
+          r.text?.languageCode && r.originalText?.languageCode && r.text.languageCode !== r.originalText.languageCode,
+        ),
       }))
       .filter((r) => r.text.trim().length > 0)
       .slice(0, 6);

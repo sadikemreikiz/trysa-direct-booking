@@ -7,6 +7,18 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trysacampin
 /** Google İşletme Profili'ndeki adla birebir aynı olmalı (arama eşleşmesi için). */
 export const BUSINESS_NAME = "Trysa Restaurant Camping";
 
+/** Ana sayfa başlığı ve arama sonucu açıklaması (sayfa metadata'sı ve yapısal veri aynısını kullanır). */
+export const HOME_TITLE: Record<Locale, string> = {
+  tr: "Trysa Restaurant Camping — Demre'de doğada konaklama & ocakbaşı",
+  en: "Trysa Restaurant Camping — Nature stay & grill in Demre, Antalya",
+  de: "Trysa Restaurant Camping — Natur, Unterkunft & Grill in Demre",
+};
+export const HOME_DESCRIPTION: Record<Locale, string> = {
+  tr: "Trysa Restaurant Camping, Demre: ahşap odalar, tiny house, kamp & karavan alanı ve ocakbaşı restoran — antik Trysa'nın eteğinde, yıl boyu açık.",
+  en: "Trysa Restaurant Camping in Demre, Antalya: wooden rooms, a tiny house, a camping & caravan area and a grill restaurant below ancient Trysa. Open all year.",
+  de: "Trysa Restaurant Camping in Demre, Antalya: Holzzimmer, Tiny House, Camping- & Wohnmobilplatz und Grillrestaurant am antiken Trysa. Ganzjährig geöffnet.",
+};
+
 /** Google İşletme Profili (Place ID ile) — yapısal veride site ↔ profil bağı. */
 export const GOOGLE_MAPS_URL = "https://maps.google.com/?cid=1839563921786307451";
 

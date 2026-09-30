@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import ClickTracker from "@/components/ClickTracker";
-import { openGraphBase, pageAlternates, SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
+import { HOME_DESCRIPTION, HOME_TITLE, openGraphBase, pageAlternates, SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
 import { locales, isLocale, defaultLocale } from "@/dictionaries";
 import "../globals.css";
 
@@ -22,6 +22,9 @@ export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
+/** Telefon tarayıcısının üst çubuğu sitenin başlığıyla aynı renk (krem) */
+export const viewport: Viewport = { themeColor: "#f6f1e7" };
+
 export async function generateMetadata({
   params,
 }: {
@@ -29,20 +32,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang } = await params;
   const loc = isLocale(lang) ? lang : defaultLocale;
-  const title =
-    loc === "tr"
-      ? "Trysa Restaurant Camping — Demre'de doğada konaklama & ocakbaşı"
-      : loc === "de"
-        ? "Trysa Restaurant Camping — Natur, Unterkunft & Grill in Demre"
-        : "Trysa Restaurant Camping — Nature stay & grill in Demre, Antalya";
-
+  const title = HOME_TITLE[loc];
   // Arama sonucu açıklaması: işletmenin tam adı + ne sunduğu (Google bunu yoksa sayfadan rastgele metin toplar)
-  const description =
-    loc === "tr"
-      ? "Trysa Restaurant Camping, Demre: ahşap odalar, tiny house, kamp & karavan alanı ve ocakbaşı restoran — antik Trysa'nın eteğinde, yıl boyu açık."
-      : loc === "de"
-        ? "Trysa Restaurant Camping in Demre, Antalya: Holzzimmer, Tiny House, Camping- & Wohnmobilplatz und Grillrestaurant am antiken Trysa. Ganzjährig geöffnet."
-        : "Trysa Restaurant Camping in Demre, Antalya: wooden rooms, a tiny house, a camping & caravan area and a grill restaurant below ancient Trysa. Open all year.";
+  const description = HOME_DESCRIPTION[loc];
 
   return {
     metadataBase: new URL(SITE_URL),

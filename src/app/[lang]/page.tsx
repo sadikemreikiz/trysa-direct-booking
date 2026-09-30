@@ -30,7 +30,7 @@ export default async function Home({
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);
-  const [googleReviews, rating] = await Promise.all([getGoogleReviews(), getRatingSummary()]);
+  const [googleReviews, rating] = await Promise.all([getGoogleReviews(lang), getRatingSummary()]);
 
   return (
     <>
@@ -48,7 +48,7 @@ export default async function Home({
         <TrysaStory t={t} />
         <Experiences t={t} />
         <Distances t={t} lang={lang} />
-        <Reviews t={t} google={googleReviews} />
+        <Reviews t={t} lang={lang} google={googleReviews} />
         <Faq t={t} />
         <CtaBand t={t} lang={lang} />
       </main>
