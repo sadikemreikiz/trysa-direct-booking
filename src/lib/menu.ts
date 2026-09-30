@@ -1,5 +1,5 @@
-// Fiyatlar menü fotoğrafından alındı — Emre güncel fiyatları verecek.
-// Güncelleme: aşağıdaki p (fiyat) değerlerini değiştirmen yeterli.
+// Fiyatlar restorandaki basılı menüyle birebir (Emre teyit etti: 2026-09-30).
+// Güncelleme: aşağıdaki p (fiyat) değerlerini değiştirmen yeterli; d = kısa içerik açıklaması.
 
 export type MenuItem = { n: string; p: string; d?: string };
 export type MenuCategory = { cat: string; items: MenuItem[] };
@@ -21,7 +21,7 @@ export const menu: MenuCategory[] = [
       { n: "Lüx Serpme Kahvaltı", p: "700" },
       { n: "Tabak Kahvaltı", p: "450" },
       { n: "Köy Tavuğu Çorbası", p: "190" },
-      { n: "Pişi Tabağı", p: "400" },
+      { n: "Pişi Tabağı", p: "400", d: "Pişi, domates, salatalık, peynir, reçel" },
     ],
   },
   {

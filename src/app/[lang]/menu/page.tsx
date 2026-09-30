@@ -55,7 +55,10 @@ export default async function MenuPage({
                       key={it.n}
                       className="flex items-baseline justify-between gap-3 py-2.5"
                     >
-                      <span className="text-[15px] text-ink">{it.n}</span>
+                      <span className="text-[15px] text-ink">
+                        {it.n}
+                        {it.d && <span className="block text-xs text-muted">{it.d}</span>}
+                      </span>
                       <span className="whitespace-nowrap font-semibold text-pine">
                         {it.p} ₺
                       </span>
