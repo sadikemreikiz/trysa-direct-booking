@@ -108,10 +108,17 @@ describe("outbox delivery", () => {
     const { outboxId, pushOutboxId } = await createReservation(db, valid, { now: NOW });
     const ok = vi.fn().mockResolvedValue({ ok: true });
     await deliverOutboxMessage(db, pushOutboxId, via(ok), NOW);
-    await deliverOutboxMessage(db, outboxId, via(vi.fn().mockResolvedValue({ ok: false, error: "x" })), NOW);
+    await deliverOutboxMessage(
+      db,
+      outboxId,
+      via(vi.fn().mockResolvedValue({ ok: false, error: "x" })),
+      NOW,
+    );
 
     expect(await deliverDueOutbox(db, via(ok), new Date(NOW.getTime() + 60_000))).toEqual([]);
-    expect(await deliverDueOutbox(db, via(ok), new Date(NOW.getTime() + backoffMs(1)))).toEqual(["sent"]);
+    expect(await deliverDueOutbox(db, via(ok), new Date(NOW.getTime() + backoffMs(1)))).toEqual([
+      "sent",
+    ]);
   });
 
   it(`leaves it as 'failed' after ${MAX_ATTEMPTS} attempts`, async () => {
@@ -130,9 +137,7 @@ describe("outbox delivery", () => {
   it("the same message is not sent twice by two concurrent workers", async () => {
     const { outboxId } = await createReservation(db, valid, { now: NOW });
     let release!: () => void;
-    const slow = vi.fn(
-      () => new Promise<{ ok: true }>((r) => (release = () => r({ ok: true }))),
-    );
+    const slow = vi.fn(() => new Promise<{ ok: true }>((r) => (release = () => r({ ok: true }))));
     const first = deliverOutboxMessage(db, outboxId, via(slow), NOW);
     await vi.waitFor(() => expect(slow).toHaveBeenCalled());
 
@@ -145,12 +150,22 @@ describe("outbox delivery", () => {
 
 describe("guest request email", () => {
   it("is queued only when requested and the guest gave an email", async () => {
-    expect((await createReservation(db, { ...valid, email: "a@example.com" }, { now: NOW })).guestAckOutboxId).toBeNull();
     expect(
-      (await createReservation(db, { ...valid, email: "" }, { now: NOW, guestAck: true })).guestAckOutboxId,
+      (await createReservation(db, { ...valid, email: "a@example.com" }, { now: NOW }))
+        .guestAckOutboxId,
     ).toBeNull();
     expect(
-      (await createReservation(db, { ...valid, email: "a@example.com" }, { now: NOW, guestAck: true })).guestAckOutboxId,
+      (await createReservation(db, { ...valid, email: "" }, { now: NOW, guestAck: true }))
+        .guestAckOutboxId,
+    ).toBeNull();
+    expect(
+      (
+        await createReservation(
+          db,
+          { ...valid, email: "a@example.com" },
+          { now: NOW, guestAck: true },
+        )
+      ).guestAckOutboxId,
     ).not.toBeNull();
   });
 

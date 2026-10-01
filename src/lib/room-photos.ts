@@ -7,9 +7,7 @@ export function getRoomPhotos(slug: string): string[] {
     const dir = path.join(process.cwd(), "public", "img", "rooms", slug);
     const files = fs.readdirSync(dir).filter((f) => f.endsWith(".jpg") && !f.endsWith(".sm.jpg"));
     const kapak = files.filter((f) => f === "kapak.jpg");
-    const rest = files
-      .filter((f) => f !== "kapak.jpg")
-      .sort((a, b) => parseInt(a) - parseInt(b));
+    const rest = files.filter((f) => f !== "kapak.jpg").sort((a, b) => parseInt(a) - parseInt(b));
     return [...kapak, ...rest].map((f) => `/img/rooms/${slug}/${f}`);
   } catch {
     return [];

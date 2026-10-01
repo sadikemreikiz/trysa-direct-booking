@@ -38,21 +38,35 @@ describe("occupancy calendar", () => {
     const days = buildCalendar(
       "2026-11",
       units,
-      [stay({ id: "p", status: "pending", checkIn: "2026-11-01", checkOut: "2026-11-05" }), stay({ checkIn: "2026-11-01", checkOut: "2026-11-02" })],
+      [
+        stay({ id: "p", status: "pending", checkIn: "2026-11-01", checkOut: "2026-11-05" }),
+        stay({ checkIn: "2026-11-01", checkOut: "2026-11-02" }),
+      ],
       { "Ambar-1": ["2026-11-01", "2026-11-02"] },
       "kamp",
     );
-    expect(days.slice(0, 4).map((d) => d.cells[0].kind)).toEqual(["confirmed", "airbnb", "pending", "pending"]);
+    expect(days.slice(0, 4).map((d) => d.cells[0].kind)).toEqual([
+      "confirmed",
+      "airbnb",
+      "pending",
+      "pending",
+    ]);
   });
 
   it("counts groups on the same night in the camping area", () => {
     const days = buildCalendar(
       "2026-11",
       units,
-      [stay({ id: "a", unitId: 7 }), stay({ id: "b", unitId: 7, checkIn: "2026-11-11", checkOut: "2026-11-13" })],
+      [
+        stay({ id: "a", unitId: 7 }),
+        stay({ id: "b", unitId: 7, checkIn: "2026-11-11", checkOut: "2026-11-13" }),
+      ],
       {},
       "kamp",
     );
-    expect(days.find((d) => d.date === "2026-11-11")!.cells[1]).toMatchObject({ kind: "confirmed", count: 2 });
+    expect(days.find((d) => d.date === "2026-11-11")!.cells[1]).toMatchObject({
+      kind: "confirmed",
+      count: 2,
+    });
   });
 });

@@ -65,8 +65,8 @@ export default function PushToggle({ vapidPublicKey }: { vapidPublicKey: string 
   if (state === "ios-install") {
     return (
       <p className="rounded-xl bg-white p-3 text-sm text-muted">
-        📲 iPhone&apos;da bildirim için: alttaki <b>Paylaş</b> düğmesi → <b>Ana Ekrana Ekle</b>. Sonra
-        paneli ana ekrandaki ikondan aç.
+        📲 iPhone&apos;da bildirim için: alttaki <b>Paylaş</b> düğmesi → <b>Ana Ekrana Ekle</b>.
+        Sonra paneli ana ekrandaki ikondan aç.
       </p>
     );
   }

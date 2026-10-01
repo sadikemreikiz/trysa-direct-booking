@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { stays } from "@/content/site";
-import { SITE_URL } from "@/lib/seo";
 import { locales } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -12,7 +12,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     paths.map((p) => ({
       url: `${SITE_URL}/${l}${p}`,
       lastModified: now,
-      alternates: { languages: Object.fromEntries(locales.map((x) => [x, `${SITE_URL}/${x}${p}`])) },
+      alternates: {
+        languages: Object.fromEntries(locales.map((x) => [x, `${SITE_URL}/${x}${p}`])),
+      },
     })),
   );
 }

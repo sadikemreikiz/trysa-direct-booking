@@ -54,7 +54,9 @@ for (const file of jpgs(ROOT)) {
   fs.writeFileSync(file.replace(/\.jpg$/, ".sm.jpg"), small);
 
   after += large.length;
-  console.log(`${name.padEnd(28)} ${kb(original.length).padStart(7)} → ${kb(large.length).padStart(7)}  (small: ${kb(small.length)})`);
+  console.log(
+    `${name.padEnd(28)} ${kb(original.length).padStart(7)} → ${kb(large.length).padStart(7)}  (small: ${kb(small.length)})`,
+  );
 }
 
 console.log(`\nLarge versions in total: ${kb(before)} → ${kb(after)}`);

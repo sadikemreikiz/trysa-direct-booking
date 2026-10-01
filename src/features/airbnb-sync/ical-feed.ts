@@ -18,7 +18,10 @@ export function verifyIcalToken(unitSlug: string, token: string, secret: string)
 const compactDate = (iso: string) => iso.replaceAll("-", "");
 
 function stamp(now: Date): string {
-  return now.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return now
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
 }
 
 export function buildIcs(

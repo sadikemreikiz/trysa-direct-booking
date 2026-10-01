@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import MobileBar from "@/components/MobileBar";
+import { getDictionary, isLocale, defaultLocale } from "@/content/dictionaries";
 import ReservationForm from "@/features/booking/components/ReservationForm";
 import { getGuestLockedDates } from "@/features/booking/guest-availability";
 import { fillRating, getRatingSummary } from "@/features/reviews/google-reviews";
 import { pageMetadata } from "@/lib/seo";
-import { getDictionary, isLocale, defaultLocale } from "@/content/dictionaries";
 
 export async function generateMetadata({
   params,
@@ -17,14 +17,13 @@ export async function generateMetadata({
   const { lang } = await params;
   const loc = isLocale(lang) ? lang : defaultLocale;
   const t = getDictionary(loc);
-  return pageMetadata(loc, "/rezervasyon", { title: t.reservation.title, description: t.reservation.intro });
+  return pageMetadata(loc, "/rezervasyon", {
+    title: t.reservation.title,
+    description: t.reservation.intro,
+  });
 }
 
-export default async function ReservationPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
+export default async function ReservationPage({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
   const t = getDictionary(lang);

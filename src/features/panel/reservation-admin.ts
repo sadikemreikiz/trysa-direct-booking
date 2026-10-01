@@ -8,9 +8,9 @@
 import { and, asc, desc, eq, gte, inArray, lt, gt, ne } from "drizzle-orm";
 import { z } from "zod";
 import type { Db } from "@/db";
+import { reservationEvents, reservations, units, user, type Reservation } from "@/db/schema";
 import { generateReference } from "@/features/booking/reservations";
 import { todayInDemre } from "@/lib/dates";
-import { reservationEvents, reservations, units, user, type Reservation } from "@/db/schema";
 
 export type ReservationStatus = Reservation["status"];
 
@@ -26,7 +26,9 @@ export function canTransition(from: ReservationStatus, to: ReservationStatus) {
 }
 
 export class TransitionError extends Error {
-  constructor(public readonly code: "not_found" | "invalid_transition" | "conflict" | "unit_required") {
+  constructor(
+    public readonly code: "not_found" | "invalid_transition" | "conflict" | "unit_required",
+  ) {
     super(code);
   }
 }
@@ -41,9 +43,7 @@ export async function listPanelReservations(db: Db, today: string) {
     .select({ r: reservations, unitName: units.name })
     .from(reservations)
     .leftJoin(units, eq(units.id, reservations.unitId))
-    .where(
-      inArray(reservations.status, ["pending", "confirmed"]),
-    )
+    .where(inArray(reservations.status, ["pending", "confirmed"]))
     .orderBy(asc(reservations.checkIn));
 
   const pending = rows.filter((x) => x.r.status === "pending");
@@ -333,9 +333,17 @@ export async function addReservationNote(db: Db, id: string, actorUserId: string
  * Taken days of bookings confirmed on the site (direct), by unit name
  * (same shape as Airbnb occupancy: name → YYYY-MM-DD[]). The shared camping area is excluded.
  */
-export async function confirmedDaysByUnit(db: Db, fromDate: string): Promise<Record<string, string[]>> {
+export async function confirmedDaysByUnit(
+  db: Db,
+  fromDate: string,
+): Promise<Record<string, string[]>> {
   const rows = await db
-    .select({ name: units.name, slug: units.slug, checkIn: reservations.checkIn, checkOut: reservations.checkOut })
+    .select({
+      name: units.name,
+      slug: units.slug,
+      checkIn: reservations.checkIn,
+      checkOut: reservations.checkOut,
+    })
     .from(reservations)
     .innerJoin(units, eq(units.id, reservations.unitId))
     .where(and(eq(reservations.status, "confirmed"), gt(reservations.checkOut, fromDate)));
@@ -344,7 +352,7 @@ export async function confirmedDaysByUnit(db: Db, fromDate: string): Promise<Rec
   for (const r of rows) {
     if (r.slug === SHARED_UNIT_SLUG) continue;
     const days = (out[r.name] ??= new Set());
-    for (let d = new Date(`${r.checkIn}T00:00:00Z`); d < new Date(`${r.checkOut}T00:00:00Z`); ) {
+    for (let d = new Date(`${r.checkIn}T00:00:00Z`); d < new Date(`${r.checkOut}T00:00:00Z`);) {
       const day = d.toISOString().slice(0, 10);
       if (day >= fromDate) days.add(day);
       d = new Date(d.getTime() + 86_400_000);

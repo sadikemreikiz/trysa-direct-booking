@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import { availabilityForRange, getReservationDetail } from "@/features/panel/reservation-admin";
+import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import ReservationActions from "@/features/panel/components/ReservationActions";
 import { formatDay, localeFlag, nights, sourceLabel } from "@/features/panel/format";
-import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { availabilityForRange, getReservationDetail } from "@/features/panel/reservation-admin";
 import { requireApprovedStaff } from "@/features/panel/session";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -52,18 +52,22 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
           {localeFlag[r.locale]} {r.guestName}
         </h1>
         <dl className="mt-4 space-y-2 text-lg">
-          <Row k="Tarih" v={`${formatDay(r.checkIn)} → ${formatDay(r.checkOut)} (${nights(r.checkIn, r.checkOut)} gece)`} />
-          <Row k="Kişi" v={`${r.adults} yetişkin${r.children > 0 ? `, ${r.children} çocuk` : ""}`} />
           <Row
-            k={r.status === "confirmed" ? "Oda" : "İstediği"}
-            v={unitName ?? "Oda seçmedi"}
+            k="Tarih"
+            v={`${formatDay(r.checkIn)} → ${formatDay(r.checkOut)} (${nights(r.checkIn, r.checkOut)} gece)`}
           />
+          <Row
+            k="Kişi"
+            v={`${r.adults} yetişkin${r.children > 0 ? `, ${r.children} çocuk` : ""}`}
+          />
+          <Row k={r.status === "confirmed" ? "Oda" : "İstediği"} v={unitName ?? "Oda seçmedi"} />
           {r.phone && <Row k="Telefon" v={r.phone} />}
           {r.email && <Row k="E-posta" v={r.email} />}
         </dl>
         {r.note && (
           <p className="mt-4 rounded-xl bg-cream p-3 text-base text-ink">
-            <span className="font-bold">{r.source === "website" ? "Misafirin notu" : "Not"}:</span> {r.note}
+            <span className="font-bold">{r.source === "website" ? "Misafirin notu" : "Not"}:</span>{" "}
+            {r.note}
           </p>
         )}
       </section>

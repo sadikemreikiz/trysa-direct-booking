@@ -59,7 +59,12 @@ export function sendNotificationEmail(subject: string, text: string): Promise<Em
 }
 
 /** Email to the guest; replies go to the family. */
-export function sendGuestEmail(to: string, subject: string, text: string, html?: string): Promise<EmailResult> {
+export function sendGuestEmail(
+  to: string,
+  subject: string,
+  text: string,
+  html?: string,
+): Promise<EmailResult> {
   if (!guestEmailEnabled()) return Promise.resolve({ ok: false, error: "RESEND_FROM is not set" });
   return sendEmail({ to, subject, text, html, replyTo: familyAddress() });
 }

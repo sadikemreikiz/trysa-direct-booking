@@ -16,7 +16,13 @@ export type CalendarStay = {
 export type Cell =
   | { kind: "free" }
   | { kind: "airbnb" }
-  | { kind: "confirmed" | "pending"; id: string; guestName: string; starts: boolean; count: number };
+  | {
+      kind: "confirmed" | "pending";
+      id: string;
+      guestName: string;
+      starts: boolean;
+      count: number;
+    };
 
 export type CalendarDay = { date: string; cells: Cell[] };
 
@@ -26,7 +32,9 @@ const DAY_MS = 86_400_000;
 export function daysOfMonth(month: string): string[] {
   const [y, m] = month.split("-").map(Number);
   const count = new Date(Date.UTC(y, m, 0)).getUTCDate();
-  return Array.from({ length: count }, (_, i) => new Date(Date.UTC(y, m - 1, i + 1)).toISOString().slice(0, 10));
+  return Array.from({ length: count }, (_, i) =>
+    new Date(Date.UTC(y, m - 1, i + 1)).toISOString().slice(0, 10),
+  );
 }
 
 export function shiftMonth(month: string, delta: number): string {

@@ -32,7 +32,11 @@ export const place = {
   /** Google's "write a review" screen (the review card QR points here: trysacamping.com/yorum) */
   reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk",
   /** Short directions links (redirected in next.config.ts), per guest language */
-  shortLink: { tr: "trysacamping.com/yol", en: "trysacamping.com/directions", de: "trysacamping.com/anfahrt" },
+  shortLink: {
+    tr: "trysacamping.com/yol",
+    en: "trysacamping.com/directions",
+    de: "trysacamping.com/anfahrt",
+  },
 };
 
 // Each room is separate. Prices from Airbnb; to be confirmed with the family.

@@ -1,13 +1,20 @@
 import Link from "next/link";
-import PanelHeader from "@/features/panel/components/PanelHeader";
+import {
+  AIRBNB_REFRESH_SECONDS,
+  getLockedDatesByType,
+} from "@/features/airbnb-sync/airbnb-calendar";
 import { buildCalendar, daysOfMonth, shiftMonth, type Cell } from "@/features/panel/calendar";
+import PanelHeader from "@/features/panel/components/PanelHeader";
 import { formatDay } from "@/features/panel/format";
 import { calendarData, SHARED_UNIT_SLUG } from "@/features/panel/reservation-admin";
-import { todayInDemre } from "@/lib/dates";
-import { AIRBNB_REFRESH_SECONDS, getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
 import { requireApprovedStaff } from "@/features/panel/session";
+import { todayInDemre } from "@/lib/dates";
 
-const monthTitle = new Intl.DateTimeFormat("tr-TR", { month: "long", year: "numeric", timeZone: "UTC" });
+const monthTitle = new Intl.DateTimeFormat("tr-TR", {
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+});
 const weekday = new Intl.DateTimeFormat("tr-TR", { weekday: "short", timeZone: "UTC" });
 
 /** Shortened unit names so the column headers fit narrow screens */
@@ -29,7 +36,11 @@ const cellStyle: Record<Cell["kind"], string> = {
 };
 
 /** Monthly occupancy: days as rows, rooms as columns. Tapping a confirmed cell opens the booking. */
-export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ ay?: string }> }) {
+export default async function CalendarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ay?: string }>;
+}) {
   const { db, staff } = await requireApprovedStaff();
   const today = todayInDemre(new Date());
   const { ay } = await searchParams;
@@ -47,13 +58,21 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
     <>
       <PanelHeader staff={staff} back />
       <div className="mb-3 flex items-center justify-between">
-        <Link href={`/panel/takvim?ay=${shiftMonth(month, -1)}`} className="px-3 py-2 text-2xl text-clay" aria-label="Önceki ay">
+        <Link
+          href={`/panel/takvim?ay=${shiftMonth(month, -1)}`}
+          className="px-3 py-2 text-2xl text-clay"
+          aria-label="Önceki ay"
+        >
           ‹
         </Link>
         <h1 className="font-display text-2xl font-semibold capitalize text-pine">
           {monthTitle.format(new Date(`${month}-01`))}
         </h1>
-        <Link href={`/panel/takvim?ay=${shiftMonth(month, 1)}`} className="px-3 py-2 text-2xl text-clay" aria-label="Sonraki ay">
+        <Link
+          href={`/panel/takvim?ay=${shiftMonth(month, 1)}`}
+          className="px-3 py-2 text-2xl text-clay"
+          aria-label="Sonraki ay"
+        >
           ›
         </Link>
       </div>
@@ -64,8 +83,8 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
         <Legend className={cellStyle.airbnb} label="Airbnb" />
       </div>
       <p className="mb-3 text-xs text-muted">
-        Airbnb takvimi en geç {AIRBNB_REFRESH_SECONDS / 60} dakikada bir okunur. Airbnb geçmiş günleri paylaşmadığı için
-        geçmiş günler soluk gösterilir.
+        Airbnb takvimi en geç {AIRBNB_REFRESH_SECONDS / 60} dakikada bir okunur. Airbnb geçmiş
+        günleri paylaşmadığı için geçmiş günler soluk gösterilir.
       </p>
 
       <div className="overflow-hidden rounded-2xl bg-white">
@@ -91,7 +110,9 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
               className={`grid border-b border-line/50 ${isToday ? "outline outline-2 -outline-offset-2 outline-clay" : ""} ${isPast ? "bg-[#f1ece2] opacity-50" : ""}`}
               style={{ gridTemplateColumns: `3.25rem repeat(${units.length}, minmax(0, 1fr))` }}
             >
-              <div className={`px-1.5 py-1.5 text-xs leading-tight ${weekend ? "font-bold text-clay" : "text-muted"}`}>
+              <div
+                className={`px-1.5 py-1.5 text-xs leading-tight ${weekend ? "font-bold text-clay" : "text-muted"}`}
+              >
                 <div className="text-sm font-bold text-ink">{d.getUTCDate()}</div>
                 {weekday.format(d)}
               </div>
@@ -105,11 +126,16 @@ export default async function CalendarPage({ searchParams }: { searchParams: Pro
 
       {unassigned.length > 0 && (
         <>
-          <h2 className="mb-2 mt-6 text-xs font-bold tracking-widest text-clay">ODA SEÇMEMİŞ TALEPLER</h2>
+          <h2 className="mb-2 mt-6 text-xs font-bold tracking-widest text-clay">
+            ODA SEÇMEMİŞ TALEPLER
+          </h2>
           <ul className="space-y-2">
             {unassigned.map((s) => (
               <li key={s.id}>
-                <Link href={`/panel/talep/${s.id}`} className="block rounded-2xl bg-white p-3 text-base">
+                <Link
+                  href={`/panel/talep/${s.id}`}
+                  className="block rounded-2xl bg-white p-3 text-base"
+                >
                   <span className="font-bold text-ink">{s.guestName}</span>
                   <span className="text-muted">
                     {" "}
@@ -131,7 +157,11 @@ function CellView({ cell }: { cell: Cell }) {
   if (cell.kind === "airbnb") return <div className={base} aria-label="Airbnb'de dolu" />;
   const label = cell.count > 1 ? `×${cell.count}` : cell.starts ? cell.guestName.slice(0, 3) : "";
   return (
-    <Link href={`/panel/talep/${cell.id}`} className={base} aria-label={`${cell.guestName} (${cell.kind === "confirmed" ? "onaylı" : "bekliyor"})`}>
+    <Link
+      href={`/panel/talep/${cell.id}`}
+      className={base}
+      aria-label={`${cell.guestName} (${cell.kind === "confirmed" ? "onaylı" : "bekliyor"})`}
+    >
       {label}
     </Link>
   );

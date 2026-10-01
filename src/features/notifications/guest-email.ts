@@ -4,8 +4,8 @@
  * Both plain text and branded HTML are built from the same content (email clients with
  * images off show the plain text).
  */
-import { SITE_URL } from "@/lib/seo";
 import { place, site } from "@/content/site";
+import { SITE_URL } from "@/lib/seo";
 
 type Locale = "tr" | "en" | "de";
 
@@ -19,12 +19,15 @@ export type GuestAckVars = {
 };
 
 function formatRange(checkIn: string, checkOut: string, locale: Locale): string {
-  const fmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : locale === "de" ? "de-DE" : "en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  });
+  const fmt = new Intl.DateTimeFormat(
+    locale === "tr" ? "tr-TR" : locale === "de" ? "de-DE" : "en-GB",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    },
+  );
   return `${fmt.format(new Date(checkIn))} – ${fmt.format(new Date(checkOut))}`;
 }
 
@@ -52,7 +55,8 @@ const TEMPLATES: Record<Locale, (v: Vars) => Content> = {
       ["Tarih", v.dates],
       ["Konaklama", v.unit || "Henüz seçilmedi"],
     ],
-    notYet: "Bu henüz bir onay değil: müsaitliği kontrol edip en kısa sürede sana telefon ya da WhatsApp'tan döneceğiz.",
+    notYet:
+      "Bu henüz bir onay değil: müsaitliği kontrol edip en kısa sürede sana telefon ya da WhatsApp'tan döneceğiz.",
     whatsapp: "WhatsApp'tan yaz",
     directions: "Yol tarifi",
     bye: "Görüşmek üzere,",
@@ -67,7 +71,8 @@ const TEMPLATES: Record<Locale, (v: Vars) => Content> = {
       ["Dates", v.dates],
       ["Stay", v.unit || "Not chosen yet"],
     ],
-    notYet: "This is not a confirmation yet: we'll check availability and get back to you by phone or WhatsApp as soon as possible.",
+    notYet:
+      "This is not a confirmation yet: we'll check availability and get back to you by phone or WhatsApp as soon as possible.",
     whatsapp: "Message us on WhatsApp",
     directions: "Directions",
     bye: "See you soon,",
@@ -82,7 +87,8 @@ const TEMPLATES: Record<Locale, (v: Vars) => Content> = {
       ["Zeitraum", v.dates],
       ["Unterkunft", v.unit || "Noch nicht gewählt"],
     ],
-    notYet: "Das ist noch keine Bestätigung: Wir prüfen die Verfügbarkeit und melden uns so schnell wie möglich per Telefon oder WhatsApp.",
+    notYet:
+      "Das ist noch keine Bestätigung: Wir prüfen die Verfügbarkeit und melden uns so schnell wie möglich per Telefon oder WhatsApp.",
     whatsapp: "Auf WhatsApp schreiben",
     directions: "Anfahrt",
     bye: "Bis bald,",
@@ -148,5 +154,9 @@ export function buildGuestAck(v: GuestAckVars): { subject: string; text: string;
     unit: v.unitName ?? "",
   });
   const directionsLink = `https://${place.shortLink[locale]}`;
-  return { subject: content.subject, text: toText(content, directionsLink), html: toHtml(content, directionsLink, locale) };
+  return {
+    subject: content.subject,
+    text: toText(content, directionsLink),
+    html: toHtml(content, directionsLink, locale),
+  };
 }

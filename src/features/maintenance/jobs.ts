@@ -51,7 +51,12 @@ export async function escalateStalePending(
   await db
     .update(reservations)
     .set({ escalatedAt: now })
-    .where(inArray(reservations.id, stale.map((s) => s.id)));
+    .where(
+      inArray(
+        reservations.id,
+        stale.map((s) => s.id),
+      ),
+    );
   return stale.length;
 }
 
@@ -65,7 +70,10 @@ export const RETENTION_DAYS = 730;
  * Deletes personal data from expired bookings; dates, unit and status remain
  * (for statistics). Past notes are deleted too, since they may contain personal details.
  */
-export async function anonymizeExpiredReservations(db: Db, now: Date = new Date()): Promise<number> {
+export async function anonymizeExpiredReservations(
+  db: Db,
+  now: Date = new Date(),
+): Promise<number> {
   const cutoff = new Date(now.getTime() - RETENTION_DAYS * 86_400_000).toISOString().slice(0, 10);
   return db.transaction(async (tx) => {
     const expired = await tx
@@ -85,7 +93,10 @@ export async function anonymizeExpiredReservations(db: Db, now: Date = new Date(
         .set({ note: null })
         .where(
           and(
-            inArray(reservationEvents.reservationId, expired.map((r) => r.id)),
+            inArray(
+              reservationEvents.reservationId,
+              expired.map((r) => r.id),
+            ),
             isNotNull(reservationEvents.note),
           ),
         );

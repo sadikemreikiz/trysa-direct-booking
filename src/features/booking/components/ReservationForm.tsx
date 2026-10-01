@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
 import Link from "next/link";
-import { submitReservation } from "@/features/booking/actions";
-import { whatsappUrl, type ReservationInput } from "@/features/booking/summary";
-import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
+import { useRef, useState } from "react";
 import { WhatsAppIcon } from "@/components/icons";
 import type { Dict, Locale } from "@/content/dictionaries";
+import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
+import { submitReservation } from "@/features/booking/actions";
+import { whatsappUrl, type ReservationInput } from "@/features/booking/summary";
 
 // Display name → the unit's stable database id (slug)
 const roomUnits: [label: string, slug: string][] = [
@@ -149,9 +149,7 @@ export default function ReservationForm({
           <Row
             k={t.reservation.sumGuests}
             v={`${data.adults} ${t.reservation.adultsWord}${
-              Number(data.children) > 0
-                ? `, ${data.children} ${t.reservation.childrenWord}`
-                : ""
+              Number(data.children) > 0 ? `, ${data.children} ${t.reservation.childrenWord}` : ""
             }`}
           />
           <Row k={t.reservation.sumStay} v={data.unit} last={!reference} />
@@ -377,11 +375,7 @@ export default function ReservationForm({
 
 function Row({ k, v, last }: { k: string; v: string; last?: boolean }) {
   return (
-    <div
-      className={`flex justify-between py-2 ${
-        last ? "" : "border-b border-line/60"
-      }`}
-    >
+    <div className={`flex justify-between py-2 ${last ? "" : "border-b border-line/60"}`}>
       <span className="text-muted">{k}</span>
       <span className="font-semibold text-ink">{v}</span>
     </div>

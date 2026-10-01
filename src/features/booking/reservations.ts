@@ -135,9 +135,11 @@ export async function createReservation(
       guestAckOutboxId = ack.id;
     }
 
-    await tx
-      .insert(analyticsEvents)
-      .values({ name: "reservation_submitted", path: `/${d.locale}/rezervasyon`, locale: d.locale });
+    await tx.insert(analyticsEvents).values({
+      name: "reservation_submitted",
+      path: `/${d.locale}/rezervasyon`,
+      locale: d.locale,
+    });
 
     return { reservation, outboxId: message.id, pushOutboxId: push.id, guestAckOutboxId };
   });

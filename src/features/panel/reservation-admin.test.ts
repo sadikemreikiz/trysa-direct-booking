@@ -2,6 +2,9 @@ import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
+import { reservations, user } from "@/db/schema";
+import { createTestDb, resetTestDb } from "@/db/test-db";
+import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
 import {
   addReservationNote,
   availabilityForRange,
@@ -18,10 +21,7 @@ import {
   mergeLockedDays,
   TransitionError,
 } from "./reservation-admin";
-import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
-import { reservations, user } from "@/db/schema";
 import { AuthorizationError, createStaffForNewUser, decideAccess, getStaffMember } from "./staff";
-import { createTestDb, resetTestDb } from "@/db/test-db";
 
 const NOW = new Date("2026-10-01T09:00:00Z");
 
@@ -105,7 +105,9 @@ describe("state machine", () => {
     const first = await request();
     const second = await request({ checkin: "2026-11-12", checkout: "2026-11-14" });
     await confirmReservation(db, first.id, u, 1);
-    await expect(confirmReservation(db, second.id, u, 1)).rejects.toMatchObject({ code: "conflict" });
+    await expect(confirmReservation(db, second.id, u, 1)).rejects.toMatchObject({
+      code: "conflict",
+    });
 
     const [still] = await db.select().from(reservations).where(eq(reservations.id, second.id));
     expect(still.status).toBe("pending");
@@ -154,7 +156,11 @@ describe("state machine", () => {
     const r = await request();
     await addReservationNote(db, r.id, u, "  Misafir geç gelecek  ");
     const detail = await getReservationDetail(db, r.id);
-    expect(detail?.events[0]).toMatchObject({ type: "note_added", note: "Misafir geç gelecek", actorName: "Emre" });
+    expect(detail?.events[0]).toMatchObject({
+      type: "note_added",
+      note: "Misafir geç gelecek",
+      actorName: "Emre",
+    });
   });
 });
 
@@ -259,12 +265,22 @@ describe("manual bookings", () => {
   it("saves directly as confirmed, keeping the source and who added it", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await createManualReservation(db, u, manual, { now: NOW });
-    expect(r).toMatchObject({ status: "confirmed", source: "phone", unitId: 2, phone: "", note: "Kapora alındı" });
+    expect(r).toMatchObject({
+      status: "confirmed",
+      source: "phone",
+      unitId: 2,
+      phone: "",
+      note: "Kapora alındı",
+    });
     expect(r.reference).toMatch(/^TRY-/);
 
     const detail = await getReservationDetail(db, r.id);
     expect(detail?.events).toHaveLength(1);
-    expect(detail?.events[0]).toMatchObject({ type: "created", toStatus: "confirmed", actor: "user:u1" });
+    expect(detail?.events[0]).toMatchObject({
+      type: "created",
+      toStatus: "confirmed",
+      actor: "user:u1",
+    });
 
     // Also shows up in the Airbnb calendar and the guest form
     expect(await confirmedStaysForUnit(db, "ambar-2", "2026-11-01")).toHaveLength(1);
@@ -275,9 +291,13 @@ describe("manual bookings", () => {
     const site = await request({ unit: "ambar-2", checkin: "2026-11-11", checkout: "2026-11-14" });
     await confirmReservation(db, site.id, u, 2);
 
-    await expect(createManualReservation(db, u, manual, { now: NOW })).rejects.toMatchObject({ code: "conflict" });
+    await expect(createManualReservation(db, u, manual, { now: NOW })).rejects.toMatchObject({
+      code: "conflict",
+    });
     // A different room is fine
-    await expect(createManualReservation(db, u, { ...manual, unitId: 3 }, { now: NOW })).resolves.toBeTruthy();
+    await expect(
+      createManualReservation(db, u, { ...manual, unitId: 3 }, { now: NOW }),
+    ).resolves.toBeTruthy();
   });
 
   it("rejects missing/invalid data", async () => {
@@ -287,17 +307,31 @@ describe("manual bookings", () => {
       { ...manual, checkOut: "2026-11-10" },
       { ...manual, adults: 0 },
     ]) {
-      await expect(createManualReservation(db, u, bad, { now: NOW })).rejects.toBeInstanceOf(ManualReservationError);
+      await expect(createManualReservation(db, u, bad, { now: NOW })).rejects.toBeInstanceOf(
+        ManualReservationError,
+      );
     }
-    await expect(createManualReservation(db, u, { ...manual, unitId: 99 }, { now: NOW })).rejects.toMatchObject({
+    await expect(
+      createManualReservation(db, u, { ...manual, unitId: 99 }, { now: NOW }),
+    ).rejects.toMatchObject({
       code: "unit_unknown",
     });
     // No past dates (Airbnb doesn't share past days, so conflicts can't be checked); today is fine
     await expect(
-      createManualReservation(db, u, { ...manual, checkIn: "2026-09-28", checkOut: "2026-09-30" }, { now: NOW }),
+      createManualReservation(
+        db,
+        u,
+        { ...manual, checkIn: "2026-09-28", checkOut: "2026-09-30" },
+        { now: NOW },
+      ),
     ).rejects.toMatchObject({ code: "in_past" });
     await expect(
-      createManualReservation(db, u, { ...manual, checkIn: "2026-10-01", checkOut: "2026-10-02" }, { now: NOW }),
+      createManualReservation(
+        db,
+        u,
+        { ...manual, checkIn: "2026-10-01", checkOut: "2026-10-02" },
+        { now: NOW },
+      ),
     ).resolves.toBeTruthy();
   });
 });
@@ -306,8 +340,12 @@ describe("panel authorization", () => {
   it("an email on the admin list starts as an approved admin, everyone else as an access request", async () => {
     await makeUser("u-emre", "Emre@Example.com");
     await makeUser("u-dayi", "dayi@example.com");
-    await createStaffForNewUser(db, { id: "u-emre", email: "Emre@Example.com" }, ["emre@example.com"]);
-    await createStaffForNewUser(db, { id: "u-dayi", email: "dayi@example.com" }, ["emre@example.com"]);
+    await createStaffForNewUser(db, { id: "u-emre", email: "Emre@Example.com" }, [
+      "emre@example.com",
+    ]);
+    await createStaffForNewUser(db, { id: "u-dayi", email: "dayi@example.com" }, [
+      "emre@example.com",
+    ]);
 
     expect(await getStaffMember(db, "u-emre")).toMatchObject({ role: "admin", status: "approved" });
     expect(await getStaffMember(db, "u-dayi")).toMatchObject({ role: "staff", status: "pending" });

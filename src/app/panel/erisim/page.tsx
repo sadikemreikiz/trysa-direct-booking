@@ -1,15 +1,19 @@
 import { asc, ne } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { units } from "@/db/schema";
-import { listStaff } from "@/features/panel/staff";
+import { icalToken } from "@/features/airbnb-sync/ical-feed";
 import { AccessActions, CopyButton } from "@/features/panel/components/AccessActions";
 import PanelHeader from "@/features/panel/components/PanelHeader";
-import { icalToken } from "@/features/airbnb-sync/ical-feed";
-import { requireApprovedStaff } from "@/features/panel/session";
-import { SITE_URL } from "@/lib/seo";
 import { SHARED_UNIT_SLUG } from "@/features/panel/reservation-admin";
+import { requireApprovedStaff } from "@/features/panel/session";
+import { listStaff } from "@/features/panel/staff";
+import { SITE_URL } from "@/lib/seo";
 
-const statusText = { pending: "⏳ Erişim istiyor", approved: "✅ Aktif", revoked: "🔒 Kapalı" } as const;
+const statusText = {
+  pending: "⏳ Erişim istiyor",
+  approved: "✅ Aktif",
+  revoked: "🔒 Kapalı",
+} as const;
 const roleText = { admin: "Yönetici", staff: "İşletme" } as const;
 
 export default async function SettingsPage() {
@@ -45,10 +49,14 @@ export default async function SettingsPage() {
         ))}
       </ul>
 
-      <h2 className="mb-2 mt-8 text-xs font-bold tracking-widest text-clay">AIRBNB TAKVİM LİNKLERİ</h2>
+      <h2 className="mb-2 mt-8 text-xs font-bold tracking-widest text-clay">
+        AIRBNB TAKVİM LİNKLERİ
+      </h2>
       <p className="mb-3 text-sm text-muted">
-        Airbnb&apos;de her ilanın <b>Takvim → Müsaitlik → Takvimleri bağla → Başka bir web sitesinden takvim
-        içe aktar</b> bölümüne o odanın linkini yapıştır. Sitede onaylanan rezervasyonlar Airbnb&apos;de de dolu görünür.
+        Airbnb&apos;de her ilanın{" "}
+        <b>Takvim → Müsaitlik → Takvimleri bağla → Başka bir web sitesinden takvim içe aktar</b>{" "}
+        bölümüne o odanın linkini yapıştır. Sitede onaylanan rezervasyonlar Airbnb&apos;de de dolu
+        görünür.
       </p>
       {secret ? (
         <ul className="space-y-2">

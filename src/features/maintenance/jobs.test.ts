@@ -1,13 +1,13 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import type { PushMessage } from "@/features/notifications/push";
 import type { Db } from "@/db";
-import { anonymizeExpiredReservations, escalateStalePending } from "./jobs";
-import { addReservationNote, confirmReservation } from "@/features/panel/reservation-admin";
-import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
 import { reservationEvents, reservations, user } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
+import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
+import type { PushMessage } from "@/features/notifications/push";
+import { addReservationNote, confirmReservation } from "@/features/panel/reservation-admin";
+import { anonymizeExpiredReservations, escalateStalePending } from "./jobs";
 
 const base: ReservationRequest = {
   checkin: "2026-11-10",
@@ -37,7 +37,11 @@ beforeEach(async () => {
 });
 
 async function requestAt(createdAt: Date, patch: Partial<ReservationRequest> = {}) {
-  const { reservation } = await createReservation(db, { ...base, ...patch }, { now: new Date("2026-10-01T00:00:00Z") });
+  const { reservation } = await createReservation(
+    db,
+    { ...base, ...patch },
+    { now: new Date("2026-10-01T00:00:00Z") },
+  );
   await db.update(reservations).set({ createdAt }).where(eq(reservations.id, reservation.id));
   return reservation;
 }
@@ -94,7 +98,10 @@ describe("unanswered request reminder", () => {
 describe("retention period (2 years)", () => {
   it("deletes personal data 2 years after the stay; statistics data remains", async () => {
     const old = await requestAt(new Date("2026-10-01T00:00:00Z"));
-    const recent = await requestAt(new Date("2026-10-01T00:00:00Z"), { checkin: "2027-06-01", checkout: "2027-06-03" });
+    const recent = await requestAt(new Date("2026-10-01T00:00:00Z"), {
+      checkin: "2027-06-01",
+      checkout: "2027-06-03",
+    });
     await db.insert(user).values({ id: "u1", email: "e@example.com", name: "Emre" });
     await addReservationNote(db, old.id, "u1", "Misafirin telefonu değişti: 0555 999");
 
@@ -103,7 +110,12 @@ describe("retention period (2 years)", () => {
     expect(await anonymizeExpiredReservations(db, new Date("2028-11-15T00:00:00Z"))).toBe(1);
 
     const [a] = await db.select().from(reservations).where(eq(reservations.id, old.id));
-    expect(a).toMatchObject({ guestName: "(silindi)", phone: "(silindi)", email: null, note: null });
+    expect(a).toMatchObject({
+      guestName: "(silindi)",
+      phone: "(silindi)",
+      email: null,
+      note: null,
+    });
     expect(a.anonymizedAt).not.toBeNull();
     expect(a).toMatchObject({ checkIn: "2026-11-10", adults: 2, status: "pending" });
 

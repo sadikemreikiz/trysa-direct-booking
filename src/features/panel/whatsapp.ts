@@ -9,7 +9,8 @@ export function toWhatsAppNumber(phone: string): string {
   let digits = trimmed.replace(/\D/g, "");
   if (digits.startsWith("00")) return digits.slice(2);
   if (trimmed.startsWith("+")) return digits;
-  if (digits.startsWith("0") && digits.length === 11) digits = "9" + digits; // TR: 0 5xx → 90 5xx
+  if (digits.startsWith("0") && digits.length === 11)
+    digits = "9" + digits; // TR: 0 5xx → 90 5xx
   else if (digits.length === 10 && digits.startsWith("5")) digits = "90" + digits; // TR: 5xx
   return digits;
 }
@@ -20,11 +21,14 @@ export type MessageKind = "reply" | "confirmed" | "declined";
 type Locale = "tr" | "en" | "de";
 
 function formatRange(checkIn: string, checkOut: string, locale: Locale): string {
-  const fmt = new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : locale === "de" ? "de-DE" : "en-GB", {
-    day: "numeric",
-    month: "long",
-    timeZone: "UTC",
-  });
+  const fmt = new Intl.DateTimeFormat(
+    locale === "tr" ? "tr-TR" : locale === "de" ? "de-DE" : "en-GB",
+    {
+      day: "numeric",
+      month: "long",
+      timeZone: "UTC",
+    },
+  );
   return `${fmt.format(new Date(checkIn))} – ${fmt.format(new Date(checkOut))}`;
 }
 

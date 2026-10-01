@@ -5,9 +5,15 @@ export function TrysaStory({ t }: T) {
     <section id="trysa" className={`${container} scroll-mt-20 pt-10`}>
       <div className="overflow-hidden rounded-2xl bg-stone md:flex">
         <div className="p-6 md:flex-1 md:p-12">
-          <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">{t.trysaStory.kicker}</div>
-          <h2 className="font-display text-2xl font-semibold leading-tight text-[#f1e9d8] md:text-3xl">{t.trysaStory.title}</h2>
-          <p className="mt-3.5 max-w-md text-sm leading-relaxed text-[#d8cfb8] md:text-base">{t.trysaStory.desc}</p>
+          <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">
+            {t.trysaStory.kicker}
+          </div>
+          <h2 className="font-display text-2xl font-semibold leading-tight text-[#f1e9d8] md:text-3xl">
+            {t.trysaStory.title}
+          </h2>
+          <p className="mt-3.5 max-w-md text-sm leading-relaxed text-[#d8cfb8] md:text-base">
+            {t.trysaStory.desc}
+          </p>
           <a
             href={t.trysaStory.link}
             target="_blank"

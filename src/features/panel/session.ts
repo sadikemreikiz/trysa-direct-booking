@@ -2,8 +2,8 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { getDb } from "@/db";
-import { getStaffMember } from "./staff";
 import { getAuth } from "@/lib/auth";
+import { getStaffMember } from "./staff";
 
 /** Session + panel permission. Every panel page and action goes through here. */
 export async function getPanelContext() {

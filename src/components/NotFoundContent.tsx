@@ -13,7 +13,10 @@ const TEXT = [
 export default function NotFoundContent() {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-5 py-16 text-center">
-      <Link href="/" className="flex flex-col items-center gap-3 font-display text-3xl font-semibold tracking-wide text-pine">
+      <Link
+        href="/"
+        className="flex flex-col items-center gap-3 font-display text-3xl font-semibold tracking-wide text-pine"
+      >
         <LogoMark id="logo-404" className="h-12 w-auto" />
         TRYSA
       </Link>
@@ -22,7 +25,10 @@ export default function NotFoundContent() {
         {TEXT.map((t) => (
           <div key={t.lang} lang={t.lang}>
             <h1 className="font-display text-2xl font-semibold text-pine">{t.title}</h1>
-            <Link href={`/${t.lang}`} className="mt-1 inline-block text-sm font-bold text-clay hover:underline">
+            <Link
+              href={`/${t.lang}`}
+              className="mt-1 inline-block text-sm font-bold text-clay hover:underline"
+            >
               {t.home} →
             </Link>
           </div>

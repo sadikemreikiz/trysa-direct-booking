@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { place, site } from "@/content/site";
 import type { Dict, Locale } from "@/content/dictionaries";
+import { place, site } from "@/content/site";
 import LogoMark from "./LogoMark";
 
 export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {

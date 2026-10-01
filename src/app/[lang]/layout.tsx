@@ -1,9 +1,16 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
-import { Analytics } from "@vercel/analytics/next";
-import ClickTracker from "@/features/analytics/components/ClickTracker";
-import { HOME_DESCRIPTION, HOME_TITLE, openGraphBase, pageAlternates, SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
 import { locales, isLocale, defaultLocale } from "@/content/dictionaries";
+import ClickTracker from "@/features/analytics/components/ClickTracker";
+import {
+  HOME_DESCRIPTION,
+  HOME_TITLE,
+  openGraphBase,
+  pageAlternates,
+  SITE_URL,
+  SITE_INDEXABLE,
+} from "@/lib/seo";
 import "@/app/globals.css";
 
 const fraunces = Fraunces({
@@ -41,9 +48,7 @@ export async function generateMetadata({
     title: { default: title, template: "%s · Trysa" },
     description,
     alternates: pageAlternates(loc, ""),
-    robots: SITE_INDEXABLE
-      ? { index: true, follow: true }
-      : { index: false, follow: false },
+    robots: SITE_INDEXABLE ? { index: true, follow: true } : { index: false, follow: false },
     openGraph: { ...openGraphBase(loc), title, description, url: `${SITE_URL}/${loc}` },
     twitter: {
       card: "summary_large_image",
@@ -64,10 +69,7 @@ export default async function RootLayout({
   const { lang } = await params;
   const htmlLang = isLocale(lang) ? lang : defaultLocale;
   return (
-    <html
-      lang={htmlLang}
-      className={`${fraunces.variable} ${manrope.variable} h-full antialiased`}
-    >
+    <html lang={htmlLang} className={`${fraunces.variable} ${manrope.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-ivory text-ink">
         {children}
         {/* Visitor analytics (Vercel Web Analytics): cookie-free, collects data only in production */}

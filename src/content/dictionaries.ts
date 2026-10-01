@@ -216,7 +216,8 @@ const tr = {
     summaryTitle: "TALEBİNİN ÖZETİ",
     refLabel: "Talep kodu",
     errInvalid: "Bilgilerde bir sorun var — tarihleri kontrol edip tekrar dener misin?",
-    errRateLimited: "Kısa sürede çok fazla talep gönderildi. Lütfen biraz sonra tekrar dene ya da bize WhatsApp'tan yaz.",
+    errRateLimited:
+      "Kısa sürede çok fazla talep gönderildi. Lütfen biraz sonra tekrar dene ya da bize WhatsApp'tan yaz.",
     sumDate: "Tarih",
     sumGuests: "Kişi",
     sumStay: "Konaklama",
@@ -442,7 +443,8 @@ const en: Dict = {
     summaryTitle: "YOUR REQUEST",
     refLabel: "Request code",
     errInvalid: "Something's off with the details — could you check the dates and try again?",
-    errRateLimited: "Too many requests in a short time. Please try again a little later or message us on WhatsApp.",
+    errRateLimited:
+      "Too many requests in a short time. Please try again a little later or message us on WhatsApp.",
     sumDate: "Dates",
     sumGuests: "Guests",
     sumStay: "Stay",
@@ -665,8 +667,10 @@ const de: Dict = {
     waOptional: "Auch per WhatsApp schreiben",
     summaryTitle: "DEINE ANFRAGE",
     refLabel: "Anfragecode",
-    errInvalid: "Bei den Angaben stimmt etwas nicht — prüf bitte die Daten und versuch es noch einmal.",
-    errRateLimited: "Zu viele Anfragen in kurzer Zeit. Bitte versuch es etwas später noch einmal oder schreib uns auf WhatsApp.",
+    errInvalid:
+      "Bei den Angaben stimmt etwas nicht — prüf bitte die Daten und versuch es noch einmal.",
+    errRateLimited:
+      "Zu viele Anfragen in kurzer Zeit. Bitte versuch es etwas später noch einmal oder schreib uns auf WhatsApp.",
     sumDate: "Daten",
     sumGuests: "Gäste",
     sumStay: "Unterkunft",

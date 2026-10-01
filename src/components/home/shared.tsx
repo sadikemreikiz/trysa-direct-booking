@@ -11,7 +11,15 @@ export type TLR = TL & { rating: RatingSummary };
  * Placeholder until real photos arrive: decorative pattern + icon, no text.
  * data-nosnippet: keeps Google from using this area in the search result description.
  */
-export function Photo({ tone, className = "", labelDark = false }: { tone: string; className?: string; labelDark?: boolean }) {
+export function Photo({
+  tone,
+  className = "",
+  labelDark = false,
+}: {
+  tone: string;
+  className?: string;
+  labelDark?: boolean;
+}) {
   return (
     <div
       aria-hidden="true"

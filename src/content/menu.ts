@@ -28,7 +28,12 @@ export const menu: MenuCategory[] = [
   {
     cat: "Kahvaltı",
     items: [
-      { n: "Lüx Serpme Kahvaltı", en: "Deluxe Turkish breakfast spread", de: "Großes türkisches Frühstück", p: "700" },
+      {
+        n: "Lüx Serpme Kahvaltı",
+        en: "Deluxe Turkish breakfast spread",
+        de: "Großes türkisches Frühstück",
+        p: "700",
+      },
       { n: "Tabak Kahvaltı", en: "Breakfast plate", de: "Frühstücksteller", p: "450" },
       { n: "Köy Tavuğu Çorbası", en: "Free-range chicken soup", de: "Landhuhn-Suppe", p: "190" },
       {
@@ -47,9 +52,24 @@ export const menu: MenuCategory[] = [
   {
     cat: "Tavadan",
     items: [
-      { n: "Kremalı Mantar Soslu Tavuk", en: "Chicken in creamy mushroom sauce", de: "Hähnchen in Champignon-Rahmsauce", p: "460" },
-      { n: "Köri Soslu Tavuk", en: "Chicken in curry sauce", de: "Hähnchen in Currysauce", p: "440" },
-      { n: "Kekik Soslu Tavuk", en: "Chicken in thyme sauce", de: "Hähnchen in Thymiansauce", p: "440" },
+      {
+        n: "Kremalı Mantar Soslu Tavuk",
+        en: "Chicken in creamy mushroom sauce",
+        de: "Hähnchen in Champignon-Rahmsauce",
+        p: "460",
+      },
+      {
+        n: "Köri Soslu Tavuk",
+        en: "Chicken in curry sauce",
+        de: "Hähnchen in Currysauce",
+        p: "440",
+      },
+      {
+        n: "Kekik Soslu Tavuk",
+        en: "Chicken in thyme sauce",
+        de: "Hähnchen in Thymiansauce",
+        p: "440",
+      },
     ],
   },
   {
@@ -105,12 +125,37 @@ export const menu: MenuCategory[] = [
   {
     cat: "Soğuk İçecekler",
     items: [
-      { n: "Kutu Kola / Fanta / Sprite", en: "Coke / Fanta / Sprite (can)", de: "Cola / Fanta / Sprite (Dose)", p: "90" },
+      {
+        n: "Kutu Kola / Fanta / Sprite",
+        en: "Coke / Fanta / Sprite (can)",
+        de: "Cola / Fanta / Sprite (Dose)",
+        p: "90",
+      },
       { n: "Meyve Suları", en: "Fruit juices", de: "Fruchtsäfte", p: "90" },
-      { n: "Meyveli Soda", en: "Fruit-flavoured mineral water", de: "Mineralwasser mit Fruchtgeschmack", p: "50" },
-      { n: "Sade Soda", en: "Sparkling mineral water", de: "Mineralwasser mit Kohlensäure", p: "35" },
-      { n: "Şalgam", en: "Şalgam (fermented black carrot juice)", de: "Şalgam (fermentierter Schwarzkarottensaft)", p: "50" },
-      { n: "Ayran", en: "Ayran (salted yoghurt drink)", de: "Ayran (salziges Joghurtgetränk)", p: "100" },
+      {
+        n: "Meyveli Soda",
+        en: "Fruit-flavoured mineral water",
+        de: "Mineralwasser mit Fruchtgeschmack",
+        p: "50",
+      },
+      {
+        n: "Sade Soda",
+        en: "Sparkling mineral water",
+        de: "Mineralwasser mit Kohlensäure",
+        p: "35",
+      },
+      {
+        n: "Şalgam",
+        en: "Şalgam (fermented black carrot juice)",
+        de: "Şalgam (fermentierter Schwarzkarottensaft)",
+        p: "50",
+      },
+      {
+        n: "Ayran",
+        en: "Ayran (salted yoghurt drink)",
+        de: "Ayran (salziges Joghurtgetränk)",
+        p: "100",
+      },
     ],
   },
 ];

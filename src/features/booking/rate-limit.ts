@@ -47,5 +47,7 @@ export async function hitRateLimits(
 
 /** Deletes long-expired counters (IP digests are kept for at most 2 days). */
 export async function pruneRateLimits(db: Db, now: Date = new Date()) {
-  await db.delete(rateLimits).where(lt(rateLimits.windowStart, new Date(now.getTime() - 2 * 86_400_000)));
+  await db
+    .delete(rateLimits)
+    .where(lt(rateLimits.windowStart, new Date(now.getTime() - 2 * 86_400_000)));
 }

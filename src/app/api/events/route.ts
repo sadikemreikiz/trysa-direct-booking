@@ -1,7 +1,7 @@
 import { getDb } from "@/db";
 import { clientEventSchema, recordClientEvent } from "@/features/analytics/events";
-import { hitRateLimit } from "@/features/booking/rate-limit";
 import { clientKey } from "@/features/booking/client-key";
+import { hitRateLimit } from "@/features/booking/rate-limit";
 
 /** At most this many events per visitor per hour are counted (so bots can't inflate the stats). */
 const EVENTS_PER_HOUR = 30;

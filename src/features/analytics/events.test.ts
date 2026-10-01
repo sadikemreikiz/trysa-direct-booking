@@ -1,9 +1,9 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { clientEventSchema, recordClientEvent } from "./events";
 import type { Db } from "@/db";
 import { analyticsEvents } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
+import { clientEventSchema, recordClientEvent } from "./events";
 
 let db: Db;
 let client: PGlite;
@@ -29,7 +29,11 @@ describe("conversion events", () => {
     await recordClientEvent(db, event);
     const rows = await db.select().from(analyticsEvents);
     expect(rows).toHaveLength(1);
-    expect(rows[0]).toMatchObject({ name: "whatsapp_click", locale: "de", referrerHost: "www.google.com" });
+    expect(rows[0]).toMatchObject({
+      name: "whatsapp_click",
+      locale: "de",
+      referrerHost: "www.google.com",
+    });
   });
 
   it.each([

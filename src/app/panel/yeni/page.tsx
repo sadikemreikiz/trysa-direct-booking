@@ -1,7 +1,7 @@
-import PanelHeader from "@/features/panel/components/PanelHeader";
 import ManualReservationForm from "@/features/panel/components/ManualReservationForm";
-import { todayInDemre } from "@/lib/dates";
+import PanelHeader from "@/features/panel/components/PanelHeader";
 import { requireApprovedStaff } from "@/features/panel/session";
+import { todayInDemre } from "@/lib/dates";
 
 /** Manually add a booking that came in by phone, WhatsApp or walk-in. */
 export default async function NewReservationPage() {
@@ -10,7 +10,9 @@ export default async function NewReservationPage() {
     <>
       <PanelHeader staff={staff} back />
       <h1 className="mb-1 font-display text-3xl font-semibold text-pine">Rezervasyon ekle</h1>
-      <p className="mb-4 text-muted">Telefon, WhatsApp ya da kapıdan gelen misafir. Kaydedince onaylı olur.</p>
+      <p className="mb-4 text-muted">
+        Telefon, WhatsApp ya da kapıdan gelen misafir. Kaydedince onaylı olur.
+      </p>
       <ManualReservationForm today={todayInDemre(new Date())} />
     </>
   );

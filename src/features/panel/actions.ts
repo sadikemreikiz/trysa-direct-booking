@@ -1,6 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { savePushSubscription } from "@/features/notifications/push";
+import { todayInDemre } from "@/lib/dates";
 import {
   addReservationNote,
   availabilityForRange,
@@ -14,11 +17,8 @@ import {
   type ManualReservationInput,
   type UnitAvailability,
 } from "./reservation-admin";
-import { AuthorizationError, decideAccess } from "./staff";
-import { todayInDemre } from "@/lib/dates";
-import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
 import { requireApprovedStaff } from "./session";
-import { savePushSubscription } from "@/features/notifications/push";
+import { AuthorizationError, decideAccess } from "./staff";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -47,7 +47,11 @@ function refreshGuestForm() {
   revalidatePath("/[lang]/rezervasyon", "page");
 }
 
-export async function confirmAction(id: string, unitId: number, note: string): Promise<ActionResult> {
+export async function confirmAction(
+  id: string,
+  unitId: number,
+  note: string,
+): Promise<ActionResult> {
   const { db, staff } = await requireApprovedStaff();
   const detail = await getReservationDetail(db, id);
   if (!detail) return { ok: false, error: MESSAGES.not_found };
@@ -74,7 +78,10 @@ export async function confirmAction(id: string, unitId: number, note: string): P
 }
 
 /** Manual booking form: which rooms are free on the chosen dates? */
-export async function availabilityAction(checkIn: string, checkOut: string): Promise<UnitAvailability[]> {
+export async function availabilityAction(
+  checkIn: string,
+  checkOut: string,
+): Promise<UnitAvailability[]> {
   const { db } = await requireApprovedStaff();
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(checkIn) ||
@@ -92,7 +99,12 @@ export async function createManualAction(
 ): Promise<{ ok: true; id: string } | { ok: false; error: string }> {
   const { db, staff } = await requireApprovedStaff();
 
-  const availability = await availabilityForRange(db, input.checkIn, input.checkOut, await getLockedDatesByType());
+  const availability = await availabilityForRange(
+    db,
+    input.checkIn,
+    input.checkOut,
+    await getLockedDatesByType(),
+  );
   const unit = availability.find((u) => u.id === input.unitId);
   if (!unit) return { ok: false, error: MESSAGES.unit_required };
   if (!unit.free) {

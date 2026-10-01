@@ -1,8 +1,7 @@
 import { container, type TL } from "./shared";
 
 export function BookingBar({ t, lang }: TL) {
-  const fld =
-    "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink";
+  const fld = "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-sm text-ink";
   const lbl = "block text-xs font-bold text-muted";
   return (
     <div className={`${container} relative z-20 -mt-8`}>

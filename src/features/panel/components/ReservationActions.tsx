@@ -28,7 +28,8 @@ type Props = {
   availability: UnitAvailability[];
 };
 
-const bigBtn = "flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-lg font-bold";
+const bigBtn =
+  "flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 text-lg font-bold";
 
 export default function ReservationActions({ reservation: r, unitName, availability }: Props) {
   const router = useRouter();
@@ -59,14 +60,19 @@ export default function ReservationActions({ reservation: r, unitName, availabil
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-xl bg-[#fbe4dc] p-3 text-base font-semibold text-clay-dark">{error}</p>
+        <p className="rounded-xl bg-[#fbe4dc] p-3 text-base font-semibold text-clay-dark">
+          {error}
+        </p>
       )}
 
       {r.status === "pending" && (
         <>
           <Step n={1} title="Misafire yaz ya da ara">
             <WhatsAppButton href={waHref("reply")} label="WhatsApp'tan yaz" />
-            <a href={`tel:${r.phone}`} className={`${bigBtn} mt-2 border border-line bg-white text-pine`}>
+            <a
+              href={`tel:${r.phone}`}
+              className={`${bigBtn} mt-2 border border-line bg-white text-pine`}
+            >
               📞 Ara · {r.phone}
             </a>
           </Step>
@@ -107,7 +113,8 @@ export default function ReservationActions({ reservation: r, unitName, availabil
               disabled={pending || unitId == null}
               onClick={() => {
                 if (unitId == null) return;
-                if (!confirm(`${r.guestName} · ${selectedName} için rezervasyon onaylansın mı?`)) return;
+                if (!confirm(`${r.guestName} · ${selectedName} için rezervasyon onaylansın mı?`))
+                  return;
                 act(() => confirmAction(r.id, unitId, note));
               }}
               className={`${bigBtn} bg-pine text-white disabled:opacity-50`}
@@ -139,7 +146,9 @@ export default function ReservationActions({ reservation: r, unitName, availabil
             type="button"
             disabled={pending}
             onClick={() => {
-              if (confirm("Bu rezervasyonu iptal etmek istediğine emin misin? Oda tekrar boşa çıkar.")) {
+              if (
+                confirm("Bu rezervasyonu iptal etmek istediğine emin misin? Oda tekrar boşa çıkar.")
+              ) {
                 act(() => cancelAction(r.id, note));
               }
             }}
@@ -152,13 +161,17 @@ export default function ReservationActions({ reservation: r, unitName, availabil
 
       {r.status === "declined" && (
         <>
-          <div className="rounded-2xl bg-[#f1ece2] p-4 text-lg font-bold text-muted">✕ Reddedildi</div>
+          <div className="rounded-2xl bg-[#f1ece2] p-4 text-lg font-bold text-muted">
+            ✕ Reddedildi
+          </div>
           <WhatsAppButton href={waHref("declined")} label="Misafire bilgi ver" />
         </>
       )}
 
       {r.status === "cancelled" && (
-        <div className="rounded-2xl bg-[#f1ece2] p-4 text-lg font-bold text-muted">İptal edildi</div>
+        <div className="rounded-2xl bg-[#f1ece2] p-4 text-lg font-bold text-muted">
+          İptal edildi
+        </div>
       )}
 
       <div className="rounded-2xl bg-white p-4">
@@ -190,7 +203,12 @@ export default function ReservationActions({ reservation: r, unitName, availabil
 
 function WhatsAppButton({ href, label }: { href: string; label: string }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={`${bigBtn} bg-whatsapp text-white`}>
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`${bigBtn} bg-whatsapp text-white`}
+    >
       💬 {label}
     </a>
   );

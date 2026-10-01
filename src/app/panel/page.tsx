@@ -1,11 +1,18 @@
 import Link from "next/link";
-import { listPanelReservations } from "@/features/panel/reservation-admin";
-import { todayInDemre } from "@/lib/dates";
+import { vapidPublicKey } from "@/features/notifications/push";
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import PushToggle from "@/features/panel/components/PushToggle";
-import { formatDay, localeFlag, nights, SLOW_RESPONSE_MS, sourceLabel, timeAgo } from "@/features/panel/format";
+import {
+  formatDay,
+  localeFlag,
+  nights,
+  SLOW_RESPONSE_MS,
+  sourceLabel,
+  timeAgo,
+} from "@/features/panel/format";
+import { listPanelReservations } from "@/features/panel/reservation-admin";
 import { requireApprovedStaff } from "@/features/panel/session";
-import { vapidPublicKey } from "@/features/notifications/push";
+import { todayInDemre } from "@/lib/dates";
 
 export default async function PanelHome() {
   const { db, staff } = await requireApprovedStaff();
@@ -70,7 +77,9 @@ export default async function PanelHome() {
 
       <h2 className="mb-3 mt-8 text-xs font-bold tracking-widest text-clay">ONAYLI · YAKLAŞAN</h2>
       {upcoming.length === 0 ? (
-        <p className="rounded-2xl bg-white p-5 text-center text-muted">Yaklaşan onaylı rezervasyon yok</p>
+        <p className="rounded-2xl bg-white p-5 text-center text-muted">
+          Yaklaşan onaylı rezervasyon yok
+        </p>
       ) : (
         <ul className="space-y-2">
           {upcoming.map(({ r, unitName }) => (
@@ -79,7 +88,9 @@ export default async function PanelHome() {
                 <div className="font-bold text-ink">
                   ✅ {unitName} · {r.guestName}
                   {r.source !== "website" && (
-                    <span className="ml-1.5 text-sm font-normal text-muted">{sourceLabel[r.source]}</span>
+                    <span className="ml-1.5 text-sm font-normal text-muted">
+                      {sourceLabel[r.source]}
+                    </span>
                   )}
                 </div>
                 <div className="text-sm text-muted">

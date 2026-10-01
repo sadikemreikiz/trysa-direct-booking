@@ -2,11 +2,15 @@ import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
-import { confirmReservation, createManualReservation, declineReservation } from "./reservation-admin";
-import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
 import { analyticsEvents, reservationEvents, reservations, user } from "@/db/schema";
-import { getStats } from "./stats";
 import { createTestDb, resetTestDb } from "@/db/test-db";
+import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
+import {
+  confirmReservation,
+  createManualReservation,
+  declineReservation,
+} from "./reservation-admin";
+import { getStats } from "./stats";
 
 const NOW = new Date("2026-11-20T10:00:00Z");
 
@@ -40,8 +44,15 @@ beforeEach(async () => {
 
 /** Saves a request as if it arrived at a given moment. */
 async function request(createdAt: string, patch: Partial<ReservationRequest> = {}) {
-  const { reservation } = await createReservation(db, { ...base, ...patch }, { now: new Date("2026-09-01T00:00:00Z") });
-  await db.update(reservations).set({ createdAt: new Date(createdAt) }).where(eq(reservations.id, reservation.id));
+  const { reservation } = await createReservation(
+    db,
+    { ...base, ...patch },
+    { now: new Date("2026-09-01T00:00:00Z") },
+  );
+  await db
+    .update(reservations)
+    .set({ createdAt: new Date(createdAt) })
+    .where(eq(reservations.id, reservation.id));
   return reservation;
 }
 
@@ -65,17 +76,22 @@ describe("panel statistics", () => {
     await request("2026-11-02T09:00:00Z", { unit: "ambar-3" }); // unanswered
     await confirmReservation(db, a.id, "u1", 1, { now: new Date("2026-10-05T09:30:00Z") }); // 30 min
     await declineReservation(db, b.id, "u1", { now: new Date("2026-10-20T11:00:00Z") }); // 120 min
-    await createManualReservation(db, "u1", {
-      unitId: 4,
-      checkIn: "2026-11-15",
-      checkOut: "2026-11-17",
-      adults: 2,
-      children: 0,
-      guestName: "Telefon misafiri",
-      phone: "",
-      note: "",
-      source: "phone",
-    }, { now: new Date("2026-10-01T00:00:00Z") });
+    await createManualReservation(
+      db,
+      "u1",
+      {
+        unitId: 4,
+        checkIn: "2026-11-15",
+        checkOut: "2026-11-17",
+        adults: 2,
+        children: 0,
+        guestName: "Telefon misafiri",
+        phone: "",
+        note: "",
+        source: "phone",
+      },
+      { now: new Date("2026-10-01T00:00:00Z") },
+    );
     await db.insert(analyticsEvents).values([
       { name: "whatsapp_click", path: "/tr", createdAt: new Date("2026-10-01T10:00:00Z") },
       { name: "whatsapp_click", path: "/tr", createdAt: new Date("2026-10-02T10:00:00Z") },

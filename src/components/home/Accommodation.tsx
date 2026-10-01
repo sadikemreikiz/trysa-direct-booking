@@ -26,10 +26,10 @@ export function Accommodation({ t, lang }: TL) {
               <Photo tone={s.tone} className="h-44" />
             )}
             <div className="p-5">
-              <div className="font-display text-lg font-semibold md:text-xl">{s.slug === "kamp" ? t.stay.kampTitle : s.title}</div>
-              <p className="mt-1.5 text-sm text-muted">
-                {t.room.descs[s.slug] ?? s.desc}
-              </p>
+              <div className="font-display text-lg font-semibold md:text-xl">
+                {s.slug === "kamp" ? t.stay.kampTitle : s.title}
+              </div>
+              <p className="mt-1.5 text-sm text-muted">{t.room.descs[s.slug] ?? s.desc}</p>
               <div className="mt-3.5 flex items-center justify-between">
                 <span className="text-lg font-bold text-pine">
                   {s.slug === "kamp" ? t.stay.fiyatSor : s.price}

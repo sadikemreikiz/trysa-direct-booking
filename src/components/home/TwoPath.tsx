@@ -1,5 +1,5 @@
-import { responsiveImage } from "@/lib/images";
 import { fillRating } from "@/features/reviews/google-reviews";
+import { responsiveImage } from "@/lib/images";
 import { container, Photo, type TLR } from "./shared";
 
 export function TwoPath({ t, lang, rating }: TLR) {
@@ -10,7 +10,10 @@ export function TwoPath({ t, lang, rating }: TLR) {
           <div className="relative h-48">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              {...responsiveImage("/img/rooms/kulube-1/kapak.jpg", "(min-width: 768px) 50vw, 100vw")}
+              {...responsiveImage(
+                "/img/rooms/kulube-1/kapak.jpg",
+                "(min-width: 768px) 50vw, 100vw",
+              )}
               alt="Trysa"
               loading="lazy"
               className="h-full w-full object-cover"
@@ -20,7 +23,9 @@ export function TwoPath({ t, lang, rating }: TLR) {
             </span>
           </div>
           <div className="p-6 md:p-7">
-            <div className="font-display text-2xl font-semibold text-pine">{t.twoPath.stayTitle}</div>
+            <div className="font-display text-2xl font-semibold text-pine">
+              {t.twoPath.stayTitle}
+            </div>
             <p className="mt-1.5 text-sm text-muted md:text-[15px]">{t.twoPath.staySub}</p>
             <a
               href={`/${lang}/rezervasyon`}
@@ -39,7 +44,9 @@ export function TwoPath({ t, lang, rating }: TLR) {
             </span>
           </div>
           <div className="p-6 md:p-7">
-            <div className="font-display text-2xl font-semibold text-pine">{t.twoPath.eatTitle}</div>
+            <div className="font-display text-2xl font-semibold text-pine">
+              {t.twoPath.eatTitle}
+            </div>
             <p className="mt-1.5 text-sm text-muted md:text-[15px]">{t.twoPath.eatSub}</p>
             <a
               href={`/${lang}/menu`}

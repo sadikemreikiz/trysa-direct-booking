@@ -25,11 +25,13 @@ I built and run this on my own: gathered requirements with the family, chose the
 ## What it does
 
 **For guests** (Turkish, English, German)
+
 - Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
 - A booking request form where dates already taken on Airbnb or confirmed directly are blocked, and re-checked on the server
 - A request code, an optional WhatsApp hand-off and a branded receipt email in their language
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
+
 - Google sign-in plus an explicit approval step: signing in alone grants nothing
 - A push notification on every new request, and a reminder if a request waits more than 3 hours
 - Confirm or decline with a room picker that shows what is free, and ready-made WhatsApp replies in the guest's language
@@ -71,14 +73,14 @@ flowchart LR
   Cron[Vercel Cron / GitHub Actions] -->|/api/cron| Next
 ```
 
-| Layer | Choice |
-| --- | --- |
-| App | Next.js 16 (App Router, Server Components, Server Actions), React 19, TypeScript, Tailwind CSS 4 |
-| Data | PostgreSQL on Neon (Frankfurt), Drizzle ORM, versioned SQL migrations applied on production builds |
-| Auth | Better Auth with Google, sessions in the database |
-| Messaging | Resend (email), Web Push with VAPID |
-| Tests | Vitest + PGlite (real Postgres in WebAssembly), GitHub Actions CI |
-| Hosting | Vercel (functions in `fra1`, next to the database) |
+| Layer     | Choice                                                                                             |
+| --------- | -------------------------------------------------------------------------------------------------- |
+| App       | Next.js 16 (App Router, Server Components, Server Actions), React 19, TypeScript, Tailwind CSS 4   |
+| Data      | PostgreSQL on Neon (Frankfurt), Drizzle ORM, versioned SQL migrations applied on production builds |
+| Auth      | Better Auth with Google, sessions in the database                                                  |
+| Messaging | Resend (email), Web Push with VAPID                                                                |
+| Tests     | Vitest + PGlite (real Postgres in WebAssembly), GitHub Actions CI                                  |
+| Hosting   | Vercel (functions in `fra1`, next to the database)                                                 |
 
 Public pages are statically generated with incremental revalidation; the booking page is revalidated on demand when staff confirm or cancel. A failed migration fails the deploy, so the previous version stays live.
 
@@ -86,17 +88,17 @@ Public pages are statically generated with incremental revalidation; the booking
 
 The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisions).
 
-| Problem | Approach |
-| --- | --- |
-| Airbnb's calendar lags by hours | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md)) |
+| Problem                           | Approach                                                                                                                                                                                                                        |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Airbnb's calendar lags by hours   | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md))                                                                           |
 | Double bookings under concurrency | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md)) |
-| Two people acting on one request | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log |
-| Lost notifications | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md)) |
-| No Airbnb API for small hosts | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md)) |
-| Spam without CAPTCHA friction | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md)) |
-| Privacy (KVKK/GDPR) | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises |
-| Graceful degradation | Without a database the site still takes requests by email; without Google it shows the last known rating |
-| Security headers | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies |
+| Two people acting on one request  | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                 |
+| Lost notifications                | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))              |
+| No Airbnb API for small hosts     | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                        |
+| Spam without CAPTCHA friction     | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                              |
+| Privacy (KVKK/GDPR)               | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                   |
+| Graceful degradation              | Without a database the site still takes requests by email; without Google it shows the last known rating                                                                                                                        |
+| Security headers                  | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies                                                                                                            |
 
 ## Quality
 
@@ -139,17 +141,17 @@ npm test             # all tests, no database or keys needed
 
 Everything except the database is optional; features switch off cleanly when their keys are missing.
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL`, `DATABASE_URL_UNPOOLED` | Postgres (pooled for the app, direct for migrations) |
-| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` | Session signing; also keys the iCal tokens and rate-limit digests |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS` | Panel sign-in; listed emails start as approved admins |
-| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Web Push |
-| `RESEND_API_KEY`, `RESERVATION_EMAIL`, `RESEND_FROM` | Email; guest receipts only when `RESEND_FROM` is on a verified domain |
-| `AIRBNB_ICAL_*` | Airbnb calendar link per room |
-| `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID` | Live Google rating and reviews |
-| `CRON_SECRET` | Protects `/api/cron` (outbox retries, reminders, data retention) |
-| `NEXT_PUBLIC_SITE_URL`, `SITE_INDEXABLE` | Canonical URL; search indexing on/off |
+| Variable                                                   | Purpose                                                               |
+| ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| `DATABASE_URL`, `DATABASE_URL_UNPOOLED`                    | Postgres (pooled for the app, direct for migrations)                  |
+| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`                    | Session signing; also keys the iCal tokens and rate-limit digests     |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS` | Panel sign-in; listed emails start as approved admins                 |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`                    | Web Push                                                              |
+| `RESEND_API_KEY`, `RESERVATION_EMAIL`, `RESEND_FROM`       | Email; guest receipts only when `RESEND_FROM` is on a verified domain |
+| `AIRBNB_ICAL_*`                                            | Airbnb calendar link per room                                         |
+| `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`                 | Live Google rating and reviews                                        |
+| `CRON_SECRET`                                              | Protects `/api/cron` (outbox retries, reminders, data retention)      |
+| `NEXT_PUBLIC_SITE_URL`, `SITE_INDEXABLE`                   | Canonical URL; search indexing on/off                                 |
 
 ## Project structure
 

@@ -87,9 +87,7 @@ export async function getLockedDatesByType(): Promise<Record<string, string[]>> 
       const sets = await Promise.all(urls.map(bookedSet));
       const [first, ...rest] = sets;
       // Only days taken in EVERY unit = the type is fully booked
-      out[type] = [...first]
-        .filter((day) => rest.every((s) => s.has(day)))
-        .sort();
+      out[type] = [...first].filter((day) => rest.every((s) => s.has(day))).sort();
     }),
   );
   return out;
@@ -101,8 +99,7 @@ export function rangeHasLockedDay(
   checkout: string,
   lockedDates: string[],
 ): boolean {
-  if (!checkin || !checkout || checkout <= checkin || lockedDates.length === 0)
-    return false;
+  if (!checkin || !checkout || checkout <= checkin || lockedDates.length === 0) return false;
   const set = new Set(lockedDates);
   let d = new Date(`${checkin}T00:00:00Z`);
   const end = new Date(`${checkout}T00:00:00Z`);

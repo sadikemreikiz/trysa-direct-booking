@@ -31,7 +31,20 @@ export type OutboxHandlers = {
 
 function shortDate(iso: string): string {
   const [, m, d] = iso.split("-");
-  const months = ["Oca", "Şub", "Mar", "Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara"];
+  const months = [
+    "Oca",
+    "Şub",
+    "Mar",
+    "Nis",
+    "May",
+    "Haz",
+    "Tem",
+    "Ağu",
+    "Eyl",
+    "Eki",
+    "Kas",
+    "Ara",
+  ];
   return `${Number(d)} ${months[Number(m) - 1]}`;
 }
 

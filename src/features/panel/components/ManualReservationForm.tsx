@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { availabilityAction, createManualAction } from "@/features/panel/actions";
-import type { UnitAvailability } from "@/features/panel/reservation-admin";
 import { nights } from "@/features/panel/format";
+import type { UnitAvailability } from "@/features/panel/reservation-admin";
 
 const SOURCES = [
   { value: "phone", label: "📞 Telefon" },
@@ -14,7 +14,8 @@ const SOURCES = [
 
 type Source = (typeof SOURCES)[number]["value"];
 
-const fld = "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-base text-ink outline-none focus:border-clay";
+const fld =
+  "mt-1.5 w-full rounded-xl border border-line bg-white p-3 text-base text-ink outline-none focus:border-clay";
 const lbl = "block text-sm font-bold text-muted";
 const chip = (active: boolean) =>
   `rounded-xl border-2 p-3 text-base font-semibold ${
@@ -104,7 +105,9 @@ export default function ManualReservationForm({ today }: { today: string }) {
         </div>
         {datesValid && <p className="mt-2 text-sm text-muted">{nights(checkIn, checkOut)} gece</p>}
         {checkIn && checkIn < today && (
-          <p className="mt-2 text-sm font-semibold text-clay-dark">Geçmiş bir tarihe rezervasyon eklenemez.</p>
+          <p className="mt-2 text-sm font-semibold text-clay-dark">
+            Geçmiş bir tarihe rezervasyon eklenemez.
+          </p>
         )}
       </section>
 
@@ -122,7 +125,9 @@ export default function ManualReservationForm({ today }: { today: string }) {
                   disabled={!u.free}
                   onClick={() => setUnitId(u.id)}
                   className={
-                    u.free ? chip(unitId === u.id) : "rounded-xl border-2 border-line bg-[#f1ece2] p-3 text-base font-semibold text-muted"
+                    u.free
+                      ? chip(unitId === u.id)
+                      : "rounded-xl border-2 border-line bg-[#f1ece2] p-3 text-base font-semibold text-muted"
                   }
                 >
                   <span className={u.free ? "" : "line-through"}>{u.name}</span>
@@ -143,7 +148,12 @@ export default function ManualReservationForm({ today }: { today: string }) {
           <span className={lbl}>Nereden geldi?</span>
           <div className="mt-1.5 grid grid-cols-3 gap-2">
             {SOURCES.map((s) => (
-              <button key={s.value} type="button" onClick={() => setSource(s.value)} className={chip(source === s.value)}>
+              <button
+                key={s.value}
+                type="button"
+                onClick={() => setSource(s.value)}
+                className={chip(source === s.value)}
+              >
                 {s.label}
               </button>
             ))}
@@ -151,11 +161,22 @@ export default function ManualReservationForm({ today }: { today: string }) {
         </div>
         <label className="block">
           <span className={lbl}>Misafirin adı</span>
-          <input className={fld} value={guestName} onChange={(e) => setGuestName(e.target.value)} autoComplete="off" />
+          <input
+            className={fld}
+            value={guestName}
+            onChange={(e) => setGuestName(e.target.value)}
+            autoComplete="off"
+          />
         </label>
         <label className="block">
           <span className={lbl}>Telefon (varsa)</span>
-          <input type="tel" className={fld} value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
+          <input
+            type="tel"
+            className={fld}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            autoComplete="off"
+          />
         </label>
         <div className="grid grid-cols-2 gap-3">
           <Counter label="Yetişkin" value={adults} min={1} onChange={setAdults} />
@@ -173,7 +194,11 @@ export default function ManualReservationForm({ today }: { today: string }) {
         </label>
       </section>
 
-      {error && <p className="rounded-xl bg-[#fbe4dc] p-3 text-base font-semibold text-clay-dark">{error}</p>}
+      {error && (
+        <p className="rounded-xl bg-[#fbe4dc] p-3 text-base font-semibold text-clay-dark">
+          {error}
+        </p>
+      )}
 
       <button
         type="button"
@@ -198,16 +223,27 @@ function Counter({
   min: number;
   onChange: (n: number) => void;
 }) {
-  const btn = "h-11 w-11 rounded-xl border border-line bg-white text-xl font-bold text-pine disabled:opacity-40";
+  const btn =
+    "h-11 w-11 rounded-xl border border-line bg-white text-xl font-bold text-pine disabled:opacity-40";
   return (
     <div>
       <span className={lbl}>{label}</span>
       <div className="mt-1.5 flex items-center justify-between gap-2">
-        <button type="button" className={btn} disabled={value <= min} onClick={() => onChange(value - 1)}>
+        <button
+          type="button"
+          className={btn}
+          disabled={value <= min}
+          onClick={() => onChange(value - 1)}
+        >
           −
         </button>
         <span className="text-lg font-bold text-ink">{value}</span>
-        <button type="button" className={btn} disabled={value >= 20} onClick={() => onChange(value + 1)}>
+        <button
+          type="button"
+          className={btn}
+          disabled={value >= 20}
+          onClick={() => onChange(value + 1)}
+        >
           +
         </button>
       </div>

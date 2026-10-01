@@ -43,7 +43,11 @@ const nextConfig: NextConfig = {
   // Short links (business card, table card, WhatsApp message, signboard):
   //   directions → Google Maps navigation, review → Google's "write a review" screen
   async redirects() {
-    const to = (destination: string) => (source: string) => ({ source, destination, permanent: false });
+    const to = (destination: string) => (source: string) => ({
+      source,
+      destination,
+      permanent: false,
+    });
     return [
       ...["/yol", "/konum", "/directions", "/anfahrt"].map(to(place.directionsUrl)),
       ...["/yorum", "/review", "/bewertung"].map(to(place.reviewUrl)),

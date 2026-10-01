@@ -1,6 +1,6 @@
+import { place, site } from "@/content/site";
 import type { Locale } from "@/lib/i18n";
 import { BUSINESS_NAME, GOOGLE_MAPS_URL, HOME_DESCRIPTION, SITE_URL } from "@/lib/seo";
-import { place, site } from "@/content/site";
 
 const CUISINE: Record<Locale, string[]> = {
   tr: ["Türk mutfağı", "Izgara", "Balık", "Ev yemekleri"],
@@ -11,7 +11,13 @@ const CUISINE: Record<Locale, string[]> = {
 const AMENITIES: Record<Locale, string[]> = {
   tr: ["Ücretsiz WiFi", "Ücretsiz otopark", "Kahvaltı", "Evcil hayvan dostu", "Çocuk oyun alanı"],
   en: ["Free WiFi", "Free parking", "Breakfast", "Pet friendly", "Children's play area"],
-  de: ["Kostenloses WLAN", "Kostenlose Parkplätze", "Frühstück", "Haustierfreundlich", "Kinderspielplatz"],
+  de: [
+    "Kostenloses WLAN",
+    "Kostenlose Parkplätze",
+    "Frühstück",
+    "Haustierfreundlich",
+    "Kinderspielplatz",
+  ],
 };
 
 /** Structured data so Google understands the business (lodging + restaurant, rating, location). */
@@ -86,9 +92,6 @@ export default function JsonLd({
   const data = { "@context": "https://schema.org", "@graph": [business, website] };
 
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
   );
 }

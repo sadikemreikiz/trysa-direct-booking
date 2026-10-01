@@ -17,7 +17,9 @@ export function Reviews({ t, lang, google }: TL & { google?: GoogleReviewsData |
         <div className="mb-4 flex items-center gap-2">
           <Stars className="text-base" />
           <span className="font-bold text-pine">{formatRating(google.rating, lang)}</span>
-          <span className="text-sm text-muted">· {google.count} {t.reviews.suffix}</span>
+          <span className="text-sm text-muted">
+            · {google.count} {t.reviews.suffix}
+          </span>
         </div>
       )}
       <div className="grid gap-4 md:grid-cols-3 md:gap-5">
@@ -28,7 +30,9 @@ export function Reviews({ t, lang, google }: TL & { google?: GoogleReviewsData |
               “{r.text}”
             </p>
             <div className="mt-3 text-sm font-semibold text-muted">— {r.author}</div>
-            {r.translated && <div className="mt-1 text-xs text-muted/80">{t.reviews.translated}</div>}
+            {r.translated && (
+              <div className="mt-1 text-xs text-muted/80">{t.reviews.translated}</div>
+            )}
           </div>
         ))}
       </div>

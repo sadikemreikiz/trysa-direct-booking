@@ -2,9 +2,13 @@ import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
-import { createReservation, ReservationValidationError, type ReservationRequest } from "./reservations";
 import { analyticsEvents, outbox, reservationEvents, reservations } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
+import {
+  createReservation,
+  ReservationValidationError,
+  type ReservationRequest,
+} from "./reservations";
 
 const NOW = new Date("2026-10-01T09:00:00Z");
 
@@ -79,7 +83,10 @@ describe("createReservation", () => {
     expect(events[0]).toMatchObject({ type: "created", toStatus: "pending", actor: "guest" });
 
     const [message] = await db.select().from(outbox).where(eq(outbox.id, outboxId));
-    expect(message).toMatchObject({ status: "pending", payload: { reservationId: reservation.id } });
+    expect(message).toMatchObject({
+      status: "pending",
+      payload: { reservationId: reservation.id },
+    });
 
     const tracked = await db.select().from(analyticsEvents);
     expect(tracked.map((e) => e.name)).toEqual(["reservation_submitted"]);
@@ -106,14 +113,18 @@ describe("createReservation", () => {
 
   it("rejects a check-in in the past (in the business's time zone)", async () => {
     await expect(
-      createReservation(db, { ...valid, checkin: "2026-09-30", checkout: "2026-10-02" }, { now: NOW }),
+      createReservation(
+        db,
+        { ...valid, checkin: "2026-09-30", checkout: "2026-10-02" },
+        { now: NOW },
+      ),
     ).rejects.toThrow(/checkin:in_past/);
   });
 
   it("rejects an unknown unit and writes nothing", async () => {
-    await expect(createReservation(db, { ...valid, unit: "villa-99" }, { now: NOW })).rejects.toThrow(
-      /unit:unknown/,
-    );
+    await expect(
+      createReservation(db, { ...valid, unit: "villa-99" }, { now: NOW }),
+    ).rejects.toThrow(/unit:unknown/);
     expect(await db.select().from(reservations)).toHaveLength(0);
   });
 
@@ -147,14 +158,19 @@ describe("double-booking protection (database constraint)", () => {
 
   it("pending requests may overlap: the family chooses which one to confirm", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13", "pending");
-    await expect(insertReservation(1, "2026-11-11", "2026-11-12", "pending")).resolves.toBeDefined();
+    await expect(
+      insertReservation(1, "2026-11-11", "2026-11-12", "pending"),
+    ).resolves.toBeDefined();
   });
 
   it("a pending request cannot be confirmed while an overlapping confirmed one exists", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13");
     await insertReservation(1, "2026-11-11", "2026-11-12", "pending");
     const msg = await dbError(
-      db.update(reservations).set({ status: "confirmed" }).where(eq(reservations.status, "pending")),
+      db
+        .update(reservations)
+        .set({ status: "confirmed" })
+        .where(eq(reservations.status, "pending")),
     );
     expect(msg).toMatch(/reservations_no_overlap_confirmed/);
   });

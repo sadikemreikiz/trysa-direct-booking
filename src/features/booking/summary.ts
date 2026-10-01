@@ -19,9 +19,7 @@ export function reservationSummary(d: ReservationInput): string {
     "",
     `Giriş: ${d.checkin || "-"}`,
     `Çıkış: ${d.checkout || "-"}`,
-    `Kişi: ${d.adults} yetişkin${
-      Number(d.children) > 0 ? `, ${d.children} çocuk` : ""
-    }`,
+    `Kişi: ${d.adults} yetişkin${Number(d.children) > 0 ? `, ${d.children} çocuk` : ""}`,
     `Konaklama: ${d.unit}`,
     `Ad: ${d.name}`,
     `Telefon: ${d.phone}`,
@@ -32,7 +30,5 @@ export function reservationSummary(d: ReservationInput): string {
 }
 
 export function whatsappUrl(d: ReservationInput): string {
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    reservationSummary(d),
-  )}`;
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(reservationSummary(d))}`;
 }

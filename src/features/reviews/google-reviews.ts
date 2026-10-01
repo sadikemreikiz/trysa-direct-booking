@@ -6,8 +6,8 @@
  * Requested per language: Google returns reviews written in that language first (English
  * reviews on the EN page); translated ones are flagged with `translated`.
  */
-import type { Locale } from "@/lib/i18n";
 import { site } from "@/content/site";
+import type { Locale } from "@/lib/i18n";
 
 export type GoogleReview = {
   author: string;
@@ -74,7 +74,9 @@ export async function getRatingSummary(): Promise<RatingSummary> {
 
 /** "4,9" (tr/de) or "4.9" (en) */
 export function formatRating(rating: number, lang: Locale): string {
-  return new Intl.NumberFormat(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(rating);
+  return new Intl.NumberFormat(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(
+    rating,
+  );
 }
 
 /** Fills in {rating} and {count} in the text. */
@@ -84,7 +86,11 @@ export function fillRating(template: string, summary: RatingSummary, lang: Local
     .replaceAll("{count}", new Intl.NumberFormat(lang).format(summary.count));
 }
 
-const ANONYMOUS: Record<Locale, string> = { tr: "Google kullanıcısı", en: "Google user", de: "Google-Nutzer" };
+const ANONYMOUS: Record<Locale, string> = {
+  tr: "Google kullanıcısı",
+  en: "Google user",
+  de: "Google-Nutzer",
+};
 
 export async function getGoogleReviews(lang: Locale = "tr"): Promise<GoogleReviewsData | null> {
   if (!KEY) return null;
@@ -92,14 +98,17 @@ export async function getGoogleReviews(lang: Locale = "tr"): Promise<GoogleRevie
   if (!placeId) return null;
   try {
     // languageCode goes into the URL, so each language is cached separately
-    const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}?languageCode=${lang}`, {
-      headers: {
-        "X-Goog-Api-Key": KEY,
-        "X-Goog-FieldMask": "rating,userRatingCount,reviews",
-        "Accept-Language": lang,
+    const res = await fetch(
+      `https://places.googleapis.com/v1/places/${placeId}?languageCode=${lang}`,
+      {
+        headers: {
+          "X-Goog-Api-Key": KEY,
+          "X-Goog-FieldMask": "rating,userRatingCount,reviews",
+          "Accept-Language": lang,
+        },
+        next: { revalidate: 86_400 }, // refresh once a day
       },
-      next: { revalidate: 86_400 }, // refresh once a day
-    });
+    );
     if (!res.ok) return null;
     const data = (await res.json()) as PlaceResponse;
     const reviews: GoogleReview[] = (data.reviews ?? [])
@@ -109,7 +118,9 @@ export async function getGoogleReviews(lang: Locale = "tr"): Promise<GoogleRevie
         text: r.text?.text ?? r.originalText?.text ?? "",
         when: r.relativePublishTimeDescription ?? "",
         translated: Boolean(
-          r.text?.languageCode && r.originalText?.languageCode && r.text.languageCode !== r.originalText.languageCode,
+          r.text?.languageCode &&
+          r.originalText?.languageCode &&
+          r.text.languageCode !== r.originalText.languageCode,
         ),
       }))
       .filter((r) => r.text.trim().length > 0)

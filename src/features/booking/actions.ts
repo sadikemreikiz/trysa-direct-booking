@@ -3,16 +3,20 @@
 import { headers } from "next/headers";
 import { after } from "next/server";
 import { getDb } from "@/db";
+import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
+import {
+  guestEmailEnabled,
+  sendGuestEmail,
+  sendNotificationEmail,
+} from "@/features/notifications/email";
+import { deliverDueOutbox, deliverOutboxMessage } from "@/features/notifications/outbox";
+import { sendPushToStaff, type PushMessage } from "@/features/notifications/push";
+import type { Locale } from "@/lib/i18n";
+import { clientKey } from "./client-key";
+import { getGuestLockedDates } from "./guest-availability";
 import { hitRateLimits, pruneRateLimits } from "./rate-limit";
 import { createReservation, ReservationValidationError } from "./reservations";
-import { deliverDueOutbox, deliverOutboxMessage } from "@/features/notifications/outbox";
-import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
-import { clientKey } from "./client-key";
-import { guestEmailEnabled, sendGuestEmail, sendNotificationEmail } from "@/features/notifications/email";
-import { getGuestLockedDates } from "./guest-availability";
-import { sendPushToStaff, type PushMessage } from "@/features/notifications/push";
 import { reservationSummary, type ReservationInput } from "./summary";
-import type { Locale } from "@/lib/i18n";
 
 export type SubmitResult = {
   ok: boolean;
@@ -57,13 +61,18 @@ export async function submitReservation(
   // The page may have come from cache: if the chosen room was taken in the meantime, reject up front.
   if (meta.unitSlug && meta.unitSlug !== "kamp") {
     const locked = (await getGuestLockedDates())[data.unit] ?? [];
-    if (rangeHasLockedDay(data.checkin, data.checkout, locked)) return { ok: false, error: "blocked" };
+    if (rangeHasLockedDay(data.checkin, data.checkout, locked))
+      return { ok: false, error: "blocked" };
   }
 
   const db = getDb();
   if (db) {
     try {
-      const allowed = await hitRateLimits(db, `res:${clientKey(await headers())}`, RESERVATION_LIMITS);
+      const allowed = await hitRateLimits(
+        db,
+        `res:${clientKey(await headers())}`,
+        RESERVATION_LIMITS,
+      );
       after(() => pruneRateLimits(db).catch(console.error));
       if (!allowed) return { ok: false, error: "rate_limited" };
     } catch (e) {

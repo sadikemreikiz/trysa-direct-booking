@@ -34,7 +34,12 @@ export async function sendPushToStaff(
   if (!configure()) return { ok: true }; // push not configured; the email still goes out
 
   const subs = await db
-    .select({ id: pushSubscriptions.id, endpoint: pushSubscriptions.endpoint, p256dh: pushSubscriptions.p256dh, auth: pushSubscriptions.auth })
+    .select({
+      id: pushSubscriptions.id,
+      endpoint: pushSubscriptions.endpoint,
+      p256dh: pushSubscriptions.p256dh,
+      auth: pushSubscriptions.auth,
+    })
     .from(pushSubscriptions)
     .innerJoin(
       staff,

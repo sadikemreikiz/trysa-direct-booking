@@ -24,16 +24,28 @@ export function AccessActions({ userId, status }: { userId: string; status: stri
       <div className="flex flex-wrap gap-2">
         {status !== "approved" && (
           <>
-            <button disabled={pending} onClick={() => decide("approved", "staff")} className={`${btn} bg-pine text-white`}>
+            <button
+              disabled={pending}
+              onClick={() => decide("approved", "staff")}
+              className={`${btn} bg-pine text-white`}
+            >
               ✓ Onayla (işletme)
             </button>
-            <button disabled={pending} onClick={() => decide("approved", "admin")} className={`${btn} border border-pine text-pine`}>
+            <button
+              disabled={pending}
+              onClick={() => decide("approved", "admin")}
+              className={`${btn} border border-pine text-pine`}
+            >
               ✓ Yönetici yap
             </button>
           </>
         )}
         {status !== "revoked" && (
-          <button disabled={pending} onClick={() => decide("revoked", "staff")} className={`${btn} border border-clay text-clay`}>
+          <button
+            disabled={pending}
+            onClick={() => decide("revoked", "staff")}
+            className={`${btn} border border-clay text-clay`}
+          >
             {status === "approved" ? "Erişimi kapat" : "Reddet"}
           </button>
         )}

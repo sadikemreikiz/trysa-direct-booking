@@ -53,7 +53,11 @@ export function openGraphBase(lang: Locale) {
 }
 
 /** Subpage metadata: title, description, own URL, language alternates, link preview. */
-export function pageMetadata(lang: Locale, path: string, m: { title: string; description?: string }): Metadata {
+export function pageMetadata(
+  lang: Locale,
+  path: string,
+  m: { title: string; description?: string },
+): Metadata {
   return {
     title: m.title,
     description: m.description,

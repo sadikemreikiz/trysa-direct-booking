@@ -17,7 +17,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
-      - run: npx tsc --noEmit
+      - run: npm run format:check
+      - run: npm run typecheck
       - run: npm test
       # Without a database or external keys the site must still build, using its fallbacks.
       - run: npm run build

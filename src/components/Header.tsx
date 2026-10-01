@@ -1,9 +1,9 @@
 import Link from "next/link";
+import type { Dict, Locale } from "@/content/dictionaries";
 import { site } from "@/content/site";
 import { WhatsAppIcon } from "./icons";
 import LangSwitcher from "./LangSwitcher";
 import LogoMark from "./LogoMark";
-import type { Dict, Locale } from "@/content/dictionaries";
 
 export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
   const nav = [

@@ -1,10 +1,10 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { clientKey } from "./client-key";
 import type { Db } from "@/db";
-import { hitRateLimit, hitRateLimits, pruneRateLimits } from "./rate-limit";
 import { rateLimits } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
+import { clientKey } from "./client-key";
+import { hitRateLimit, hitRateLimits, pruneRateLimits } from "./rate-limit";
 
 const T0 = new Date("2026-10-01T09:00:00Z");
 const at = (minutes: number) => new Date(T0.getTime() + minutes * 60_000);

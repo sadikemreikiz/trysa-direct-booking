@@ -1,15 +1,21 @@
 import { redirect } from "next/navigation";
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import { sourceLabel } from "@/features/panel/format";
-import { getStats } from "@/features/panel/stats";
 import { requireApprovedStaff } from "@/features/panel/session";
+import { getStats } from "@/features/panel/stats";
 
-const monthName = new Intl.DateTimeFormat("tr-TR", { month: "short", year: "2-digit", timeZone: "UTC" });
+const monthName = new Intl.DateTimeFormat("tr-TR", {
+  month: "short",
+  year: "2-digit",
+  timeZone: "UTC",
+});
 
 function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes} dk`;
   const hours = minutes / 60;
-  return hours < 24 ? `${hours.toFixed(1).replace(".", ",")} saat` : `${Math.round(hours / 24)} gün`;
+  return hours < 24
+    ? `${hours.toFixed(1).replace(".", ",")} saat`
+    : `${Math.round(hours / 24)} gün`;
 }
 
 /** Measured numbers only: requests, response time, clicks, nights sold. Admins only. */
@@ -26,7 +32,10 @@ export default async function StatsPage() {
     }),
     { requests: 0, confirmed: 0, clicks: 0 },
   );
-  const maxBar = Math.max(1, ...stats.months.map((m) => m.requests + m.whatsappClicks + m.phoneClicks));
+  const maxBar = Math.max(
+    1,
+    ...stats.months.map((m) => m.requests + m.whatsappClicks + m.phoneClicks),
+  );
 
   return (
     <>
@@ -39,7 +48,11 @@ export default async function StatsPage() {
         <Tile
           label="Onaylanan"
           value={totals.confirmed}
-          hint={totals.requests > 0 ? `%${Math.round((totals.confirmed / totals.requests) * 100)}` : undefined}
+          hint={
+            totals.requests > 0
+              ? `%${Math.round((totals.confirmed / totals.requests) * 100)}`
+              : undefined
+          }
         />
         <Tile label="WhatsApp / telefon tıklaması" value={totals.clicks} />
         <Tile label="Yaklaşan onaylı gece" value={stats.upcomingNights} />
@@ -58,12 +71,17 @@ export default async function StatsPage() {
         {[...stats.months].reverse().map((m) => (
           <li key={m.month} className="rounded-2xl bg-white p-4">
             <div className="flex items-baseline justify-between">
-              <span className="font-bold text-ink">{monthName.format(new Date(`${m.month}-01`))}</span>
+              <span className="font-bold text-ink">
+                {monthName.format(new Date(`${m.month}-01`))}
+              </span>
               <span className="text-sm text-muted">{m.nights} onaylı gece</span>
             </div>
             <div className="mt-2 flex h-3 overflow-hidden rounded-full bg-cream" aria-hidden="true">
               <div className="bg-clay" style={{ width: `${(m.requests / maxBar) * 100}%` }} />
-              <div className="bg-whatsapp" style={{ width: `${(m.whatsappClicks / maxBar) * 100}%` }} />
+              <div
+                className="bg-whatsapp"
+                style={{ width: `${(m.whatsappClicks / maxBar) * 100}%` }}
+              />
               <div className="bg-pine" style={{ width: `${(m.phoneClicks / maxBar) * 100}%` }} />
             </div>
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
@@ -75,7 +93,9 @@ export default async function StatsPage() {
         ))}
       </ul>
 
-      <h2 className="mb-3 mt-7 text-xs font-bold tracking-widest text-clay">ONAYLI REZERVASYONLAR · KAYNAK</h2>
+      <h2 className="mb-3 mt-7 text-xs font-bold tracking-widest text-clay">
+        ONAYLI REZERVASYONLAR · KAYNAK
+      </h2>
       <section className="rounded-2xl bg-white p-4">
         {Object.keys(stats.bySource).length === 0 ? (
           <p className="text-muted">Henüz onaylı rezervasyon yok</p>
@@ -93,8 +113,8 @@ export default async function StatsPage() {
         )}
       </section>
       <p className="mt-4 text-xs text-muted">
-        Airbnb rezervasyonları burada yok (Airbnb takviminden sadece dolu günler gelir). Tıklamalar çerezsiz sayılır;
-        aynı kişinin birden çok tıklaması ayrı sayılabilir.
+        Airbnb rezervasyonları burada yok (Airbnb takviminden sadece dolu günler gelir). Tıklamalar
+        çerezsiz sayılır; aynı kişinin birden çok tıklaması ayrı sayılabilir.
       </p>
     </>
   );

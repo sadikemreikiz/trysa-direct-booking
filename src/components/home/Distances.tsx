@@ -4,7 +4,9 @@ import { container, type TL } from "./shared";
 export function Distances({ t, lang }: TL) {
   return (
     <section className={`${container} pt-10`}>
-      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">{t.distances.title}</h2>
+      <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">
+        {t.distances.title}
+      </h2>
       <div className="mt-4 grid gap-4 md:grid-cols-2 md:gap-6">
         <div className="overflow-hidden rounded-2xl border border-line bg-white">
           {t.distances.places.map((d, i) => (

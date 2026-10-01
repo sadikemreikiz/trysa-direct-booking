@@ -1,9 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
 import { getDb } from "@/db";
-import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
 import { pruneRateLimits } from "@/features/booking/rate-limit";
-import { deliverDueOutbox } from "@/features/notifications/outbox";
+import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
 import { sendGuestEmail, sendNotificationEmail } from "@/features/notifications/email";
+import { deliverDueOutbox } from "@/features/notifications/outbox";
 import { sendPushToStaff } from "@/features/notifications/push";
 
 /**
@@ -23,8 +23,14 @@ export async function GET(request: Request) {
   if (!db) return Response.json({ skipped: "DATABASE_URL yok" });
 
   const push = (m: Parameters<typeof sendPushToStaff>[1]) => sendPushToStaff(db, m);
-  const outbox = await deliverDueOutbox(db, { email: sendNotificationEmail, push, guestEmail: sendGuestEmail });
-  const escalated = await escalateStalePending(db, (m) => sendPushToStaff(db, m, { roles: ["admin"] }));
+  const outbox = await deliverDueOutbox(db, {
+    email: sendNotificationEmail,
+    push,
+    guestEmail: sendGuestEmail,
+  });
+  const escalated = await escalateStalePending(db, (m) =>
+    sendPushToStaff(db, m, { roles: ["admin"] }),
+  );
   const anonymized = await anonymizeExpiredReservations(db);
   await pruneRateLimits(db);
 

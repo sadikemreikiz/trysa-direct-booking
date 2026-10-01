@@ -6,7 +6,9 @@ export function Gallery({ t }: T) {
   return (
     <section id="galeri" className={`${container} scroll-mt-20 pt-10`}>
       <div className="flex items-baseline justify-between">
-        <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">{t.gallery.title}</h2>
+        <h2 className="font-display text-3xl font-semibold text-pine md:text-4xl">
+          {t.gallery.title}
+        </h2>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         {galleryImages.map((g, i) => (

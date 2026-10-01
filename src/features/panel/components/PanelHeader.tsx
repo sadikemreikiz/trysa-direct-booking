@@ -1,7 +1,7 @@
 import Link from "next/link";
+import LogoMark from "@/components/LogoMark";
 import type { StaffMember } from "@/features/panel/staff";
 import { SignOutButton } from "./AuthButtons";
-import LogoMark from "@/components/LogoMark";
 
 export default function PanelHeader({ staff, back }: { staff: StaffMember; back?: boolean }) {
   return (

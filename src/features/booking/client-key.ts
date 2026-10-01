@@ -14,5 +14,8 @@ export function clientIp(headers: Headers): string {
 }
 
 export function clientKey(headers: Headers, secret = process.env.BETTER_AUTH_SECRET ?? ""): string {
-  return createHmac("sha256", secret).update(`rate:${clientIp(headers)}`).digest("hex").slice(0, 32);
+  return createHmac("sha256", secret)
+    .update(`rate:${clientIp(headers)}`)
+    .digest("hex")
+    .slice(0, 32);
 }

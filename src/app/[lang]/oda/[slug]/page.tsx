@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import MobileBar from "@/components/MobileBar";
-import { stays } from "@/content/site";
-import { getRoomPhotos } from "@/lib/room-photos";
-import { responsiveImage } from "@/lib/images";
-import { pageMetadata } from "@/lib/seo";
 import { getDictionary, isLocale, defaultLocale, locales } from "@/content/dictionaries";
+import { stays } from "@/content/site";
+import { responsiveImage } from "@/lib/images";
+import { getRoomPhotos } from "@/lib/room-photos";
+import { pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ lang: string; slug: string }> };
 
@@ -23,9 +23,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const t = getDictionary(loc);
   const room = stays.find((s) => s.slug === slug);
   if (!room) return { title: "404" };
-  const meta = pageMetadata(loc, `/oda/${room.slug}`, { title: room.title, description: t.room.descs[room.slug] });
+  const meta = pageMetadata(loc, `/oda/${room.slug}`, {
+    title: room.title,
+    description: t.room.descs[room.slug],
+  });
   // Use the room's own cover photo in link previews
-  if (room.img) meta.openGraph = { ...meta.openGraph, images: [{ url: room.img, alt: room.title }] };
+  if (room.img)
+    meta.openGraph = { ...meta.openGraph, images: [{ url: room.img, alt: room.title }] };
   return meta;
 }
 
@@ -60,9 +64,7 @@ export default async function RoomPage({ params }: Params) {
             </div>
             <div className="text-right">
               <div className="text-sm text-muted">{t.room.gecelik}</div>
-              <div className="font-display text-2xl font-bold text-pine">
-                {room.price}
-              </div>
+              <div className="font-display text-2xl font-bold text-pine">{room.price}</div>
             </div>
           </div>
 
