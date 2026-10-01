@@ -1,3 +1,4 @@
+import { foodPhotos } from "@/content/site";
 import { fillRating } from "@/features/reviews/google-reviews";
 import { responsiveImage } from "@/lib/images";
 import { container, type TLR } from "./shared";
@@ -27,15 +28,22 @@ export function Restaurant({ t, lang, rating }: TLR) {
             {t.restaurant.cta}
           </a>
         </div>
-        <div className="relative h-56 md:h-auto md:w-[420px]">
-          {/* The open-air section under the reed roof (lower part of the hero photo) */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            {...responsiveImage("/img/hero.jpg", "(min-width: 768px) 420px, 100vw")}
-            alt={t.restaurant.h}
-            loading="lazy"
-            className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
-          />
+        {/* The breakfast spread large, a grill and gözleme below it */}
+        <div className="grid h-80 grid-cols-2 grid-rows-[minmax(0,3fr)_minmax(0,2fr)] gap-1 md:h-96 md:w-[460px]">
+          {foodPhotos.map((p, i) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={p.src}
+              {...responsiveImage(
+                p.src,
+                i === 0 ? "(min-width: 768px) 460px, 100vw" : "(min-width: 768px) 230px, 50vw",
+                p.width,
+              )}
+              alt={t.gallery[p.label]}
+              loading="lazy"
+              className={`h-full w-full object-cover ${p.focus} ${i === 0 ? "col-span-2" : ""}`}
+            />
+          ))}
         </div>
       </div>
     </section>

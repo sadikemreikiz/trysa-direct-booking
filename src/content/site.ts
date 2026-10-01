@@ -106,14 +106,32 @@ export const stays: {
   },
 ];
 
-/** Home page gallery. `alt` is a room name, or a key of the gallery's translated labels. */
-export const galleryImages: { src: string; alt: string | { label: "corner" | "view" } }[] = [
-  { src: "/img/rooms/ambar-1/kapak.jpg", alt: "Ambar-1" },
-  { src: "/img/rooms/kulube-1/kapak.jpg", alt: "Kulübe-1" },
-  { src: "/img/rooms/tiny-house/kapak.jpg", alt: "Tiny House" },
-  { src: "/img/rooms/ambar-1/5.jpg", alt: { label: "view" } },
-  { src: "/img/rooms/ambar-3/kapak.jpg", alt: "Ambar-3" },
-  { src: "/img/rooms/kulube-2/kapak.jpg", alt: "Kulübe-2" },
-  { src: "/img/rooms/ambar-2/kapak.jpg", alt: "Ambar-2" },
-  { src: "/img/gallery/trysa-corner.jpg", alt: { label: "corner" } },
+/** Translated captions of the site's photos (keys of the dictionary's `gallery`). */
+export type PhotoLabel =
+  "corner" | "view" | "breakfast" | "grill" | "gozleme" | "board" | "chicken";
+
+/**
+ * Home page gallery: food and the place, alternating (the rooms have their own cards above).
+ * `alt` is a room name, or a translated caption. `width`: large versions narrower than 1600 px.
+ */
+export const galleryImages: { src: string; alt: string | { label: PhotoLabel }; width?: number }[] =
+  [
+    { src: "/img/food/serpme-kahvalti.jpg", alt: { label: "breakfast" }, width: 1130 },
+    { src: "/img/rooms/ambar-1/kapak.jpg", alt: "Ambar-1" },
+    { src: "/img/food/karisik-izgara.jpg", alt: { label: "grill" }, width: 963 },
+    { src: "/img/rooms/ambar-1/5.jpg", alt: { label: "view" } },
+    { src: "/img/food/kahvalti-tahtasi.jpg", alt: { label: "board" }, width: 1002 },
+    { src: "/img/rooms/tiny-house/kapak.jpg", alt: "Tiny House" },
+    { src: "/img/food/gozleme.jpg", alt: { label: "gozleme" }, width: 1037 },
+    { src: "/img/gallery/trysa-corner.jpg", alt: { label: "corner" } },
+  ];
+
+/**
+ * Food photos for the restaurant section (large first) and the menu page. `focus` is the
+ * object-position that keeps the dish in view when the photo is cropped to a wide frame.
+ */
+export const foodPhotos: { src: string; label: PhotoLabel; width: number; focus: string }[] = [
+  { src: "/img/food/serpme-kahvalti.jpg", label: "breakfast", width: 1130, focus: "object-center" },
+  { src: "/img/food/karisik-izgara.jpg", label: "grill", width: 963, focus: "object-[50%_45%]" },
+  { src: "/img/food/gozleme.jpg", label: "gozleme", width: 1037, focus: "object-[50%_70%]" },
 ];

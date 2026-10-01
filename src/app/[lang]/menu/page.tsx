@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import MobileBar from "@/components/MobileBar";
 import { getDictionary, isLocale, defaultLocale } from "@/content/dictionaries";
 import { itemName } from "@/content/menu";
+import { foodPhotos } from "@/content/site";
 import { getDb } from "@/db";
 import { getMenu } from "@/features/restaurant/menu-store";
 import { pageMetadata } from "@/lib/seo";
@@ -37,6 +38,21 @@ export default async function MenuPage({ params }: { params: Promise<{ lang: str
             {t.menu.title}
           </h1>
           <p className="mt-2 text-muted">{t.menu.sub}</p>
+
+          {/* A taste of the dishes; small 600 px versions, as guests often open this on mobile data */}
+          <div className="mt-6 grid grid-cols-3 gap-2 md:gap-3">
+            {foodPhotos.map((p) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={p.src}
+                src={p.src.replace("/img/food/", "/img/food/thumbs/")}
+                alt={t.gallery[p.label]}
+                width={600}
+                height={450}
+                className="aspect-[4/3] w-full rounded-xl object-cover"
+              />
+            ))}
+          </div>
 
           {/* Guests arriving from the table QR code jump straight to a category */}
           <nav

@@ -50,6 +50,11 @@ for (const file of jpgs(ROOT)) {
     }
   }
 
+  // Thumbnails that are already small (e.g. img/food/thumbs) need no small version.
+  if ((await sharp(large).metadata()).width <= SMALL_WIDTH) {
+    after += large.length;
+    continue;
+  }
   const small = await sharp(large)
     .rotate()
     .resize({ width: SMALL_WIDTH, withoutEnlargement: true })

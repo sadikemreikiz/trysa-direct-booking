@@ -15,7 +15,7 @@ export function Gallery({ t }: T) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={i}
-            {...responsiveImage(g.src, "(min-width: 768px) 25vw, 50vw")}
+            {...responsiveImage(g.src, "(min-width: 768px) 25vw, 50vw", g.width)}
             alt={typeof g.alt === "string" ? g.alt : t.gallery[g.alt.label]}
             loading="lazy"
             className="h-28 w-full rounded-xl object-cover md:h-36"
