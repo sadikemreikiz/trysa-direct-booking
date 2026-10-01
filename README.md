@@ -29,7 +29,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
-- A request code, an optional WhatsApp hand-off and a branded receipt email in their language
+- Branded emails in their language along the stay: request received, booking confirmed (sent when the family confirms), directions and arrival times two days before arrival, and after check-out one review request for guests who opted in on the form
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
 
@@ -89,17 +89,18 @@ Public pages are statically generated with incremental revalidation; the booking
 
 The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisions).
 
-| Problem                           | Approach                                                                                                                                                                                                                        |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Airbnb's calendar lags by hours   | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md))                                                                           |
-| Double bookings under concurrency | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md)) |
-| Two people acting on one request  | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                 |
-| Lost notifications                | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))              |
-| No Airbnb API for small hosts     | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                        |
-| Spam without CAPTCHA friction     | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                              |
-| Privacy (KVKK/GDPR)               | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                   |
-| Graceful degradation              | Without a database the site still takes requests by email; without Google it shows the last known rating                                                                                                                        |
-| Security headers                  | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies                                                                                                            |
+| Problem                              | Approach                                                                                                                                                                                                                        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Airbnb's calendar lags by hours      | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md))                                                                           |
+| Double bookings under concurrency    | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md)) |
+| Two people acting on one request     | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                 |
+| Lost notifications                   | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))              |
+| Emails sent twice by a scheduled job | Each outbox row can carry an idempotency key (`guest_prearrival:<booking id>`, unique in the database). The job runs every 15 minutes, inserts with `ON CONFLICT DO NOTHING` and only between 10:00 and 20:00 in Demre          |
+| No Airbnb API for small hosts        | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                        |
+| Spam without CAPTCHA friction        | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                              |
+| Privacy (KVKK/GDPR)                  | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                   |
+| Graceful degradation                 | Without a database the site still takes requests by email; without Google it shows the last known rating                                                                                                                        |
+| Security headers                     | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies                                                                                                            |
 
 ## Quality
 

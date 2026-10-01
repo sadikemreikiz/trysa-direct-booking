@@ -23,13 +23,20 @@ const eventTime = new Intl.DateTimeFormat("tr-TR", {
   timeZone: "Europe/Istanbul",
 });
 
+const guestEmailLabel: Record<string, string> = {
+  guest_ack: "Talep alındı",
+  guest_confirmed: "Rezervasyon onayı",
+  guest_prearrival: "Varış öncesi (yol tarifi)",
+  guest_review: "Yorum isteği",
+};
+
 export default async function ReservationPage({ params }: { params: Promise<{ id: string }> }) {
   const { db, staff } = await requireApprovedStaff();
   const { id } = await params;
   if (!UUID.test(id)) notFound();
   const detail = await getReservationDetail(db, id);
   if (!detail) notFound();
-  const { r, unitName, events } = detail;
+  const { r, unitName, events, guestEmails } = detail;
 
   const availability = await availabilityForRange(
     db,
@@ -88,6 +95,42 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
           unitName={unitName}
           availability={availability}
         />
+      </div>
+
+      <h2 className="mb-2 mt-8 text-xs font-bold tracking-widest text-clay">MİSAFİRE E-POSTALAR</h2>
+      <div className="rounded-xl bg-white p-3 text-sm">
+        {!r.email ? (
+          <p className="text-muted">Misafir e-posta adresi bırakmadı.</p>
+        ) : (
+          <>
+            {guestEmails.length === 0 ? (
+              <p className="text-muted">Henüz e-posta gönderilmedi.</p>
+            ) : (
+              <ul className="space-y-1.5">
+                {guestEmails.map((m) => (
+                  <li key={m.kind} className="flex justify-between gap-3">
+                    <span className="font-semibold text-ink">
+                      {guestEmailLabel[m.kind] ?? m.kind}
+                    </span>
+                    <span className="text-right text-muted">
+                      {m.status === "sent" && m.sentAt
+                        ? `✓ ${eventTime.format(m.sentAt)}`
+                        : m.status === "failed"
+                          ? "✗ gönderilemedi"
+                          : "⏳ sırada"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-2 text-xs text-muted">
+              {r.reviewConsentAt
+                ? "Konaklamadan sonra yorum isteği e-postasına izin verdi."
+                : "Yorum isteği e-postasına izin vermedi."}{" "}
+              Varıştan 2 gün önce yol tarifi e-postası otomatik gider.
+            </p>
+          </>
+        )}
       </div>
 
       <h2 className="mb-2 mt-8 text-xs font-bold tracking-widest text-clay">GEÇMİŞ</h2>
