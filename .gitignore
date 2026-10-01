@@ -46,3 +46,8 @@ next-env.d.ts
 
 # personal editor and AI-assistant settings
 .claude/
+
+# end-to-end tests (Playwright)
+/test-results/
+/playwright-report/
+/blob-report/

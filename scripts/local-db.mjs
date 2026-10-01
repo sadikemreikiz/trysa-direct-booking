@@ -2,15 +2,18 @@
 // No Docker needed. Data persists in .pglite/ (git-ignored).
 //   npm run db:local   →  postgres://postgres@127.0.0.1:5433/postgres
 // Put this address in .env.development.local as DATABASE_URL; `npm run dev` picks it up.
+// The end-to-end tests start a throwaway in-memory copy on another port:
+//   PGLITE_DATA_DIR=memory:// PGLITE_PORT=5434 node scripts/local-db.mjs
 import { PGlite } from "@electric-sql/pglite";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 
-const PORT = 5433;
+const PORT = Number(process.env.PGLITE_PORT ?? 5433);
+const DATA_DIR = process.env.PGLITE_DATA_DIR ?? "./.pglite";
 
-const db = await PGlite.create("./.pglite", { extensions: { btree_gist } });
+const db = await PGlite.create(DATA_DIR, { extensions: { btree_gist } });
 await migrate(drizzle(db), { migrationsFolder: "./drizzle" });
 console.log("[local-db] migrations applied ✓");
 
