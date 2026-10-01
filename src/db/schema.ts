@@ -105,7 +105,7 @@ export const reservationEvents = pgTable(
     type: text("type").notNull(),
     fromStatus: reservationStatus("from_status"),
     toStatus: reservationStatus("to_status"),
-    /** "guest", "system" or "admin:<email>" */
+    /** "guest" or "user:<id>" (a panel user) */
     actor: text("actor").notNull(),
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

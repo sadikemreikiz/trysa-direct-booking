@@ -10,7 +10,8 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "node scripts/migrate.mjs --force",
-    "db:local": "node scripts/local-db.mjs"
+    "db:local": "node scripts/local-db.mjs",
+    "db:seed": "node --env-file=.env.development.local scripts/seed-demo.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
