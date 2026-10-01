@@ -2,7 +2,7 @@
  * Emails to guests, in their language, along the stay:
  *   1. ack: "we got your request" (not a confirmation yet)
  *   2. confirmed: the family confirmed the booking in the panel
- *   3. prearrival: two days before arrival, with directions and arrival times
+ *   3. prearrival: the day before arrival, with directions and arrival times
  *   4. review: the day after check-out, only if the guest opted in on the form
  * Every email is built once as plain text and once as branded HTML from the same content
  * (email clients with images off show the plain text). Facts such as arrival times come
@@ -102,9 +102,9 @@ const TEMPLATES: Record<Locale, Record<GuestEmailKind, (v: Vars) => Content>> = 
       bye: "Görüşmek üzere,",
     }),
     prearrival: (v) => ({
-      subject: `Trysa'ya iki gün kaldı — yol tarifi ve giriş bilgileri`,
+      subject: "Yarın görüşüyoruz — yol tarifi ve giriş bilgileri · Trysa",
       hello: `Merhaba ${v.name},`,
-      intro: "Gelişine iki gün kaldı, seni görmek için sabırsızlanıyoruz! 🌿",
+      intro: "Yarın geliyorsun, seni görmek için sabırsızlanıyoruz! 🌿",
       details: [
         ["Rezervasyon kodu", v.ref],
         ["Tarih", v.dates],
@@ -116,7 +116,7 @@ const TEMPLATES: Record<Locale, Record<GuestEmailKind, (v: Vars) => Content>> = 
         `Akşam yemeği için restoranımız da tesiste: ${v.menu}`,
       ],
       buttons: [directions(v, "Yol tarifi"), whatsapp("WhatsApp'tan yaz")],
-      bye: "Yakında görüşmek üzere,",
+      bye: "Yarın görüşmek üzere,",
     }),
     review: (v) => ({
       subject: "Trysa'da konaklaman nasıldı?",
@@ -166,9 +166,9 @@ const TEMPLATES: Record<Locale, Record<GuestEmailKind, (v: Vars) => Content>> = 
       bye: "See you soon,",
     }),
     prearrival: (v) => ({
-      subject: "Two days to go — directions and arrival details · Trysa",
+      subject: "See you tomorrow — directions and arrival details · Trysa",
       hello: `Hello ${v.name},`,
-      intro: "Only two days until you arrive, we can't wait to welcome you! 🌿",
+      intro: "You're arriving tomorrow, we can't wait to welcome you! 🌿",
       details: [
         ["Booking code", v.ref],
         ["Dates", v.dates],
@@ -180,7 +180,7 @@ const TEMPLATES: Record<Locale, Record<GuestEmailKind, (v: Vars) => Content>> = 
         `Our restaurant is right on site for dinner: ${v.menu}`,
       ],
       buttons: [directions(v, "Directions"), whatsapp("Message us on WhatsApp")],
-      bye: "See you very soon,",
+      bye: "See you tomorrow,",
     }),
     review: (v) => ({
       subject: "How was your stay at Trysa?",
@@ -230,9 +230,9 @@ const TEMPLATES: Record<Locale, Record<GuestEmailKind, (v: Vars) => Content>> = 
       bye: "Bis bald,",
     }),
     prearrival: (v) => ({
-      subject: "Noch zwei Tage — Anfahrt und Anreise · Trysa",
+      subject: "Bis morgen — Anfahrt und Anreise · Trysa",
       hello: `Hallo ${v.name},`,
-      intro: "Nur noch zwei Tage bis zu deiner Anreise, wir freuen uns auf dich! 🌿",
+      intro: "Morgen geht es los, wir freuen uns auf dich! 🌿",
       details: [
         ["Buchungscode", v.ref],
         ["Zeitraum", v.dates],
@@ -244,7 +244,7 @@ const TEMPLATES: Record<Locale, Record<GuestEmailKind, (v: Vars) => Content>> = 
         `Zum Abendessen ist unser Restaurant direkt vor Ort: ${v.menu}`,
       ],
       buttons: [directions(v, "Anfahrt"), whatsapp("Auf WhatsApp schreiben")],
-      bye: "Bis ganz bald,",
+      bye: "Bis morgen,",
     }),
     review: (v) => ({
       subject: "Wie war dein Aufenthalt bei Trysa?",

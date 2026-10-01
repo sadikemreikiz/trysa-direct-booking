@@ -127,7 +127,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
               {r.reviewConsentAt
                 ? "Konaklamadan sonra yorum isteği e-postasına izin verdi."
                 : "Yorum isteği e-postasına izin vermedi."}{" "}
-              Varıştan 2 gün önce yol tarifi e-postası otomatik gider.
+              Varıştan 1 gün önce yol tarifi e-postası otomatik gider.
             </p>
           </>
         )}

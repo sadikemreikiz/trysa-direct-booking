@@ -30,7 +30,7 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Neden işliyoruz? (Amaç ve hukuki sebep)",
         p: [
           "Rezervasyon talebinizi yanıtlamak, müsaitliği teyit etmek ve sizinle iletişim kurmak için. Hukuki sebep: bir sözleşmenin kurulmasıyla doğrudan ilgili olması (KVKK m.5/2-c; GDPR m.6/1-b) ve formda verdiğiniz açık onay.",
-          "E-posta adresinizi verdiyseniz, konaklamanızla ilgili bilgilendirme e-postaları: talebinizin alındığı, rezervasyonunuzun onaylandığı ve varışınızdan iki gün önce yol tarifi ile giriş bilgileri. Hukuki sebep: sözleşmenin ifası (KVKK m.5/2-c; GDPR m.6/1-b).",
+          "E-posta adresinizi verdiyseniz, konaklamanızla ilgili bilgilendirme e-postaları: talebinizin alındığı, rezervasyonunuzun onaylandığı ve varışınızdan bir gün önce yol tarifi ile giriş bilgileri. Hukuki sebep: sözleşmenin ifası (KVKK m.5/2-c; GDPR m.6/1-b).",
           "Konaklamanızdan sonra deneyiminizi soran tek bir e-posta: yalnızca formda bu kutuyu ayrıca işaretlediyseniz gönderilir. Hukuki sebep: açık rızanız (KVKK m.5/1; GDPR m.6/1-a); rızanızı istediğiniz zaman geri alabilirsiniz.",
           "Sitenin işleyişini iyileştirmek için anonim istatistikler: meşru menfaat (KVKK m.5/2-f; GDPR m.6/1-f).",
         ],
@@ -80,7 +80,7 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Why we process it (purpose and legal basis)",
         p: [
           "To answer your booking request, confirm availability and contact you — legal basis: steps prior to entering a contract (GDPR Art. 6(1)(b)) and the consent you give in the form.",
-          "If you give an email address, emails about your stay: that we received your request, that your booking is confirmed, and directions with arrival details two days before you arrive — legal basis: performance of a contract (GDPR Art. 6(1)(b)).",
+          "If you give an email address, emails about your stay: that we received your request, that your booking is confirmed, and directions with arrival details the day before you arrive — legal basis: performance of a contract (GDPR Art. 6(1)(b)).",
           "One email after your stay asking about your experience, only if you ticked that separate box in the form — legal basis: your consent (GDPR Art. 6(1)(a)), which you can withdraw at any time.",
           "Anonymous statistics to improve the site — legitimate interest (GDPR Art. 6(1)(f)).",
         ],
@@ -130,7 +130,7 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Zweck und Rechtsgrundlage",
         p: [
           "Beantwortung deiner Buchungsanfrage, Prüfung der Verfügbarkeit und Kontaktaufnahme — Rechtsgrundlage: vorvertragliche Maßnahmen (Art. 6 Abs. 1 lit. b DSGVO) und deine Einwilligung im Formular.",
-          "Wenn du eine E-Mail-Adresse angibst, E-Mails zu deinem Aufenthalt: dass deine Anfrage eingegangen ist, dass deine Buchung bestätigt ist, und zwei Tage vor der Anreise Anfahrt und Anreiseinfos — Rechtsgrundlage: Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).",
+          "Wenn du eine E-Mail-Adresse angibst, E-Mails zu deinem Aufenthalt: dass deine Anfrage eingegangen ist, dass deine Buchung bestätigt ist, und am Tag vor der Anreise Anfahrt und Anreiseinfos — Rechtsgrundlage: Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).",
           "Eine E-Mail nach deinem Aufenthalt mit der Frage nach deinen Eindrücken, nur wenn du das eigene Kästchen im Formular angekreuzt hast — Rechtsgrundlage: deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit widerrufen kannst.",
           "Anonyme Statistiken zur Verbesserung der Website — berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO).",
         ],

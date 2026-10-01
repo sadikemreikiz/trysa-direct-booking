@@ -16,8 +16,8 @@ const NIGHT = new Date("2026-10-01T20:30:00Z"); // 23:30 in Demre
 const DAY = 86_400_000;
 
 const base: ReservationRequest = {
-  checkin: "2026-10-03",
-  checkout: "2026-10-05",
+  checkin: "2026-10-02",
+  checkout: "2026-10-04",
   adults: "2",
   children: "1",
   unit: "ambar-1",
@@ -95,8 +95,8 @@ describe("confirmation email", () => {
 });
 
 describe("pre-arrival email", () => {
-  it("is queued two days before check-in for confirmed stays with an email", async () => {
-    await confirmedStay(); // check-in 3 Oct = today + 2
+  it("is queued the day before check-in for confirmed stays with an email", async () => {
+    await confirmedStay(); // check-in 2 Oct = tomorrow
     expect(await queueGuestJourneyEmails(db, { enabled: true, now: NOW })).toEqual({
       prearrival: 1,
       review: 0,
@@ -113,15 +113,17 @@ describe("pre-arrival email", () => {
     expect((await kinds()).filter((k) => k === "guest_prearrival")).toHaveLength(1);
   });
 
-  it("skips pending requests, missing emails and stays further ahead", async () => {
+  it("skips pending requests, missing emails, later stays and guests arriving today", async () => {
     await createReservation(db, base, { now: new Date(NOW.getTime() - 10 * DAY) }); // pending
     await confirmedStay({ unit: "ambar-2", email: "" });
-    await confirmedStay({ unit: "ambar-3", checkin: "2026-10-04", checkout: "2026-10-06" });
+    await confirmedStay({ unit: "ambar-3", checkin: "2026-10-03", checkout: "2026-10-06" });
+    // Too late for "see you tomorrow"
+    await confirmedStay({ unit: "kulube-1", checkin: "2026-10-01", checkout: "2026-10-03" });
     expect((await queueGuestJourneyEmails(db, { enabled: true, now: NOW })).prearrival).toBe(0);
   });
 
   it("skips stays confirmed just before arrival: the confirmation already has the details", async () => {
-    await confirmedStay({}, { confirmedDaysAgo: 0 }); // confirmed today, arriving in two days
+    await confirmedStay({}, { confirmedDaysAgo: 0 }); // confirmed today, arriving tomorrow
     expect((await queueGuestJourneyEmails(db, { enabled: true, now: NOW })).prearrival).toBe(0);
   });
 
