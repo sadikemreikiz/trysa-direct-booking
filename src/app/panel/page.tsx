@@ -37,6 +37,12 @@ export default async function PanelHome() {
         >
           📅 Takvim
         </Link>
+        <Link
+          href="/panel/menu"
+          className="col-span-2 flex items-center justify-center rounded-2xl border-2 border-pine bg-white px-3 py-3.5 text-base font-bold text-pine"
+        >
+          🍽 Restoran menüsü ve fiyatlar
+        </Link>
       </div>
 
       <h2 className="mb-3 mt-7 text-xs font-bold tracking-widest text-clay">
