@@ -237,6 +237,21 @@ export const rateLimits = pgTable("rate_limits", {
   windowStart: timestamp("window_start", { withTimezone: true }).notNull(),
 });
 
+/**
+ * Health of things that fail quietly (Airbnb calendars, the 15-minute scheduler): when each
+ * last worked, since when it has been failing, and whether the admins were told about it.
+ */
+export const healthChecks = pgTable("health_checks", {
+  /** e.g. "airbnb:Ambar-1", "cron:github" */
+  name: text("name").primaryKey(),
+  okAt: timestamp("ok_at", { withTimezone: true }),
+  /** Set on the first failure, cleared when it works again */
+  failingSince: timestamp("failing_since", { withTimezone: true }),
+  lastError: text("last_error"),
+  /** When the admins were alerted about the current failure (null: not yet) */
+  alertedAt: timestamp("alerted_at", { withTimezone: true }),
+});
+
 /* ------------------------------------------------------------------------ */
 /* Panel sign-in: Better Auth core tables (names as the library expects)   */
 /* ------------------------------------------------------------------------ */

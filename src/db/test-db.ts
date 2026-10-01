@@ -18,7 +18,7 @@ export async function createTestDb() {
 
 export async function resetTestDb(client: PGlite) {
   await client.exec(
-    `TRUNCATE reservations, reservation_events, outbox, analytics_events, rate_limits, "user"
+    `TRUNCATE reservations, reservation_events, outbox, analytics_events, rate_limits, health_checks, "user"
      RESTART IDENTITY CASCADE`,
   );
 }
