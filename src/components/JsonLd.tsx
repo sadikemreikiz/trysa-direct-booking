@@ -1,6 +1,6 @@
 import { place, site } from "@/content/site";
 import type { Locale } from "@/lib/i18n";
-import { BUSINESS_NAME, GOOGLE_MAPS_URL, HOME_DESCRIPTION, SITE_URL } from "@/lib/seo";
+import { BUSINESS_NAME, GOOGLE_MAPS_URL, HOME_DESCRIPTION, jsonLd, SITE_URL } from "@/lib/seo";
 
 const CUISINE: Record<Locale, string[]> = {
   tr: ["Türk mutfağı", "Izgara", "Balık", "Ev yemekleri"],
@@ -91,7 +91,5 @@ export default function JsonLd({
 
   const data = { "@context": "https://schema.org", "@graph": [business, website] };
 
-  return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(data) }} />;
 }

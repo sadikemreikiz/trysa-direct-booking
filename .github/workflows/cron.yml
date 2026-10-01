@@ -8,12 +8,16 @@ on:
     - cron: "*/15 * * * *"
   workflow_dispatch:
 
+# Least privilege: the jobs only read the code.
+permissions:
+  contents: read
+
 jobs:
   maintenance:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
-      - name: /api/cron çağır
+      - name: Call /api/cron
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}

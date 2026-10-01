@@ -1,3 +1,4 @@
+import { jsonLd } from "@/lib/seo";
 import { container, type T } from "./shared";
 
 export function Faq({ t }: T) {
@@ -12,10 +13,7 @@ export function Faq({ t }: T) {
   };
   return (
     <section id="sss" className={`${container} scroll-mt-20 pt-10`}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(faqLd) }} />
       <h2 className="font-display text-2xl font-semibold text-pine md:text-3xl">{t.faq.title}</h2>
       <div className="mt-5 grid gap-3.5 md:grid-cols-2 md:items-start">
         {t.faq.items.map((f) => (

@@ -70,3 +70,11 @@ export function pageMetadata(
     },
   };
 }
+
+/**
+ * Structured data (JSON-LD) for a <script> tag. "<" is escaped so no text inside it can ever
+ * close the tag early, even if content from outside (e.g. Google) ends up in it one day.
+ */
+export function jsonLd(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
