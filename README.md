@@ -29,6 +29,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
+- A QR menu on the restaurant tables that opens in the language of the guest's phone, with dishes sold out today marked
 - An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself
 - Branded emails in their language along the stay: request received, booking confirmed (sent when the family confirms), directions and arrival times the day before arrival, and after check-out one review request for guests who opted in on the form
 
@@ -41,6 +42,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - A monthly occupancy calendar across all rooms and Airbnb
 - Statistics from measured data only: requests, confirmation rate, median first-response time, clicks, nights sold
 - An iCal feed per room, so Airbnb blocks dates sold directly
+- The restaurant menu edited from the phone: prices, "not available today", new dishes and translations reach the public menu and the AI concierge at once; printable QR table cards that never need reprinting
 
 <table>
   <tr>
@@ -106,7 +108,7 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 
 ## Quality
 
-- **84 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **138 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
 - **CI** runs lint, type checks, tests and a production build without any secrets on every push.
 - **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB.
 - **SEO:** per-page canonical URLs and `hreflang`, localized JSON-LD (`LodgingBusiness` + `Restaurant`, FAQ), a sitemap with language alternates.
@@ -152,7 +154,8 @@ src/
     analytics/            cookie-free conversion events
     reviews/              live Google rating and reviews
     concierge/            AI assistant: knowledge, tools, streaming loop, chat UI, stored chats
-  content/                site facts, menu and prices, privacy policy, TR/EN/DE dictionaries
+    restaurant/           menu in the database, staff menu editor, QR table cards
+  content/                site facts, printed menu (seed and fallback), privacy policy, TR/EN/DE dictionaries
   components/             shared UI (header, footer, logo) and the home page sections
   db/                     Drizzle schema, connection and the PGlite test database
   lib/                    cross-cutting helpers: auth, i18n, SEO, dates, images
@@ -168,7 +171,7 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 - End-to-end tests of the guest booking and panel confirmation flows (Playwright)
 - Error monitoring and alerting
 - An evaluation set of real guest questions for the AI concierge, run in CI on prompt changes
-- Online food ordering from the restaurant, plus a QR menu with prices managed from the panel
+- Ordering from the table, building on the QR menu
 
 ## License
 
