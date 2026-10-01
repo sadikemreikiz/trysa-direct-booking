@@ -153,6 +153,8 @@ const tr = {
     title: "Menü",
     sub: "Ocakbaşı ızgaralar, taze balık, serpme kahvaltı ve ev yemekleri — açık hava bölümünde, doğanın içinde.",
     note: "* Fiyatlar değişebilir. Güncel bilgi için bize ulaşın.",
+    unavailable: "Bugün yok",
+    navLabel: "Menü kategorileri",
     cats: {
       Izgaralar: "Izgaralar",
       Kahvaltı: "Kahvaltı",
@@ -421,6 +423,8 @@ const en: Dict = {
     title: "Menu",
     sub: "Grills, fresh fish, Turkish breakfast and home cooking — in the open-air section, surrounded by nature.",
     note: "* Prices may change. Contact us for current info.",
+    unavailable: "Not available today",
+    navLabel: "Menu categories",
     cats: {
       Izgaralar: "Grills",
       Kahvaltı: "Breakfast",
@@ -688,6 +692,8 @@ const de: Dict = {
     title: "Speisekarte",
     sub: "Grillgerichte, frischer Fisch, türkisches Frühstück und Hausmannskost — im Außenbereich, mitten in der Natur.",
     note: "* Preise können sich ändern. Kontaktiere uns für aktuelle Infos.",
+    unavailable: "Heute nicht verfügbar",
+    navLabel: "Kategorien der Speisekarte",
     cats: {
       Izgaralar: "Grillgerichte",
       Kahvaltı: "Frühstück",
