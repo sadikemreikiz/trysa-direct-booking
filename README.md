@@ -1,75 +1,143 @@
-# Trysa — direct bookings for a family-run nature stay
+# Trysa: direct bookings for a family-run nature stay
 
-Website, booking system and staff panel for **Trysa Restaurant Camping**, a small family business in Demre, Antalya (6 wooden cabins/rooms, a tiny house, a camping area and a restaurant). Live at [trysacamping.com](https://trysacamping.com).
+[![CI](https://github.com/GITHUB_USER/trysa-direct-booking/actions/workflows/ci.yml/badge.svg)](https://github.com/GITHUB_USER/trysa-direct-booking/actions/workflows/ci.yml)
+[![Live](https://img.shields.io/badge/live-trysacamping.com-c2622e)](https://trysacamping.com)
 
-Before this project, bookings came in through Airbnb or scattered phone and WhatsApp messages. The goal is a direct channel with no commission that a non-technical family can run from a phone. It also has to stay correct when the same room is sold on Airbnb at the same time.
+Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: six wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
+
+![The public site](docs/screenshots/site-desktop.jpg)
+
+## The problem
+
+Guests found Trysa on Airbnb, which takes a commission, or on Google, and then called or messaged the family to ask about rooms. Bookings arrived through several channels at once and were hard to keep track of, and there was no single place where a guest could see the rooms and simply ask for dates.
+
+My goal is one place that represents the whole business, where guests can easily book a stay today and, later, order food from the restaurant. The booking part had to be a direct channel that:
+
+- a non-technical family can run entirely from their phones,
+- never double-books a room that is also listed on Airbnb,
+- never loses a request, even when email or a phone is unreachable,
+- works for international guests in Turkish, English and German.
+
+## My role
+
+I built and run this on my own: gathered requirements with the family, chose the architecture and stack, wrote the code with tests, and set up and operate the production infrastructure (domain and DNS, email domain verification, Google Cloud and Business Profile, Vercel, Neon). I developed it with an AI pair programmer (Claude Code), which I used for implementation speed; the product decisions, trade-offs and reviews are mine and are written down in [`docs/decisions`](docs/decisions).
 
 ## What it does
 
-**Guests** (Turkish, English, German)
-- Browse rooms, restaurant menu, gallery, FAQ and live Google rating
-- Send a booking request. Dates that are already taken (Airbnb or confirmed direct bookings) are blocked in the form and re-checked on the server
-- Get a request code, optional WhatsApp hand-off and (when enabled) a receipt email in their language
+**For guests** (Turkish, English, German)
+- Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
+- A booking request form where dates already taken on Airbnb or confirmed directly are blocked, and re-checked on the server
+- A request code, an optional WhatsApp hand-off and a branded receipt email in their language
 
-**Staff panel** (`/panel`, mobile-first, installable as a PWA)
-- Google sign-in plus an explicit access-approval step (signing in alone grants nothing)
-- Push notification on every new request; a reminder if a request waits more than 3 hours
-- Confirm / decline with a room picker that shows what is free, with prepared WhatsApp replies in the guest's language
-- Add phone, WhatsApp and walk-in bookings by hand, so every booking lives in one place
-- Stats: requests, confirmations, median first-response time, WhatsApp/phone clicks, booked nights
-- iCal feed per room, so Airbnb blocks dates that were sold directly (two-way calendar sync)
+**For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
+- Google sign-in plus an explicit approval step: signing in alone grants nothing
+- A push notification on every new request, and a reminder if a request waits more than 3 hours
+- Confirm or decline with a room picker that shows what is free, and ready-made WhatsApp replies in the guest's language
+- Phone, WhatsApp and walk-in bookings added by hand, so every booking lives in one place
+- A monthly occupancy calendar across all rooms and Airbnb
+- Statistics from measured data only: requests, confirmation rate, median first-response time, clicks, nights sold
+- An iCal feed per room, so Airbnb blocks dates sold directly
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/panel-list.png" width="200" alt="Request list with a request waiting over 3 hours highlighted"></td>
+    <td><img src="docs/screenshots/panel-detail.png" width="200" alt="Request detail with WhatsApp reply and room picker"></td>
+    <td><img src="docs/screenshots/panel-calendar.png" width="200" alt="Monthly occupancy calendar: confirmed, pending and Airbnb"></td>
+    <td><img src="docs/screenshots/panel-stats.png" width="200" alt="Statistics page"></td>
+    <td><img src="docs/screenshots/booking-mobile.png" width="200" alt="Guest booking form on a phone"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Requests</sub></td>
+    <td align="center"><sub>Request detail</sub></td>
+    <td align="center"><sub>Occupancy calendar</sub></td>
+    <td align="center"><sub>Statistics</sub></td>
+    <td align="center"><sub>Guest form</sub></td>
+  </tr>
+</table>
+
+<sub>Panel screenshots use the fictional demo data from `npm run db:seed`, not real guests.</sub>
 
 ## Architecture
 
 ```mermaid
 flowchart LR
   Guest([Guest]) -->|Server Action| Next[Next.js on Vercel]
-  Staff([Staff phone]) -->|/panel| Next
+  Staff([Family's phones]) -->|/panel| Next
   Next --> DB[(PostgreSQL · Neon)]
   DB -->|outbox| Mail[Resend email]
   DB -->|outbox| Push[Web Push]
-  Airbnb[(Airbnb iCal)] -->|hourly| Next
+  Airbnb[(Airbnb iCal)] -->|every 15 min| Next
   Next -->|/api/ical| Airbnb
   Cron[Vercel Cron / GitHub Actions] -->|/api/cron| Next
 ```
 
-- **Next.js 16 (App Router)** with Server Components and Server Actions. Public pages are statically generated with ISR. The booking page refreshes hourly and is revalidated on demand when staff confirm or cancel.
-- **PostgreSQL (Neon) + Drizzle ORM**, versioned SQL migrations applied automatically on production builds (a failed migration fails the deploy, so the old version stays live).
-- **Better Auth** (Google) for the panel, sessions stored in the database.
+| Layer | Choice |
+| --- | --- |
+| App | Next.js 16 (App Router, Server Components, Server Actions), React 19, TypeScript, Tailwind CSS 4 |
+| Data | PostgreSQL on Neon (Frankfurt), Drizzle ORM, versioned SQL migrations applied on production builds |
+| Auth | Better Auth with Google, sessions in the database |
+| Messaging | Resend (email), Web Push with VAPID |
+| Tests | Vitest + PGlite (real Postgres in WebAssembly), GitHub Actions CI |
+| Hosting | Vercel (functions in `fra1`, next to the database) |
+
+Public pages are statically generated with incremental revalidation; the booking page is revalidated on demand when staff confirm or cancel. A failed migration fails the deploy, so the previous version stays live.
 
 ## Engineering decisions
 
+The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisions).
+
 | Problem | Approach |
 | --- | --- |
-| Double bookings | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings. The database rejects overlaps even under concurrent writes. The shared camping area is exempt. |
-| Lost notifications | **Transactional outbox**: the booking, audit event and notification rows are written in one transaction. Delivery retries with exponential backoff and a lease so two workers never send the same email. |
-| Two people acting on one request | Status changes are a small state machine applied with conditional `UPDATE … WHERE status = expected`. The second click gets "already handled" instead of corrupting data. Every change is written to an audit log. |
-| Spam | Honeypot field + minimum fill time (bots get a silent fake success) + a fixed-window rate limit stored in Postgres (serverless instances don't share memory). IPs are stored only as an HMAC digest and deleted after 2 days. |
-| Privacy (KVKK/GDPR) | Cookie-free analytics, no IPs in analytics, and a scheduled job that anonymises booking data 2 years after the stay, as promised in the privacy policy. |
-| Stale cached pages | The form blocks taken dates on the client, and the server re-checks availability on submit in case the page came from cache. |
-| Security headers | CSP (no external scripts, `frame-ancestors 'none'`), HSTS, `nosniff`, strict referrer and permissions policies. |
+| Airbnb's calendar lags by hours | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md)) |
+| Double bookings under concurrency | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md)) |
+| Two people acting on one request | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log |
+| Lost notifications | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md)) |
+| No Airbnb API for small hosts | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md)) |
+| Spam without CAPTCHA friction | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md)) |
+| Privacy (KVKK/GDPR) | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises |
+| Graceful degradation | Without a database the site still takes requests by email; without Google it shows the last known rating |
+| Security headers | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies |
 
-## Tests
+## Quality
 
-```bash
-npm test
-```
-
-Unit and integration tests (Vitest) run against **PGlite**, a real PostgreSQL engine in WebAssembly, with the same migration files as production. Constraints such as the double-booking exclusion are tested for real, with no mocks and no Docker.
+- **84 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **CI** runs lint, type checks, tests and a production build without any secrets on every push.
+- **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB.
+- **SEO:** per-page canonical URLs and `hreflang`, localized JSON-LD (`LodgingBusiness` + `Restaurant`, FAQ), a sitemap with language alternates.
 
 ## Running locally
 
+Requires Node 24.
+
 ```bash
 npm install
-npm run db:local     # local Postgres (PGlite) on 127.0.0.1:5433, migrations applied
+npm run db:local     # local Postgres (PGlite) on 127.0.0.1:5433 with migrations; keep it running
+```
+
+Create `.env.development.local`:
+
+```bash
+DATABASE_URL=postgres://postgres@127.0.0.1:5433/postgres
+BETTER_AUTH_SECRET=any-long-random-string
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+Then, in a second terminal:
+
+```bash
+npm run db:seed      # fictional demo bookings, so the panel has something to show
 npm run dev          # http://localhost:3000
 ```
 
-Put `DATABASE_URL=postgres://postgres@127.0.0.1:5433/postgres` and a random `BETTER_AUTH_SECRET` in `.env.development.local`. Without a database the site still works and falls back to email-only requests.
+To open the panel without Google, `node --env-file=.env.development.local scripts/dev-login.mjs` prints a session cookie for a local admin (it refuses to run against a non-local database). Set it as `better-auth.session_token` for `localhost` and open `/panel`.
 
-To open the panel locally without Google, `node --env-file=.env.development.local scripts/dev-login.mjs` prints a session cookie for a local test admin (refuses to run against a non-local database).
+```bash
+npm test             # all tests, no database or keys needed
+```
 
 ### Environment variables
+
+Everything except the database is optional; features switch off cleanly when their keys are missing.
 
 | Variable | Purpose |
 | --- | --- |
@@ -77,8 +145,8 @@ To open the panel locally without Google, `node --env-file=.env.development.loca
 | `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` | Session signing; also keys the iCal tokens and rate-limit digests |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS` | Panel sign-in; listed emails start as approved admins |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Web Push |
-| `RESEND_API_KEY`, `RESERVATION_EMAIL`, `RESEND_FROM` | Emails; guest receipts only when `RESEND_FROM` is a verified domain |
-| `AIRBNB_ICAL_*` | Airbnb calendar links per room |
+| `RESEND_API_KEY`, `RESERVATION_EMAIL`, `RESEND_FROM` | Email; guest receipts only when `RESEND_FROM` is on a verified domain |
+| `AIRBNB_ICAL_*` | Airbnb calendar link per room |
 | `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID` | Live Google rating and reviews |
 | `CRON_SECRET` | Protects `/api/cron` (outbox retries, reminders, data retention) |
 | `NEXT_PUBLIC_SITE_URL`, `SITE_INDEXABLE` | Canonical URL; search indexing on/off |
@@ -88,8 +156,21 @@ To open the panel locally without Google, `node --env-file=.env.development.loca
 ```
 src/app/[lang]/        public site (tr/en/de)
 src/app/panel/         staff panel
-src/app/api/           events, iCal feed, cron, auth
-src/db/                schema, queries, business rules + their tests
+src/app/api/           conversion events, iCal feed, cron, auth
+src/db/                schema, queries and business rules, with their tests
 src/lib/               availability, email, push, i18n content, SEO
 drizzle/               SQL migrations
+scripts/               local database, demo data, image optimisation, migrations
+docs/decisions/        architecture decision records
 ```
+
+## What's next
+
+- End-to-end tests of the guest booking and panel confirmation flows (Playwright)
+- Error monitoring and alerting
+- An AI concierge that answers guest questions and checks real availability through tool calls, with an evaluation set
+- Online food ordering from the restaurant, plus a QR menu with prices managed from the panel
+
+## License
+
+The source code is published to show my work; it is not open source. Code © Sadik Emre Ikiz. Photos, texts, the Trysa name and logo © Trysa Restaurant Camping. All rights reserved.
