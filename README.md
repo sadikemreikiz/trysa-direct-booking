@@ -27,7 +27,8 @@ I built and run this on my own: gathered requirements with the family, chose the
 **For guests** (Turkish, English, German)
 
 - Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
-- A booking request form where dates already taken on Airbnb or confirmed directly are blocked, and re-checked on the server
+- A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
+- Dates chosen on the home page or a room page carry over into the form
 - A request code, an optional WhatsApp hand-off and a branded receipt email in their language
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
@@ -46,14 +47,14 @@ I built and run this on my own: gathered requirements with the family, chose the
     <td><img src="docs/screenshots/panel-detail.png" width="200" alt="Request detail with WhatsApp reply and room picker"></td>
     <td><img src="docs/screenshots/panel-calendar.png" width="200" alt="Monthly occupancy calendar: confirmed, pending and Airbnb"></td>
     <td><img src="docs/screenshots/panel-stats.png" width="200" alt="Statistics page"></td>
-    <td><img src="docs/screenshots/booking-mobile.png" width="200" alt="Guest booking form on a phone"></td>
+    <td><img src="docs/screenshots/booking-mobile.png" width="200" alt="Booking form: room choice and availability calendar with booked nights hatched"></td>
   </tr>
   <tr>
     <td align="center"><sub>Requests</sub></td>
     <td align="center"><sub>Request detail</sub></td>
     <td align="center"><sub>Occupancy calendar</sub></td>
     <td align="center"><sub>Statistics</sub></td>
-    <td align="center"><sub>Guest form</sub></td>
+    <td align="center"><sub>Availability calendar</sub></td>
   </tr>
 </table>
 
