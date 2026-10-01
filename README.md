@@ -109,19 +109,12 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 
 ## Running locally
 
-Requires Node 24.
+Requires Node 24 (see `.nvmrc`).
 
 ```bash
 npm install
+cp .env.example .env.development.local   # then set BETTER_AUTH_SECRET
 npm run db:local     # local Postgres (PGlite) on 127.0.0.1:5433 with migrations; keep it running
-```
-
-Create `.env.development.local`:
-
-```bash
-DATABASE_URL=postgres://postgres@127.0.0.1:5433/postgres
-BETTER_AUTH_SECRET=any-long-random-string
-BETTER_AUTH_URL=http://localhost:3000
 ```
 
 Then, in a second terminal:
@@ -134,37 +127,36 @@ npm run dev          # http://localhost:3000
 To open the panel without Google, `node --env-file=.env.development.local scripts/dev-login.mjs` prints a session cookie for a local admin (it refuses to run against a non-local database). Set it as `better-auth.session_token` for `localhost` and open `/panel`.
 
 ```bash
-npm test             # all tests, no database or keys needed
+npm run check        # lint, formatting, types and all tests, as in CI; no database or keys needed
 ```
 
-### Environment variables
-
-Everything except the database is optional; features switch off cleanly when their keys are missing.
-
-| Variable                                                   | Purpose                                                               |
-| ---------------------------------------------------------- | --------------------------------------------------------------------- |
-| `DATABASE_URL`, `DATABASE_URL_UNPOOLED`                    | Postgres (pooled for the app, direct for migrations)                  |
-| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`                    | Session signing; also keys the iCal tokens and rate-limit digests     |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ADMIN_EMAILS` | Panel sign-in; listed emails start as approved admins                 |
-| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`                    | Web Push                                                              |
-| `RESEND_API_KEY`, `RESERVATION_EMAIL`, `RESEND_FROM`       | Email; guest receipts only when `RESEND_FROM` is on a verified domain |
-| `AIRBNB_ICAL_*`                                            | Airbnb calendar link per room                                         |
-| `GOOGLE_PLACES_API_KEY`, `GOOGLE_PLACE_ID`                 | Live Google rating and reviews                                        |
-| `CRON_SECRET`                                              | Protects `/api/cron` (outbox retries, reminders, data retention)      |
-| `NEXT_PUBLIC_SITE_URL`, `SITE_INDEXABLE`                   | Canonical URL; search indexing on/off                                 |
+Only the database and the auth secret are required. Every other integration (Google sign-in, email, push, Airbnb calendars, Google reviews) switches off cleanly when its variables are empty; [`.env.example`](.env.example) documents each one.
 
 ## Project structure
 
+The code is organised by feature: each folder under `src/features` holds a domain's server logic, actions, UI components and tests together, so a feature can grow (or a new one such as restaurant orders can be added) without touching the others.
+
 ```
-src/app/[lang]/        public site (tr/en/de)
-src/app/panel/         staff panel
-src/app/api/           conversion events, iCal feed, cron, auth
-src/db/                schema, queries and business rules, with their tests
-src/lib/               availability, email, push, i18n content, SEO
-drizzle/               SQL migrations
-scripts/               local database, demo data, image optimisation, migrations
-docs/decisions/        architecture decision records
+src/
+  app/                    routes only: public site (tr/en/de), staff panel, API endpoints
+  features/
+    booking/              request validation and storage, form action, spam limits, guest form
+    airbnb-sync/          Airbnb calendar import and the iCal feed Airbnb imports
+    notifications/        transactional outbox delivery, email, guest receipts, Web Push
+    panel/                status changes, access control, calendar, statistics, panel UI
+    maintenance/          scheduled jobs: reminders and data retention
+    analytics/            cookie-free conversion events
+    reviews/              live Google rating and reviews
+  content/                site facts, menu and prices, privacy policy, TR/EN/DE dictionaries
+  components/             shared UI (header, footer, logo) and the home page sections
+  db/                     Drizzle schema, connection and the PGlite test database
+  lib/                    cross-cutting helpers: auth, i18n, SEO, dates, images
+drizzle/                  versioned SQL migrations
+scripts/                  local database, demo data, dev sign-in, image optimisation, migrations
+docs/decisions/           architecture decision records
 ```
+
+The code, comments and documentation are in English. URLs stay Turkish (`/rezervasyon`, `/oda/…`, `/panel/takvim`) on purpose: they are part of the product for a Turkish business, already indexed by Google, and saved on the family's phones.
 
 ## What's next
 
@@ -175,4 +167,4 @@ docs/decisions/        architecture decision records
 
 ## License
 
-The source code is published to show my work; it is not open source. Code © Sadik Emre Ikiz. Photos, texts, the Trysa name and logo © Trysa Restaurant Camping. All rights reserved.
+The source code is published to show my work; it is not open source. Code © Sadik Emre Ikiz; photos, texts, the Trysa name and logo © Trysa Restaurant Camping. All rights reserved, see [LICENSE](LICENSE).
