@@ -74,6 +74,8 @@ export const reservations = pgTable(
     status: reservationStatus("status").notNull().default("pending"),
     /** Moment KVKK/GDPR consent was given */
     consentAt: timestamp("consent_at", { withTimezone: true }).notNull(),
+    /** Moment the guest opted in to one email after the stay asking for a review (null = no) */
+    reviewConsentAt: timestamp("review_consent_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
     /** Moment the admin was reminded because the request went unanswered for too long */
@@ -132,6 +134,11 @@ export const outbox = pgTable(
     nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     sentAt: timestamp("sent_at", { withTimezone: true }),
+    /**
+     * Idempotency key, e.g. "guest_prearrival:<reservation id>". Scheduled jobs insert with
+     * ON CONFLICT DO NOTHING, so a message is queued at most once however often they run.
+     */
+    dedupeKey: text("dedupe_key").unique(),
   },
   (t) => [
     index("outbox_pending_idx")
