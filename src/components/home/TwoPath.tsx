@@ -10,13 +10,10 @@ export function TwoPath({ t, lang, rating }: TLR) {
           <div className="relative h-48">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              {...responsiveImage(
-                "/img/rooms/kulube-1/kapak.jpg",
-                "(min-width: 768px) 50vw, 100vw",
-              )}
-              alt="Trysa"
+              {...responsiveImage("/img/home/stay-in-nature.jpg", "(min-width: 768px) 50vw, 100vw")}
+              alt={t.twoPath.stayTitle}
               loading="lazy"
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover object-[center_58%]"
             />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-pine px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-ivory">
               {t.twoPath.stayLabel}
@@ -40,10 +37,14 @@ export function TwoPath({ t, lang, rating }: TLR) {
           <div className="relative h-48">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              {...responsiveImage("/img/rooms/tiny-house/5.jpg", "(min-width: 768px) 50vw, 100vw")}
+              {...responsiveImage(
+                "/img/home/take-a-seat.jpg",
+                "(min-width: 768px) 50vw, 100vw",
+                1010,
+              )}
               alt={t.twoPath.eatTitle}
               loading="lazy"
-              className="h-full w-full object-cover object-[center_35%]"
+              className="h-full w-full object-cover object-[center_45%]"
             />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-gold px-3 py-1.5 text-[11px] font-extrabold text-[#3a2e0a]">
               ★ {fillRating("{rating} · {count}", rating, lang)} {t.twoPath.reviewsWord}
