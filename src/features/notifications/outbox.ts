@@ -7,6 +7,7 @@
 import { and, asc, eq, lte, sql } from "drizzle-orm";
 import type { Db } from "@/db";
 import { outbox, reservations, units } from "@/db/schema";
+import { alertAdmins } from "@/features/monitoring/alerts";
 import type { EmailResult } from "./email";
 import { buildGuestEmail, type GuestEmailKind } from "./guest-email";
 import type { PushMessage } from "./push";
@@ -181,8 +182,23 @@ export async function deliverOutboxMessage(
       nextAttemptAt: new Date(now.getTime() + backoffMs(claimed.attempts)),
     })
     .where(eq(outbox.id, id));
+  if (giveUp) {
+    const { reservationId } = (claimed.payload ?? {}) as { reservationId?: string };
+    await alertAdmins(db, {
+      key: `outbox:${claimed.kind}`,
+      title: "⚠️ Gönderilemeyen bildirim",
+      body: `${OUTBOX_LABELS[claimed.kind] ?? claimed.kind} ${MAX_ATTEMPTS} denemede gönderilemedi: ${result.error}`,
+      url: reservationId ? `/panel/talep/${reservationId}` : "/panel",
+    });
+  }
   return giveUp ? "failed" : "retry_scheduled";
 }
+
+/** For the alert when a message is given up (in Turkish, for the family). */
+const OUTBOX_LABELS: Record<string, string> = {
+  reservation_notification: "Yeni talep e-postası (aileye)",
+  reservation_push: "Yeni talep bildirimi",
+};
 
 /** Sends due pending messages in order (the retry sweep). */
 export async function deliverDueOutbox(

@@ -2,7 +2,7 @@ import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Db } from "@/db";
-import { outbox } from "@/db/schema";
+import { outbox, rateLimits } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
 import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
 import {
@@ -132,6 +132,9 @@ describe("outbox delivery", () => {
     }
     expect(results.at(-1)).toBe("failed");
     expect(send).toHaveBeenCalledTimes(MAX_ATTEMPTS);
+    // Giving up alerts the admins (one alert, kept from repeating by its cooldown counter)
+    const alerts = await db.select().from(rateLimits);
+    expect(alerts.map((r) => r.key)).toEqual(["alert:outbox:reservation_notification"]);
   });
 
   it("the same message is not sent twice by two concurrent workers", async () => {
