@@ -8,6 +8,8 @@
  *   AIRBNB_ICAL_AMBAR1/2/3, AIRBNB_ICAL_KULUBE1/2, AIRBNB_ICAL_TINY
  */
 
+import type { CheckResult } from "@/features/monitoring/health";
+
 type TypeConfig = { total: number; envKey: string };
 
 // Room (booking option) → env key (each room is a single unit)
@@ -91,6 +93,37 @@ export async function getLockedDatesByType(): Promise<Record<string, string[]>> 
     }),
   );
   return out;
+}
+
+/**
+ * Reads every connected Airbnb calendar fresh (bypassing the cache), for the health check.
+ * A calendar that can't be read would quietly show the room as free on the site and in the
+ * panel, so failures are reported per room.
+ */
+export async function checkAirbnbCalendars(
+  fetchImpl: typeof fetch = fetch,
+): Promise<{ room: string; result: CheckResult }[]> {
+  const rooms = Object.entries(TYPE_CONFIG).filter(([, cfg]) => urlsFor(cfg.envKey).length > 0);
+  return Promise.all(
+    rooms.map(async ([room, cfg]) => {
+      const errors = await Promise.all(
+        urlsFor(cfg.envKey).map(async (url) => {
+          try {
+            const res = await fetchImpl(url, {
+              cache: "no-store",
+              signal: AbortSignal.timeout(10_000),
+            });
+            if (!res.ok) return `HTTP ${res.status}`;
+            return (await res.text()).includes("BEGIN:VCALENDAR") ? null : "not a calendar";
+          } catch (e) {
+            return e instanceof Error ? e.message : String(e);
+          }
+        }),
+      );
+      const error = errors.find((e) => e !== null);
+      return { room, result: error ? { ok: false as const, error } : { ok: true as const } };
+    }),
+  );
 }
 
 /** Is there a blocked day in the chosen [check-in, checkout) range? */

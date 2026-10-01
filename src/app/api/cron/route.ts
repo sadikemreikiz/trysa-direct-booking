@@ -3,6 +3,7 @@ import { getDb } from "@/db";
 import { pruneRateLimits } from "@/features/booking/rate-limit";
 import { deleteExpiredConversations } from "@/features/concierge/conversations";
 import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
+import { monitorAirbnbCalendars, monitorScheduler } from "@/features/monitoring/checks";
 import { guestEmailEnabled } from "@/features/notifications/email";
 import { queueGuestJourneyEmails } from "@/features/notifications/guest-journey";
 import { outboxHandlers } from "@/features/notifications/handlers";
@@ -12,7 +13,8 @@ import { sendPushToStaff } from "@/features/notifications/push";
 /**
  * Scheduled maintenance: queues pre-arrival and review emails, retries failed notifications,
  * reminds the admin about unanswered requests, deletes expired personal data and assistant
- * conversations, and cleans up old spam counters.
+ * conversations, cleans up old spam counters, and checks what fails quietly (Airbnb
+ * calendars, the scheduler itself) to alert the admins.
  *
  * Callers (Authorization: Bearer $CRON_SECRET):
  *   - Vercel Cron (vercel.json): once a day on the Hobby plan; Vercel adds the header itself.
@@ -36,7 +38,20 @@ export async function GET(request: Request) {
   const conversations = await deleteExpiredConversations(db);
   await pruneRateLimits(db);
 
-  return Response.json({ journey, outbox, escalated, anonymized, conversations });
+  // Vercel's own cron identifies itself; every other authorised caller is the GitHub schedule.
+  const source = request.headers.get("user-agent")?.startsWith("vercel-cron") ? "vercel" : "github";
+  const scheduler = await monitorScheduler(db, source);
+  const airbnb = await monitorAirbnbCalendars(db);
+
+  return Response.json({
+    journey,
+    outbox,
+    escalated,
+    anonymized,
+    conversations,
+    scheduler,
+    airbnb,
+  });
 }
 
 function authorized(header: string | null): boolean {
