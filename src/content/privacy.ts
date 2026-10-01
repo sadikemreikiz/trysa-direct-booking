@@ -5,7 +5,7 @@
  */
 import type { Locale } from "@/lib/i18n";
 
-export const PRIVACY_UPDATED = "2026-09-30";
+export const PRIVACY_UPDATED = "2026-10-01";
 export const PRIVACY_CONTACT = "trysarestaurantcamping@gmail.com";
 
 type Section = { h: string; p: string[] };
@@ -30,13 +30,15 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Neden işliyoruz? (Amaç ve hukuki sebep)",
         p: [
           "Rezervasyon talebinizi yanıtlamak, müsaitliği teyit etmek ve sizinle iletişim kurmak için. Hukuki sebep: bir sözleşmenin kurulmasıyla doğrudan ilgili olması (KVKK m.5/2-c; GDPR m.6/1-b) ve formda verdiğiniz açık onay.",
+          "E-posta adresinizi verdiyseniz, konaklamanızla ilgili bilgilendirme e-postaları: talebinizin alındığı, rezervasyonunuzun onaylandığı ve varışınızdan iki gün önce yol tarifi ile giriş bilgileri. Hukuki sebep: sözleşmenin ifası (KVKK m.5/2-c; GDPR m.6/1-b).",
+          "Konaklamanızdan sonra deneyiminizi soran tek bir e-posta: yalnızca formda bu kutuyu ayrıca işaretlediyseniz gönderilir. Hukuki sebep: açık rızanız (KVKK m.5/1; GDPR m.6/1-a); rızanızı istediğiniz zaman geri alabilirsiniz.",
           "Sitenin işleyişini iyileştirmek için anonim istatistikler: meşru menfaat (KVKK m.5/2-f; GDPR m.6/1-f).",
         ],
       },
       {
         h: "Verileriniz kimlerle paylaşılır?",
         p: [
-          "Verileriniz satılmaz ve reklam amacıyla kullanılmaz. Sadece hizmeti sunabilmemiz için gerekli teknik hizmet sağlayıcılarla paylaşılır: Vercel (site barındırma), Neon (veritabanı — sunucular Frankfurt, Almanya), Resend (işletmeye bildirim ve size talep onayı e-postası) ve Google (harita, yorumlar). Bu sağlayıcıların bazıları yurt dışında (AB ve ABD) bulunduğundan verileriniz yurt dışına aktarılabilir; bu aktarım yalnızca yukarıdaki amaçlarla ve formda verdiğiniz onaya dayanarak yapılır.",
+          "Verileriniz satılmaz ve reklam amacıyla kullanılmaz. Sadece hizmeti sunabilmemiz için gerekli teknik hizmet sağlayıcılarla paylaşılır: Vercel (site barındırma), Neon (veritabanı — sunucular Frankfurt, Almanya), Resend (işletmeye bildirim ve size gönderilen rezervasyon e-postaları) ve Google (harita, yorumlar). Bu sağlayıcıların bazıları yurt dışında (AB ve ABD) bulunduğundan verileriniz yurt dışına aktarılabilir; bu aktarım yalnızca yukarıdaki amaçlarla ve formda verdiğiniz onaya dayanarak yapılır.",
           "WhatsApp'tan yazmayı seçerseniz o iletişim WhatsApp'ın kendi gizlilik koşullarına tabidir.",
         ],
       },
@@ -78,13 +80,15 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Why we process it (purpose and legal basis)",
         p: [
           "To answer your booking request, confirm availability and contact you — legal basis: steps prior to entering a contract (GDPR Art. 6(1)(b)) and the consent you give in the form.",
+          "If you give an email address, emails about your stay: that we received your request, that your booking is confirmed, and directions with arrival details two days before you arrive — legal basis: performance of a contract (GDPR Art. 6(1)(b)).",
+          "One email after your stay asking about your experience, only if you ticked that separate box in the form — legal basis: your consent (GDPR Art. 6(1)(a)), which you can withdraw at any time.",
           "Anonymous statistics to improve the site — legitimate interest (GDPR Art. 6(1)(f)).",
         ],
       },
       {
         h: "Who we share it with",
         p: [
-          "We never sell your data or use it for advertising. It is shared only with the technical providers we need to run the service: Vercel (hosting), Neon (database — servers in Frankfurt, Germany), Resend (notification emails to the business and a request receipt to you) and Google (maps, reviews). Some providers are located outside Türkiye (EU and USA), so your data may be transferred abroad for these purposes only.",
+          "We never sell your data or use it for advertising. It is shared only with the technical providers we need to run the service: Vercel (hosting), Neon (database — servers in Frankfurt, Germany), Resend (notifications to the business and booking emails to you) and Google (maps, reviews). Some providers are located outside Türkiye (EU and USA), so your data may be transferred abroad for these purposes only.",
           "If you choose to message us on WhatsApp, that conversation is subject to WhatsApp's own privacy terms.",
         ],
       },
@@ -126,13 +130,15 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Zweck und Rechtsgrundlage",
         p: [
           "Beantwortung deiner Buchungsanfrage, Prüfung der Verfügbarkeit und Kontaktaufnahme — Rechtsgrundlage: vorvertragliche Maßnahmen (Art. 6 Abs. 1 lit. b DSGVO) und deine Einwilligung im Formular.",
+          "Wenn du eine E-Mail-Adresse angibst, E-Mails zu deinem Aufenthalt: dass deine Anfrage eingegangen ist, dass deine Buchung bestätigt ist, und zwei Tage vor der Anreise Anfahrt und Anreiseinfos — Rechtsgrundlage: Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).",
+          "Eine E-Mail nach deinem Aufenthalt mit der Frage nach deinen Eindrücken, nur wenn du das eigene Kästchen im Formular angekreuzt hast — Rechtsgrundlage: deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit widerrufen kannst.",
           "Anonyme Statistiken zur Verbesserung der Website — berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO).",
         ],
       },
       {
         h: "Weitergabe",
         p: [
-          "Wir verkaufen deine Daten nicht und nutzen sie nicht für Werbung. Sie gehen nur an technische Dienstleister, die wir für den Betrieb benötigen: Vercel (Hosting), Neon (Datenbank — Server in Frankfurt), Resend (Benachrichtigungen an den Betrieb und eine Eingangsbestätigung an dich) und Google (Karten, Bewertungen). Einige Anbieter sitzen außerhalb der Türkei (EU und USA); eine Übermittlung erfolgt nur zu diesen Zwecken.",
+          "Wir verkaufen deine Daten nicht und nutzen sie nicht für Werbung. Sie gehen nur an technische Dienstleister, die wir für den Betrieb benötigen: Vercel (Hosting), Neon (Datenbank — Server in Frankfurt), Resend (Benachrichtigungen an den Betrieb und Buchungs-E-Mails an dich) und Google (Karten, Bewertungen). Einige Anbieter sitzen außerhalb der Türkei (EU und USA); eine Übermittlung erfolgt nur zu diesen Zwecken.",
           "Wenn du uns per WhatsApp schreibst, gelten dafür die Datenschutzbestimmungen von WhatsApp.",
         ],
       },

@@ -4,13 +4,9 @@ import { headers } from "next/headers";
 import { after } from "next/server";
 import { getDb } from "@/db";
 import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
-import {
-  guestEmailEnabled,
-  sendGuestEmail,
-  sendNotificationEmail,
-} from "@/features/notifications/email";
+import { guestEmailEnabled, sendNotificationEmail } from "@/features/notifications/email";
+import { outboxHandlers } from "@/features/notifications/handlers";
 import { deliverDueOutbox, deliverOutboxMessage } from "@/features/notifications/outbox";
-import { sendPushToStaff, type PushMessage } from "@/features/notifications/push";
 import type { Locale } from "@/lib/i18n";
 import { clientKey } from "./client-key";
 import { getGuestLockedDates } from "./guest-availability";
@@ -47,6 +43,8 @@ export async function submitReservation(
     unitSlug: string;
     locale: Locale;
     consent: boolean;
+    /** Opt-in to one email after the stay asking for a review */
+    reviewConsent?: boolean;
     /** Bot traps: hidden field (humans never see it, so it stays empty) and form fill time */
     trap?: { hp: string; elapsedMs: number };
   },
@@ -81,14 +79,16 @@ export async function submitReservation(
     try {
       const { reservation, outboxId, pushOutboxId } = await createReservation(
         db,
-        { ...data, unit: meta.unitSlug, locale: meta.locale, consent: meta.consent as true },
+        {
+          ...data,
+          unit: meta.unitSlug,
+          locale: meta.locale,
+          consent: meta.consent as true,
+          reviewConsent: meta.reviewConsent ?? false,
+        },
         { guestAck: guestEmailEnabled() },
       );
-      const handlers = {
-        email: sendNotificationEmail,
-        push: (m: PushMessage) => sendPushToStaff(db, m),
-        guestEmail: sendGuestEmail,
-      };
+      const handlers = outboxHandlers(db);
       const [delivery] = await Promise.all([
         deliverOutboxMessage(db, outboxId, handlers),
         deliverOutboxMessage(db, pushOutboxId, handlers),

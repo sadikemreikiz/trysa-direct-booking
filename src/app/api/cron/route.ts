@@ -2,13 +2,16 @@ import { timingSafeEqual } from "node:crypto";
 import { getDb } from "@/db";
 import { pruneRateLimits } from "@/features/booking/rate-limit";
 import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
-import { sendGuestEmail, sendNotificationEmail } from "@/features/notifications/email";
+import { guestEmailEnabled } from "@/features/notifications/email";
+import { queueGuestJourneyEmails } from "@/features/notifications/guest-journey";
+import { outboxHandlers } from "@/features/notifications/handlers";
 import { deliverDueOutbox } from "@/features/notifications/outbox";
 import { sendPushToStaff } from "@/features/notifications/push";
 
 /**
- * Scheduled maintenance: retries failed notifications, reminds the admin about unanswered
- * requests, deletes expired personal data and cleans up old spam counters.
+ * Scheduled maintenance: queues pre-arrival and review emails, retries failed notifications,
+ * reminds the admin about unanswered requests, deletes expired personal data and cleans up
+ * old spam counters.
  *
  * Callers (Authorization: Bearer $CRON_SECRET):
  *   - Vercel Cron (vercel.json): once a day on the Hobby plan; Vercel adds the header itself.
@@ -20,21 +23,18 @@ export async function GET(request: Request) {
     return new Response(null, { status: 401 });
   }
   const db = getDb();
-  if (!db) return Response.json({ skipped: "DATABASE_URL yok" });
+  if (!db) return Response.json({ skipped: "no DATABASE_URL" });
 
-  const push = (m: Parameters<typeof sendPushToStaff>[1]) => sendPushToStaff(db, m);
-  const outbox = await deliverDueOutbox(db, {
-    email: sendNotificationEmail,
-    push,
-    guestEmail: sendGuestEmail,
-  });
+  // Queue first, so new pre-arrival and review emails go out in this same run.
+  const journey = await queueGuestJourneyEmails(db, { enabled: guestEmailEnabled() });
+  const outbox = await deliverDueOutbox(db, outboxHandlers(db));
   const escalated = await escalateStalePending(db, (m) =>
     sendPushToStaff(db, m, { roles: ["admin"] }),
   );
   const anonymized = await anonymizeExpiredReservations(db);
   await pruneRateLimits(db);
 
-  return Response.json({ outbox, escalated, anonymized });
+  return Response.json({ journey, outbox, escalated, anonymized });
 }
 
 function authorized(header: string | null): boolean {

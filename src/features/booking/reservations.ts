@@ -31,6 +31,7 @@ export const reservationRequestSchema = z
     note: z.string().trim().max(2000),
     locale: z.enum(["tr", "en", "de"]),
     consent: z.literal(true),
+    reviewConsent: z.boolean().optional(),
   })
   .refine((d) => d.checkout > d.checkin, { message: "checkout_before_checkin", path: ["checkout"] })
   .refine((d) => nightsBetween(d.checkin, d.checkout) <= MAX_NIGHTS, {
@@ -101,6 +102,8 @@ export async function createReservation(
         note: d.note || null,
         locale: d.locale,
         consentAt: now,
+        // Only meaningful with an email address to write to
+        reviewConsentAt: d.reviewConsent && d.email ? now : null,
         createdAt: now,
         updatedAt: now,
       })
@@ -130,7 +133,12 @@ export async function createReservation(
     if (opts.guestAck && d.email) {
       const [ack] = await tx
         .insert(outbox)
-        .values({ kind: "guest_ack", payload: { reservationId: reservation.id }, ...queued })
+        .values({
+          kind: "guest_ack",
+          payload: { reservationId: reservation.id },
+          dedupeKey: `guest_ack:${reservation.id}`,
+          ...queued,
+        })
         .returning({ id: outbox.id });
       guestAckOutboxId = ack.id;
     }

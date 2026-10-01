@@ -5,11 +5,19 @@
  * Every transition is a conditional UPDATE (WHERE status = expected status): if two people
  * act at the same time the second gets an "already handled" error and the data stays consistent.
  */
-import { and, asc, desc, eq, gte, inArray, lt, gt, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lt, gt, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import type { Db } from "@/db";
-import { reservationEvents, reservations, units, user, type Reservation } from "@/db/schema";
+import {
+  outbox,
+  reservationEvents,
+  reservations,
+  units,
+  user,
+  type Reservation,
+} from "@/db/schema";
 import { generateReference } from "@/features/booking/reservations";
+import { GUEST_EMAILS } from "@/features/notifications/outbox";
 import { todayInDemre } from "@/lib/dates";
 
 export type ReservationStatus = Reservation["status"];
@@ -67,6 +75,23 @@ export async function getReservationDetail(db: Db, id: string) {
     .where(eq(reservationEvents.reservationId, id))
     .orderBy(desc(reservationEvents.createdAt), desc(reservationEvents.id));
 
+  // Emails to the guest (request receipt, confirmation, pre-arrival, review) and their state
+  const guestEmails = await db
+    .select({
+      kind: outbox.kind,
+      status: outbox.status,
+      sentAt: outbox.sentAt,
+      nextAttemptAt: outbox.nextAttemptAt,
+    })
+    .from(outbox)
+    .where(
+      and(
+        inArray(outbox.kind, Object.keys(GUEST_EMAILS)),
+        sql`${outbox.payload}->>'reservationId' = ${id}`,
+      ),
+    )
+    .orderBy(asc(outbox.createdAt));
+
   // actor "user:<id>" → name
   const userIds = events
     .map((e) => (e.actor.startsWith("user:") ? e.actor.slice(5) : null))
@@ -78,6 +103,7 @@ export async function getReservationDetail(db: Db, id: string) {
 
   return {
     ...row,
+    guestEmails,
     events: events.map((e) => ({
       ...e,
       actorName: e.actor.startsWith("user:")
@@ -158,7 +184,7 @@ async function transition(
   id: string,
   to: ReservationStatus,
   actorUserId: string,
-  opts: { unitId?: number; note?: string; now?: Date } = {},
+  opts: { unitId?: number; note?: string; now?: Date; notifyGuest?: boolean } = {},
 ) {
   const now = opts.now ?? new Date();
   try {
@@ -190,6 +216,20 @@ async function transition(
         note: opts.note?.trim() || null,
         createdAt: now,
       });
+
+      // The confirmation email is queued in the same transaction as the status change.
+      if (to === "confirmed" && opts.notifyGuest && updated.email) {
+        await tx
+          .insert(outbox)
+          .values({
+            kind: "guest_confirmed",
+            payload: { reservationId: id },
+            dedupeKey: `guest_confirmed:${id}`,
+            nextAttemptAt: now,
+            createdAt: now,
+          })
+          .onConflictDoNothing();
+      }
       return updated;
     });
   } catch (e) {
@@ -204,7 +244,8 @@ export function confirmReservation(
   id: string,
   actorUserId: string,
   unitId: number,
-  opts: { note?: string; now?: Date } = {},
+  /** notifyGuest: queue a confirmation email if the guest gave an address */
+  opts: { note?: string; now?: Date; notifyGuest?: boolean } = {},
 ) {
   return transition(db, id, "confirmed", actorUserId, { ...opts, unitId });
 }

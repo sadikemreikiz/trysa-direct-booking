@@ -1,7 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { guestEmailEnabled } from "@/features/notifications/email";
+import { outboxHandlers } from "@/features/notifications/handlers";
+import { deliverDueOutbox } from "@/features/notifications/outbox";
 import { savePushSubscription } from "@/features/notifications/push";
 import { todayInDemre } from "@/lib/dates";
 import {
@@ -72,8 +76,12 @@ export async function confirmAction(
       error: unit.reason === "airbnb" ? "Bu oda bu tarihlerde Airbnb'de dolu." : MESSAGES.conflict,
     };
   }
-  const result = await run(id, () => confirmReservation(db, id, staff.userId, unitId, { note }));
+  const result = await run(id, () =>
+    confirmReservation(db, id, staff.userId, unitId, { note, notifyGuest: guestEmailEnabled() }),
+  );
   refreshGuestForm();
+  // Send the guest's confirmation email right after the response.
+  if (result.ok) after(() => deliverDueOutbox(db, outboxHandlers(db)).catch(console.error));
   return result;
 }
 

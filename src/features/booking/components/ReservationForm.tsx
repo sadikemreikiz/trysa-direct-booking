@@ -99,6 +99,7 @@ function BookingForm({
   ];
   const [data, setData] = useState<ReservationInput>(() => initialData(search, today, unitOptions));
   const [kvkk, setKvkk] = useState(false);
+  const [reviewOk, setReviewOk] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [emailed, setEmailed] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
@@ -156,6 +157,7 @@ function BookingForm({
         unitSlug,
         locale: lang,
         consent: kvkk,
+        reviewConsent: reviewOk && data.email.trim() !== "",
         trap: { hp, elapsedMs: openedAt.current ? Date.now() - openedAt.current : 0 },
       });
       if (!res.ok) {
@@ -392,6 +394,17 @@ function BookingForm({
             onChange={(e) => set("email", e.target.value)}
           />
         </label>
+        {data.email.trim() !== "" && (
+          <label className="-mt-1 flex items-start gap-2.5 text-xs leading-relaxed text-muted">
+            <input
+              type="checkbox"
+              className="mt-0.5 h-[18px] w-[18px] accent-clay"
+              checked={reviewOk}
+              onChange={(e) => setReviewOk(e.target.checked)}
+            />
+            <span>{t.reservation.reviewOptIn}</span>
+          </label>
+        )}
         <label className="block">
           <span className={lbl}>
             {t.reservation.note}{" "}

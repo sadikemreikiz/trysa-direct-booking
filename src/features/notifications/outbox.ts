@@ -8,7 +8,7 @@ import { and, asc, eq, lte, sql } from "drizzle-orm";
 import type { Db } from "@/db";
 import { outbox, reservations, units } from "@/db/schema";
 import type { EmailResult } from "./email";
-import { buildGuestAck } from "./guest-email";
+import { buildGuestEmail, type GuestEmailKind } from "./guest-email";
 import type { PushMessage } from "./push";
 
 export const MAX_ATTEMPTS = 6;
@@ -95,6 +95,36 @@ export async function buildReservationEmail(db: Db, reservationId: string) {
   };
 }
 
+/** Outbox kinds for emails to the guest, and the template each one uses. */
+export const GUEST_EMAILS: Record<string, GuestEmailKind> = {
+  guest_ack: "ack",
+  guest_confirmed: "confirmed",
+  guest_prearrival: "prearrival",
+  guest_review: "review",
+};
+
+/**
+ * Sends one guest email. Nothing is sent (and the message counts as done) when the email
+ * address was deleted by the retention job, or when a message about the stay itself finds
+ * the booking no longer confirmed, e.g. it was cancelled after the message was queued.
+ */
+async function deliverGuestEmail(
+  db: Db,
+  kind: GuestEmailKind,
+  reservationId: string,
+  handlers: OutboxHandlers,
+): Promise<EmailResult> {
+  const [row] = await db
+    .select({ r: reservations, unitName: units.name })
+    .from(reservations)
+    .leftJoin(units, eq(units.id, reservations.unitId))
+    .where(eq(reservations.id, reservationId));
+  if (!row?.r.email) return { ok: true };
+  if (kind !== "ack" && row.r.status !== "confirmed") return { ok: true };
+  const email = buildGuestEmail(kind, { ...row.r, unitName: row.unitName });
+  return handlers.guestEmail(row.r.email, email.subject, email.text, email.html);
+}
+
 export type DeliveryResult = "sent" | "retry_scheduled" | "failed" | "skipped";
 
 /**
@@ -125,18 +155,8 @@ export async function deliverOutboxMessage(
       result = await handlers.email(email.subject, email.text);
     } else if (claimed.kind === "reservation_push") {
       result = await handlers.push(await buildReservationPush(db, reservationId));
-    } else if (claimed.kind === "guest_ack") {
-      const [row] = await db
-        .select({ r: reservations, unitName: units.name })
-        .from(reservations)
-        .leftJoin(units, eq(units.id, reservations.unitId))
-        .where(eq(reservations.id, reservationId));
-      if (!row?.r.email) {
-        result = { ok: true }; // email was deleted (e.g. retention period), nothing to send
-      } else {
-        const ack = buildGuestAck({ ...row.r, unitName: row.unitName });
-        result = await handlers.guestEmail(row.r.email, ack.subject, ack.text, ack.html);
-      }
+    } else if (Object.hasOwn(GUEST_EMAILS, claimed.kind)) {
+      result = await deliverGuestEmail(db, GUEST_EMAILS[claimed.kind], reservationId, handlers);
     } else {
       result = { ok: false, error: `Unknown outbox kind: ${claimed.kind}` };
     }
