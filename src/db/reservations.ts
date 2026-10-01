@@ -183,7 +183,7 @@ export async function buildReservationPush(db: Db, reservationId: string): Promi
     .from(reservations)
     .leftJoin(units, eq(units.id, reservations.unitId))
     .where(eq(reservations.id, reservationId));
-  if (!row) throw new Error(`Rezervasyon bulunamadı: ${reservationId}`);
+  if (!row) throw new Error(`Reservation not found: ${reservationId}`);
   const { r, unitName } = row;
   const guests = r.adults + r.children;
   return {
@@ -200,7 +200,7 @@ export async function buildReservationEmail(db: Db, reservationId: string) {
     .from(reservations)
     .leftJoin(units, eq(units.id, reservations.unitId))
     .where(eq(reservations.id, reservationId));
-  if (!row) throw new Error(`Rezervasyon bulunamadı: ${reservationId}`);
+  if (!row) throw new Error(`Reservation not found: ${reservationId}`);
   const { r, unitName } = row;
 
   const lines = [
@@ -266,7 +266,7 @@ export async function deliverOutboxMessage(
         result = await handlers.guestEmail(row.r.email, ack.subject, ack.text, ack.html);
       }
     } else {
-      result = { ok: false, error: `Bilinmeyen outbox türü: ${claimed.kind}` };
+      result = { ok: false, error: `Unknown outbox kind: ${claimed.kind}` };
     }
   } catch (e) {
     result = { ok: false, error: e instanceof Error ? e.message : String(e) };

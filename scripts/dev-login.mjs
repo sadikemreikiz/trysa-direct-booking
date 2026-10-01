@@ -15,11 +15,11 @@ const host = (() => {
   }
 })();
 if (!["127.0.0.1", "localhost"].includes(host)) {
-  console.error("[dev-login] sadece lokal veritabanında çalışır (DATABASE_URL 127.0.0.1 olmalı)");
+  console.error("[dev-login] only runs against a local database (DATABASE_URL must be 127.0.0.1)");
   process.exit(1);
 }
 if (!secret) {
-  console.error("[dev-login] BETTER_AUTH_SECRET tanımlı değil");
+  console.error("[dev-login] BETTER_AUTH_SECRET is not set");
   process.exit(1);
 }
 

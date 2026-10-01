@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         await recordClientEvent(db, parsed.data);
       }
     } catch (e) {
-      console.error("Ölçüm olayı yazılamadı", e);
+      console.error("Failed to write analytics event", e);
     }
   }
   return new Response(null, { status: 204 });

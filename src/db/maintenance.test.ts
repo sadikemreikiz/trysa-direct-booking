@@ -46,7 +46,7 @@ function fakePush(ok = true) {
   const sent: PushMessage[] = [];
   const push = async (m: PushMessage) => {
     sent.push(m);
-    return ok ? ({ ok: true } as const) : ({ ok: false, error: "ağ hatası" } as const);
+    return ok ? ({ ok: true } as const) : ({ ok: false, error: "network error" } as const);
   };
   return { sent, push };
 }

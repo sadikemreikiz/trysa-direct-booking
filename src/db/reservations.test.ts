@@ -52,7 +52,7 @@ async function dbError(p: Promise<unknown>): Promise<string> {
     const err = e as { message?: string; cause?: { message?: string } };
     return `${err.message ?? ""} ${err.cause?.message ?? ""}`;
   }
-  throw new Error("Hata bekleniyordu ama işlem başarılı oldu");
+  throw new Error("Expected an error but the operation succeeded");
 }
 
 async function insertReservation(

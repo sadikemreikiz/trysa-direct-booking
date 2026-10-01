@@ -12,11 +12,11 @@ const PORT = 5433;
 
 const db = await PGlite.create("./.pglite", { extensions: { btree_gist } });
 await migrate(drizzle(db), { migrationsFolder: "./drizzle" });
-console.log("[local-db] migration'lar uygulandı ✓");
+console.log("[local-db] migrations applied ✓");
 
 const server = new PGLiteSocketServer({ db, port: PORT, host: "127.0.0.1", maxConnections: 10 });
 await server.start();
-console.log(`[local-db] hazır: postgres://postgres@127.0.0.1:${PORT}/postgres`);
+console.log(`[local-db] ready: postgres://postgres@127.0.0.1:${PORT}/postgres`);
 
 async function shutdown() {
   await server.stop();

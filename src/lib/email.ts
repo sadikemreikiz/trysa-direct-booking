@@ -28,7 +28,7 @@ async function sendEmail(message: {
   replyTo?: string;
 }): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return { ok: false, error: "RESEND_API_KEY tanımlı değil" };
+  if (!apiKey) return { ok: false, error: "RESEND_API_KEY is not set" };
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
@@ -60,6 +60,6 @@ export function sendNotificationEmail(subject: string, text: string): Promise<Em
 
 /** Email to the guest; replies go to the family. */
 export function sendGuestEmail(to: string, subject: string, text: string, html?: string): Promise<EmailResult> {
-  if (!guestEmailEnabled()) return Promise.resolve({ ok: false, error: "RESEND_FROM tanımlı değil" });
+  if (!guestEmailEnabled()) return Promise.resolve({ ok: false, error: "RESEND_FROM is not set" });
   return sendEmail({ to, subject, text, html, replyTo: familyAddress() });
 }

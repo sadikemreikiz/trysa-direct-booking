@@ -71,7 +71,7 @@ export async function submitReservation(
       after(() => pruneRateLimits(db).catch(console.error));
       if (!allowed) return { ok: false, error: "rate_limited" };
     } catch (e) {
-      console.error("Spam sınırı kontrol edilemedi, talep kabul ediliyor", e);
+      console.error("Rate limit check failed, accepting the request", e);
     }
     try {
       const { reservation, outboxId, pushOutboxId } = await createReservation(
@@ -95,7 +95,7 @@ export async function submitReservation(
       if (e instanceof ReservationValidationError) {
         return { ok: false, error: "invalid" };
       }
-      console.error("Rezervasyon veritabanına yazılamadı, doğrudan e-postaya geçiliyor", e);
+      console.error("Failed to save the booking, falling back to direct email", e);
     }
   }
 

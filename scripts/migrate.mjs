@@ -10,21 +10,21 @@ const force = process.argv.includes("--force");
 const isProductionBuild = process.env.VERCEL_ENV === "production";
 
 if (!force && !isProductionBuild) {
-  console.log("[migrate] production build değil — atlandı (elle: npm run db:migrate)");
+  console.log("[migrate] not a production build, skipped (run by hand: npm run db:migrate)");
   process.exit(0);
 }
 
 // Migrations use a direct connection instead of the pooler (safer for DDL + advisory locks).
 const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
 if (!url) {
-  console.log("[migrate] DATABASE_URL tanımlı değil — atlandı");
+  console.log("[migrate] DATABASE_URL is not set, skipped");
   process.exit(0);
 }
 
 const client = postgres(url, { max: 1 });
 try {
   await migrate(drizzle(client), { migrationsFolder: "./drizzle" });
-  console.log("[migrate] veritabanı güncel ✓");
+  console.log("[migrate] database is up to date ✓");
 } finally {
   await client.end();
 }

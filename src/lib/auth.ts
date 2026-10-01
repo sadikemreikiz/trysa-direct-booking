@@ -22,7 +22,7 @@ function adminEmails(): string[] {
 
 function createAuth() {
   const db = getDb();
-  if (!db) throw new Error("Panel için DATABASE_URL gerekli");
+  if (!db) throw new Error("The panel requires DATABASE_URL");
 
   return betterAuth({
     appName: "Trysa Panel",

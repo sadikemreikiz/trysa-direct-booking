@@ -19,7 +19,7 @@ export async function getPanelContext() {
 /** Redirects to sign-in if not signed in, to the waiting page if not approved. */
 export async function requireApprovedStaff() {
   const ctx = await getPanelContext();
-  if (!ctx) throw new Error("Panel için veritabanı gerekli");
+  if (!ctx) throw new Error("The panel requires a database");
   if (!ctx.session) redirect("/panel/giris");
   if (!ctx.staff || ctx.staff.status !== "approved") redirect("/panel/bekleniyor");
   return { db: ctx.db, staff: ctx.staff };

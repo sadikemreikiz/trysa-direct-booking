@@ -14,7 +14,7 @@ export async function getGuestLockedDates(): Promise<Record<string, string[]>> {
   try {
     return mergeLockedDays(airbnb, await confirmedDaysByUnit(db, todayInDemre(new Date())));
   } catch (e) {
-    console.error("Onaylı rezervasyonlar okunamadı, sadece Airbnb doluluğu kullanılıyor", e);
+    console.error("Failed to read confirmed bookings, using Airbnb occupancy only", e);
     return airbnb;
   }
 }
