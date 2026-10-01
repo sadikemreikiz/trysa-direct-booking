@@ -110,7 +110,8 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 ## Quality
 
 - **138 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
-- **CI** runs lint, type checks, tests and a production build without any secrets on every push.
+- **End-to-end tests** (Playwright, on a phone-sized Chromium) run against a production build and a throwaway in-memory database: a guest sends a request, the family confirms it in the panel and the next guest finds those nights booked; a bot filling the hidden field is told "success" while nothing is stored; the panel stays closed without signing in; a price changed in the panel reaches the German menu. The test server blanks every variable from local `.env` files, so a run can never email the family or reach a real database.
+- **CI** runs lint, type checks, tests, a production build and the end-to-end tests without any secrets on every push.
 - **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB.
 - **SEO:** per-page canonical URLs and `hreflang`, localized JSON-LD (`LodgingBusiness` + `Restaurant`, FAQ), a sitemap with language alternates.
 
@@ -135,7 +136,10 @@ To open the panel without Google, `node --env-file=.env.development.local script
 
 ```bash
 npm run check        # lint, formatting, types and all tests, as in CI; no database or keys needed
+npm run test:e2e     # builds the site and tests it in a browser on its own throwaway database
 ```
+
+The end-to-end tests need Playwright's browser once: `npx playwright install --only-shell chromium`.
 
 Only the database and the auth secret are required. Every other integration (Google sign-in, email, push, Airbnb calendars, Google reviews) switches off cleanly when its variables are empty; [`.env.example`](.env.example) documents each one.
 
@@ -161,6 +165,7 @@ src/
   db/                     Drizzle schema, connection and the PGlite test database
   lib/                    cross-cutting helpers: auth, i18n, SEO, dates, images
 drizzle/                  versioned SQL migrations
+e2e/                      end-to-end tests (Playwright) of the guest and panel flows
 scripts/                  local database, demo data, dev sign-in, image optimisation, migrations
 docs/decisions/           architecture decision records
 ```
@@ -169,7 +174,6 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 
 ## What's next
 
-- End-to-end tests of the guest booking and panel confirmation flows (Playwright)
 - Error monitoring and alerting
 - An evaluation set of real guest questions for the AI concierge, run in CI on prompt changes
 - Ordering from the table, building on the QR menu
