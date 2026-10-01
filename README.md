@@ -29,6 +29,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
+- An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself
 - Branded emails in their language along the stay: request received, booking confirmed (sent when the family confirms), directions and arrival times the day before arrival, and after check-out one review request for guests who opted in on the form
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
@@ -89,18 +90,19 @@ Public pages are statically generated with incremental revalidation; the booking
 
 The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisions).
 
-| Problem                              | Approach                                                                                                                                                                                                                        |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Airbnb's calendar lags by hours      | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md))                                                                           |
-| Double bookings under concurrency    | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md)) |
-| Two people acting on one request     | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                 |
-| Lost notifications                   | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))              |
-| Emails sent twice by a scheduled job | Each outbox row can carry an idempotency key (`guest_prearrival:<booking id>`, unique in the database). The job runs every 15 minutes, inserts with `ON CONFLICT DO NOTHING` and only between 10:00 and 20:00 in Demre          |
-| No Airbnb API for small hosts        | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                        |
-| Spam without CAPTCHA friction        | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                              |
-| Privacy (KVKK/GDPR)                  | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                   |
-| Graceful degradation                 | Without a database the site still takes requests by email; without Google it shows the last known rating                                                                                                                        |
-| Security headers                     | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies                                                                                                            |
+| Problem                                    | Approach                                                                                                                                                                                                                                                                                                |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Airbnb's calendar lags by hours            | Guests send a **request** that a human confirms, instead of instant booking ([ADR 0001](docs/decisions/0001-booking-requests-not-instant-booking.md))                                                                                                                                                   |
+| Double bookings under concurrency          | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md))                                                                         |
+| Two people acting on one request           | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                                                                                         |
+| Lost notifications                         | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))                                                                                      |
+| Emails sent twice by a scheduled job       | Each outbox row can carry an idempotency key (`guest_prearrival:<booking id>`, unique in the database). The job runs every 15 minutes, inserts with `ON CONFLICT DO NOTHING` and only between 10:00 and 20:00 in Demre                                                                                  |
+| No Airbnb API for small hosts              | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                                                                                                |
+| Spam without CAPTCHA friction              | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                                                                                                      |
+| Privacy (KVKK/GDPR)                        | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                                                                                           |
+| Graceful degradation                       | Without a database the site still takes requests by email; without Google it shows the last known rating                                                                                                                                                                                                |
+| An AI assistant that must not invent facts | Knowledge generated from the site's content, availability only via a tool, links built by our code and rendered only for site paths and WhatsApp, per-visitor and site-wide cost ceilings in Postgres, masked 30-day storage ([ADR 0007](docs/decisions/0007-ai-concierge-with-tools-not-free-text.md)) |
+| Security headers                           | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies                                                                                                                                                                                    |
 
 ## Quality
 
@@ -149,6 +151,7 @@ src/
     maintenance/          scheduled jobs: reminders and data retention
     analytics/            cookie-free conversion events
     reviews/              live Google rating and reviews
+    concierge/            AI assistant: knowledge, tools, streaming loop, chat UI, stored chats
   content/                site facts, menu and prices, privacy policy, TR/EN/DE dictionaries
   components/             shared UI (header, footer, logo) and the home page sections
   db/                     Drizzle schema, connection and the PGlite test database
@@ -164,7 +167,7 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 
 - End-to-end tests of the guest booking and panel confirmation flows (Playwright)
 - Error monitoring and alerting
-- An AI concierge that answers guest questions and checks real availability through tool calls, with an evaluation set
+- An evaluation set of real guest questions for the AI concierge, run in CI on prompt changes
 - Online food ordering from the restaurant, plus a QR menu with prices managed from the panel
 
 ## License
