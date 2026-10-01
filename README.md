@@ -42,6 +42,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - A monthly occupancy calendar across all rooms and Airbnb
 - Statistics from measured data only: requests, confirmation rate, median first-response time, clicks, nights sold
 - An iCal feed per room, so Airbnb blocks dates sold directly
+- Alerts on the admin's phone when something breaks quietly: an unexpected server error, an Airbnb calendar unreadable for 3 hours (its room would look free), a message given up after six attempts, or the 15-minute scheduler stopping
 - The restaurant menu edited from the phone: prices, "not available today", new dishes and translations reach the public menu and the AI concierge at once
 - Printable QR cards: the menu for the restaurant tables, Google's review screen for the rooms. They point to short links, so they never need reprinting
 
@@ -103,13 +104,14 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 | No Airbnb API for small hosts              | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                                                                                                |
 | Spam without CAPTCHA friction              | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                                                                                                      |
 | Privacy (KVKK/GDPR)                        | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                                                                                           |
+| Failures nobody would notice               | Next.js `onRequestError` plus health checks in the scheduled job (Airbnb calendars, the scheduler's own heartbeat) push one alert per problem to the admins, with a cooldown, and an all-clear when it recovers; email when push or the database is down                                                |
 | Graceful degradation                       | Without a database the site still takes requests by email; without Google it shows the last known rating                                                                                                                                                                                                |
 | An AI assistant that must not invent facts | Knowledge generated from the site's content, availability only via a tool, links built by our code and rendered only for site paths and WhatsApp, per-visitor and site-wide cost ceilings in Postgres, masked 30-day storage ([ADR 0007](docs/decisions/0007-ai-concierge-with-tools-not-free-text.md)) |
 | Security headers                           | CSP with no third-party scripts, `frame-ancestors 'none'`, HSTS, `nosniff`, strict referrer and permissions policies                                                                                                                                                                                    |
 
 ## Quality
 
-- **138 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **153 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
 - **End-to-end tests** (Playwright, on a phone-sized Chromium) run against a production build and a throwaway in-memory database: a guest sends a request, the family confirms it in the panel and the next guest finds those nights booked; a bot filling the hidden field is told "success" while nothing is stored; the panel stays closed without signing in; a price changed in the panel reaches the German menu. The test server blanks every variable from local `.env` files, so a run can never email the family or reach a real database.
 - **CI** runs lint, type checks, tests, a production build and the end-to-end tests without any secrets on every push.
 - **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB.
@@ -156,6 +158,7 @@ src/
     notifications/        transactional outbox delivery, email, guest receipts, Web Push
     panel/                status changes, access control, calendar, statistics, QR cards, panel UI
     maintenance/          scheduled jobs: reminders and data retention
+    monitoring/           alerts to the admins, health checks, server error reports
     analytics/            cookie-free conversion events
     reviews/              live Google rating and reviews
     concierge/            AI assistant: knowledge, tools, streaming loop, chat UI, stored chats
@@ -174,7 +177,6 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 
 ## What's next
 
-- Error monitoring and alerting
 - An evaluation set of real guest questions for the AI concierge, run in CI on prompt changes
 - Ordering from the table, building on the QR menu
 
