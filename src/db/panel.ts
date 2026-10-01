@@ -64,7 +64,7 @@ export async function getReservationDetail(db: Db, id: string) {
     .select()
     .from(reservationEvents)
     .where(eq(reservationEvents.reservationId, id))
-    .orderBy(desc(reservationEvents.createdAt));
+    .orderBy(desc(reservationEvents.createdAt), desc(reservationEvents.id));
 
   // actor "user:<id>" → isim
   const userIds = events

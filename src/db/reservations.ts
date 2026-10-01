@@ -108,6 +108,8 @@ export async function createReservation(
         note: d.note || null,
         locale: d.locale,
         consentAt: now,
+        createdAt: now,
+        updatedAt: now,
       })
       .returning();
 
@@ -116,15 +118,18 @@ export async function createReservation(
       type: "created",
       toStatus: "pending",
       actor: "guest",
+      createdAt: now,
     });
 
     // İki bağımsız bildirim: aileye e-posta + panel kullanıcılarının telefonuna bildirim.
     // Ayrı satırlar oldukları için biri başarısız olursa sadece o tekrar denenir.
+    // Zamanlar veritabanı saatinden değil `now`dan: teslim de aynı `now` ile karşılaştırır.
+    const queued = { nextAttemptAt: now, createdAt: now };
     const [message, push] = await tx
       .insert(outbox)
       .values([
-        { kind: "reservation_notification", payload: { reservationId: reservation.id } },
-        { kind: "reservation_push", payload: { reservationId: reservation.id } },
+        { kind: "reservation_notification", payload: { reservationId: reservation.id }, ...queued },
+        { kind: "reservation_push", payload: { reservationId: reservation.id }, ...queued },
       ])
       .returning({ id: outbox.id });
 
@@ -132,7 +137,7 @@ export async function createReservation(
     if (opts.guestAck && d.email) {
       const [ack] = await tx
         .insert(outbox)
-        .values({ kind: "guest_ack", payload: { reservationId: reservation.id } })
+        .values({ kind: "guest_ack", payload: { reservationId: reservation.id }, ...queued })
         .returning({ id: outbox.id });
       guestAckOutboxId = ack.id;
     }
