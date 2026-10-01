@@ -1,6 +1,6 @@
 # Trysa: direct bookings for a family-run nature stay
 
-[![CI](https://github.com/GITHUB_USER/trysa-direct-booking/actions/workflows/ci.yml/badge.svg)](https://github.com/GITHUB_USER/trysa-direct-booking/actions/workflows/ci.yml)
+[![CI](https://github.com/sadikemreikiz/trysa-direct-booking/actions/workflows/ci.yml/badge.svg)](https://github.com/sadikemreikiz/trysa-direct-booking/actions/workflows/ci.yml)
 [![Live](https://img.shields.io/badge/live-trysacamping.com-c2622e)](https://trysacamping.com)
 
 Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: six wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
