@@ -142,7 +142,11 @@ const tr = {
     btn: "Müsaitlik & Rezervasyon",
     whatsapp: "WhatsApp'tan yaz",
   },
-  footer: { whatsappNote: "WhatsApp mevcut", rights: "Gizlilik / KVKK" },
+  footer: {
+    whatsappNote: "WhatsApp mevcut",
+    rights: "Gizlilik / KVKK",
+    showMap: "Haritayı göster",
+  },
   mobileBar: { call: "Ara", rezervasyon: "Rezervasyon" },
   menu: {
     kicker: "TRYSA RESTORAN",
@@ -369,7 +373,7 @@ const en: Dict = {
     btn: "Availability & booking",
     whatsapp: "Message on WhatsApp",
   },
-  footer: { whatsappNote: "WhatsApp available", rights: "Privacy" },
+  footer: { whatsappNote: "WhatsApp available", rights: "Privacy", showMap: "Show map" },
   mobileBar: { call: "Call", rezervasyon: "Book" },
   menu: {
     kicker: "TRYSA RESTAURANT",
@@ -594,7 +598,7 @@ const de: Dict = {
     btn: "Verfügbarkeit & Buchung",
     whatsapp: "Per WhatsApp schreiben",
   },
-  footer: { whatsappNote: "WhatsApp verfügbar", rights: "Datenschutz" },
+  footer: { whatsappNote: "WhatsApp verfügbar", rights: "Datenschutz", showMap: "Karte anzeigen" },
   mobileBar: { call: "Anrufen", rezervasyon: "Buchen" },
   menu: {
     kicker: "TRYSA RESTAURANT",

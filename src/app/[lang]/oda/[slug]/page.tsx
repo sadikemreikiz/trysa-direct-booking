@@ -73,6 +73,7 @@ export default async function RoomPage({ params }: Params) {
             <img
               {...responsiveImage(cover, "(min-width: 768px) 1100px, 100vw")}
               alt={room.title}
+              fetchPriority="high"
               className="mt-5 h-64 w-full rounded-2xl object-cover md:h-[420px]"
             />
           )}
@@ -86,6 +87,7 @@ export default async function RoomPage({ params }: Params) {
                   {...responsiveImage(src, "(min-width: 768px) 33vw, 50vw")}
                   alt={`${room.title} ${i + 2}`}
                   loading="lazy"
+                  decoding="async"
                   className="h-40 w-full rounded-xl object-cover md:h-52"
                 />
               ))}

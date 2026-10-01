@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Dict, Locale } from "@/content/dictionaries";
 import { place, site } from "@/content/site";
 import LogoMark from "./LogoMark";
+import MapEmbed from "./MapEmbed";
 
 export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
   return (
@@ -19,7 +20,7 @@ export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
             </div>
             <div>Instagram: {site.instagramLabel}</div>
           </div>
-          <div className="mt-4 text-xs text-[#6e7364]">
+          <div className="mt-4 text-xs text-[#a3a796]">
             © {new Date().getFullYear()} Trysa ·{" "}
             <Link href={`/${lang}/gizlilik`} className="underline hover:text-ivory">
               {t.footer.rights}
@@ -27,12 +28,10 @@ export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
           </div>
         </div>
         <div className="w-full overflow-hidden rounded-xl md:w-72">
-          <iframe
-            title="Trysa"
+          <MapEmbed
             src={`https://maps.google.com/maps?q=${place.lat},${place.lng}&hl=${lang}&z=14&output=embed`}
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            className="h-32 w-full border-0"
+            label={t.footer.showMap}
+            className="h-32 w-full"
           />
         </div>
       </div>
