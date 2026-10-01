@@ -5,7 +5,7 @@ import { todayInDemre } from "@/db/reservations";
 import { units } from "@/db/schema";
 import { buildIcs, verifyIcalToken } from "@/lib/ical";
 
-/** Airbnb bu adresi birkaç saatte bir okur: /api/ical/ambar-1?token=... */
+/** Airbnb polls this URL every few hours: /api/ical/ambar-1?token=... */
 export async function GET(request: Request, { params }: { params: Promise<{ unit: string }> }) {
   const { unit } = await params;
   const token = new URL(request.url).searchParams.get("token") ?? "";

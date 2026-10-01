@@ -1,6 +1,6 @@
 /**
- * Duyarlı görsel: her fotoğrafın yanında 800 px'lik "<ad>.sm.jpg" sürümü vardır
- * (scripts/optimize-images.mjs üretir). Tarayıcı ekran genişliğine göre uygun olanı indirir.
+ * Responsive images: every photo has an 800 px "<name>.sm.jpg" version next to it
+ * (made by scripts/optimize-images.mjs). The browser downloads the right one for the screen width.
  */
 export function responsiveImage(src: string, sizes: string) {
   const large = src.endsWith("/hero.jpg") ? 1920 : 1600;

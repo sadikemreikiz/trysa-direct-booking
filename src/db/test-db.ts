@@ -1,6 +1,6 @@
 /**
- * Testler için gerçek PostgreSQL motoru (PGlite, bellek içinde — Docker gerekmez).
- * Canlıdakiyle aynı migration dosyaları uygulanır; kısıtlar birebir aynı çalışır.
+ * A real PostgreSQL engine for tests (PGlite, in memory, no Docker needed).
+ * The same migration files as production are applied; constraints behave exactly the same.
  */
 import { PGlite } from "@electric-sql/pglite";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";

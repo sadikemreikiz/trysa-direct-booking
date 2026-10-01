@@ -1,7 +1,7 @@
-// Veritabanı migration'larını uygular (drizzle/ klasöründeki sürümlü SQL dosyaları).
-// - Vercel production build'inde otomatik çalışır: migration başarısız olursa build durur,
-//   canlıdaki eski sürüm yayında kalır.
-// - Preview/yerel build'lerde atlanır; elle çalıştırmak için: npm run db:migrate
+// Applies database migrations (versioned SQL files in drizzle/).
+// - Runs automatically in the Vercel production build: if a migration fails the build stops
+//   and the previous version stays live.
+// - Skipped in preview/local builds; to run by hand: npm run db:migrate
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
@@ -14,7 +14,7 @@ if (!force && !isProductionBuild) {
   process.exit(0);
 }
 
-// Migration için pooler yerine doğrudan bağlantı (DDL + advisory lock için daha güvenli).
+// Migrations use a direct connection instead of the pooler (safer for DDL + advisory locks).
 const url = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
 if (!url) {
   console.log("[migrate] DATABASE_URL tanımlı değil — atlandı");

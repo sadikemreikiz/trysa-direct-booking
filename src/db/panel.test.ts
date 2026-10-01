@@ -62,8 +62,8 @@ async function request(patch: Partial<ReservationRequest> = {}) {
   return reservation;
 }
 
-describe("durum makinesi", () => {
-  it("izin verilen geçişler", () => {
+describe("state machine", () => {
+  it("allowed transitions", () => {
     expect(canTransition("pending", "confirmed")).toBe(true);
     expect(canTransition("pending", "declined")).toBe(true);
     expect(canTransition("confirmed", "cancelled")).toBe(true);
@@ -72,11 +72,11 @@ describe("durum makinesi", () => {
     expect(canTransition("confirmed", "declined")).toBe(false);
   });
 
-  it("onaylar, denetim kaydına kimin yaptığını yazar", async () => {
-    const dayi = await makeUser("u-dayi", "dayi@example.com", "Dayı");
+  it("confirms and records who did it in the audit log", async () => {
+    const owner = await makeUser("u-owner", "owner@example.com", "Owner");
     const r = await request();
 
-    await confirmReservation(db, r.id, dayi, 1, { note: "Telefonda konuştuk", now: NOW });
+    await confirmReservation(db, r.id, owner, 1, { note: "Telefonda konuştuk", now: NOW });
 
     const detail = await getReservationDetail(db, r.id);
     expect(detail?.r.status).toBe("confirmed");
@@ -84,13 +84,13 @@ describe("durum makinesi", () => {
       type: "status_changed",
       fromStatus: "pending",
       toStatus: "confirmed",
-      actorName: "Dayı",
+      actorName: "Owner",
       note: "Telefonda konuştuk",
     });
     expect(detail?.events.at(-1)?.actorName).toBe("Misafir");
   });
 
-  it("'emin değilim' talebini onaylarken ünite atanır; ünitesiz onay reddedilir", async () => {
+  it("a unit is assigned when confirming a 'not sure' request; confirming without a unit is rejected", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await request({ unit: "" });
     await expect(
@@ -100,7 +100,7 @@ describe("durum makinesi", () => {
     expect(updated.unitId).toBe(4);
   });
 
-  it("aynı odaya çakışan ikinci onay 'conflict' hatası verir", async () => {
+  it("a second overlapping confirmation for the same room fails with 'conflict'", async () => {
     const u = await makeUser("u1", "a@example.com");
     const first = await request();
     const second = await request({ checkin: "2026-11-12", checkout: "2026-11-14" });
@@ -111,7 +111,7 @@ describe("durum makinesi", () => {
     expect(still.status).toBe("pending");
   });
 
-  it("reddedilmiş talep sonradan onaylanamaz", async () => {
+  it("a declined request cannot be confirmed later", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await request();
     await declineReservation(db, r.id, u, { note: "Dolu" });
@@ -120,7 +120,7 @@ describe("durum makinesi", () => {
     });
   });
 
-  it("iki kişi aynı anda işlem yaparsa ikincisi başarısız olur", async () => {
+  it("if two people act at the same time, the second one fails", async () => {
     const dayi = await makeUser("u-dayi", "d@example.com");
     const emre = await makeUser("u-emre", "e@example.com");
     const r = await request();
@@ -133,7 +133,7 @@ describe("durum makinesi", () => {
     expect(failed.reason).toBeInstanceOf(TransitionError);
   });
 
-  it("onaylı rezervasyon iptal edilince oda tekrar boşa çıkar", async () => {
+  it("cancelling a confirmed booking frees the room again", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await request();
     await confirmReservation(db, r.id, u, 1);
@@ -158,15 +158,15 @@ describe("durum makinesi", () => {
   });
 });
 
-describe("müsaitlik", () => {
-  it("onaylı rezervasyonları ve Airbnb doluluğunu birlikte hesaba katar", async () => {
+describe("availability", () => {
+  it("takes confirmed bookings and Airbnb occupancy into account together", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await request();
     await confirmReservation(db, r.id, u, 1);
 
     const avail = await availabilityForRange(db, "2026-11-11", "2026-11-15", {
       "Ambar-2": ["2026-11-14"],
-      "Ambar-3": ["2026-11-15"], // çıkış günü — çakışma sayılmaz
+      "Ambar-3": ["2026-11-15"], // checkout day, not a conflict
     });
     const bySlug = Object.fromEntries(avail.map((a) => [a.slug, a]));
     expect(bySlug["ambar-1"]).toMatchObject({ free: false, reason: "confirmed" });
@@ -176,7 +176,7 @@ describe("müsaitlik", () => {
     expect(avail).toHaveLength(7);
   });
 
-  it("detay ekranında talebin kendisi çakışma sayılmaz", async () => {
+  it("on the detail screen the request itself doesn't count as a conflict", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await request();
     await confirmReservation(db, r.id, u, 1);
@@ -184,7 +184,7 @@ describe("müsaitlik", () => {
     expect(avail.find((a) => a.slug === "ambar-1")?.free).toBe(true);
   });
 
-  it("listede bekleyenler en eski talep önce, onaylılar giriş tarihine göre", async () => {
+  it("list: pending oldest first, confirmed by check-in date", async () => {
     const u = await makeUser("u1", "a@example.com");
     const older = await request({ name: "Eski" });
     const newer = await createReservation(
@@ -199,37 +199,37 @@ describe("müsaitlik", () => {
     expect(list.pending.map((x) => x.r.guestName)).toEqual(["Eski", "Yeni"]);
     expect(list.pending[0].r.id).toBe(older.id);
     expect(newer.reservation.id).toBe(list.pending[1].r.id);
-    expect(list.upcoming).toHaveLength(0); // çıkışı geçmiş rezervasyon listede yok
+    expect(list.upcoming).toHaveLength(0); // a booking whose checkout has passed is not listed
   });
 
-  it("Airbnb takvimi için sadece onaylı ve geçmemiş rezervasyonları verir", async () => {
+  it("gives the Airbnb calendar only confirmed, upcoming bookings", async () => {
     const u = await makeUser("u1", "a@example.com");
     const a = await request();
     const b = await request({ checkin: "2026-12-01", checkout: "2026-12-03" });
-    await request({ checkin: "2026-12-10", checkout: "2026-12-12" }); // pending — dahil değil
+    await request({ checkin: "2026-12-10", checkout: "2026-12-12" }); // pending, not included
     await confirmReservation(db, a.id, u, 1);
     await confirmReservation(db, b.id, u, 1);
     const stays = await confirmedStaysForUnit(db, "ambar-1", "2026-11-20");
     expect(stays.map((s) => s.checkIn)).toEqual(["2026-12-01"]);
   });
 
-  it("misafir formu için onaylı günleri ünite adına göre verir (çıkış günü ve kamp hariç)", async () => {
+  it("gives the guest form confirmed days by unit name (excluding checkout day and camping)", async () => {
     const u = await makeUser("u1", "a@example.com");
     const a = await request({ checkin: "2026-11-10", checkout: "2026-11-12" });
     const b = await request({ unit: "kulube-1", checkin: "2026-11-11", checkout: "2026-11-12" });
     const kamp = await request({ unit: "kamp" });
-    await request({ unit: "ambar-2" }); // pending — dahil değil
+    await request({ unit: "ambar-2" }); // pending, not included
     await confirmReservation(db, a.id, u, 1);
     await confirmReservation(db, b.id, u, 4);
     await confirmReservation(db, kamp.id, u, 7);
 
     expect(await confirmedDaysByUnit(db, "2026-11-11")).toEqual({
-      "Ambar-1": ["2026-11-11"], // 10'u geçmişte kaldı, 12 çıkış günü
+      "Ambar-1": ["2026-11-11"], // the 10th is in the past, the 12th is the checkout day
       "Kulübe-1": ["2026-11-11"],
     });
   });
 
-  it("Airbnb ve site doluluğunu birleştirir", () => {
+  it("merges Airbnb and site occupancy", () => {
     expect(
       mergeLockedDays(
         { "Ambar-1": ["2026-11-12", "2026-11-10"], "Ambar-2": [] },
@@ -243,7 +243,7 @@ describe("müsaitlik", () => {
   });
 });
 
-describe("elle rezervasyon ekleme", () => {
+describe("manual bookings", () => {
   const manual = {
     unitId: 2,
     checkIn: "2026-11-10",
@@ -256,7 +256,7 @@ describe("elle rezervasyon ekleme", () => {
     source: "phone" as const,
   };
 
-  it("doğrudan onaylı kaydeder, kaynağı ve kimin eklediğini tutar", async () => {
+  it("saves directly as confirmed, keeping the source and who added it", async () => {
     const u = await makeUser("u1", "a@example.com");
     const r = await createManualReservation(db, u, manual, { now: NOW });
     expect(r).toMatchObject({ status: "confirmed", source: "phone", unitId: 2, phone: "", note: "Kapora alındı" });
@@ -266,21 +266,21 @@ describe("elle rezervasyon ekleme", () => {
     expect(detail?.events).toHaveLength(1);
     expect(detail?.events[0]).toMatchObject({ type: "created", toStatus: "confirmed", actor: "user:u1" });
 
-    // Airbnb takvimine ve misafir formuna da yansır
+    // Also shows up in the Airbnb calendar and the guest form
     expect(await confirmedStaysForUnit(db, "ambar-2", "2026-11-01")).toHaveLength(1);
   });
 
-  it("aynı odaya çakışan onaylı rezervasyonu engeller", async () => {
+  it("blocks an overlapping confirmed booking for the same room", async () => {
     const u = await makeUser("u1", "a@example.com");
     const site = await request({ unit: "ambar-2", checkin: "2026-11-11", checkout: "2026-11-14" });
     await confirmReservation(db, site.id, u, 2);
 
     await expect(createManualReservation(db, u, manual, { now: NOW })).rejects.toMatchObject({ code: "conflict" });
-    // Başka oda sorun değil
+    // A different room is fine
     await expect(createManualReservation(db, u, { ...manual, unitId: 3 }, { now: NOW })).resolves.toBeTruthy();
   });
 
-  it("eksik/geçersiz bilgiyi reddeder", async () => {
+  it("rejects missing/invalid data", async () => {
     const u = await makeUser("u1", "a@example.com");
     for (const bad of [
       { ...manual, guestName: "  " },
@@ -292,7 +292,7 @@ describe("elle rezervasyon ekleme", () => {
     await expect(createManualReservation(db, u, { ...manual, unitId: 99 }, { now: NOW })).rejects.toMatchObject({
       code: "unit_unknown",
     });
-    // Geçmişe kayıt yok (Airbnb geçmişi paylaşmadığı için çakışma kontrol edilemez); bugün olur
+    // No past dates (Airbnb doesn't share past days, so conflicts can't be checked); today is fine
     await expect(
       createManualReservation(db, u, { ...manual, checkIn: "2026-09-28", checkOut: "2026-09-30" }, { now: NOW }),
     ).rejects.toMatchObject({ code: "in_past" });
@@ -302,8 +302,8 @@ describe("elle rezervasyon ekleme", () => {
   });
 });
 
-describe("panel yetkisi", () => {
-  it("yönetici listesindeki e-posta onaylı admin başlar, diğerleri erişim isteği", async () => {
+describe("panel authorization", () => {
+  it("an email on the admin list starts as an approved admin, everyone else as an access request", async () => {
     await makeUser("u-emre", "Emre@Example.com");
     await makeUser("u-dayi", "dayi@example.com");
     await createStaffForNewUser(db, { id: "u-emre", email: "Emre@Example.com" }, ["emre@example.com"]);
@@ -313,7 +313,7 @@ describe("panel yetkisi", () => {
     expect(await getStaffMember(db, "u-dayi")).toMatchObject({ role: "staff", status: "pending" });
   });
 
-  it("admin erişim isteğini onaylar; onaylanmamış kişi karar veremez; kimse kendini değiştiremez", async () => {
+  it("an admin approves access requests; unapproved users can't decide; nobody can change their own role", async () => {
     await makeUser("u-emre", "e@example.com");
     await makeUser("u-dayi", "d@example.com");
     await makeUser("u-yabanci", "x@example.com");

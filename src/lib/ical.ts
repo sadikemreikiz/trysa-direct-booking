@@ -1,7 +1,7 @@
 /**
- * Airbnb'ye verilecek takvim (iCal) — sitede onaylanan rezervasyonlar Airbnb'de de dolu görünür.
- * Böylece senkron iki yönlü olur: Airbnb → site (lib/availability), site → Airbnb (burası).
- * Link tahmin edilemesin diye ünite başına HMAC token taşır; takvimde kişisel veri yoktur.
+ * Calendar (iCal) for Airbnb: bookings confirmed on the site show as taken on Airbnb too.
+ * This makes the sync two-way: Airbnb → site (lib/availability), site → Airbnb (here).
+ * Each unit's link carries an HMAC token so it can't be guessed; the calendar has no personal data.
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 

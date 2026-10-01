@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const room = stays.find((s) => s.slug === slug);
   if (!room) return { title: "404" };
   const meta = pageMetadata(loc, `/oda/${room.slug}`, { title: room.title, description: t.room.descs[room.slug] });
-  // Paylaşım önizlemesinde odanın kendi kapak fotoğrafı
+  // Use the room's own cover photo in link previews
   if (room.img) meta.openGraph = { ...meta.openGraph, images: [{ url: room.img, alt: room.title }] };
   return meta;
 }

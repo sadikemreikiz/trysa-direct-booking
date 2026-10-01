@@ -51,10 +51,10 @@ function fakePush(ok = true) {
   return { sent, push };
 }
 
-describe("cevapsız talep hatırlatması", () => {
+describe("unanswered request reminder", () => {
   const now = new Date("2026-10-01T12:00:00Z");
 
-  it("3 saati geçen bekleyen talep için bir kez hatırlatır", async () => {
+  it("reminds once about a pending request older than 3 hours", async () => {
     const old = await requestAt(new Date("2026-10-01T08:00:00Z"), { name: "Eski" });
     await requestAt(new Date("2026-10-01T11:00:00Z"), { name: "Yeni" });
     const { sent, push } = fakePush();
@@ -64,12 +64,12 @@ describe("cevapsız talep hatırlatması", () => {
     expect(sent[0].body).toContain("Eski");
     expect(sent[0].url).toBe(`/panel/talep/${old.id}`);
 
-    // Tekrar çalışınca aynı talep için ikinci bildirim yok
+    // Running again sends no second notification for the same request
     expect(await escalateStalePending(db, push, now)).toBe(0);
     expect(sent).toHaveLength(1);
   });
 
-  it("birden çok talebi tek bildirimde toplar; işlenmiş talepleri atlar", async () => {
+  it("bundles several requests into one notification; skips handled ones", async () => {
     await db.insert(user).values({ id: "u1", email: "e@example.com", name: "Emre" });
     await requestAt(new Date("2026-10-01T07:00:00Z"));
     await requestAt(new Date("2026-10-01T08:00:00Z"), { unit: "ambar-2" });
@@ -82,7 +82,7 @@ describe("cevapsız talep hatırlatması", () => {
     expect(sent[0].url).toBe("/panel");
   });
 
-  it("bildirim gitmezse işaretlemez, sonra tekrar dener", async () => {
+  it("does not mark them if the notification fails, and retries later", async () => {
     await requestAt(new Date("2026-10-01T08:00:00Z"));
     expect(await escalateStalePending(db, fakePush(false).push, now)).toBe(0);
     const { sent, push } = fakePush();
@@ -91,14 +91,14 @@ describe("cevapsız talep hatırlatması", () => {
   });
 });
 
-describe("saklama süresi (2 yıl)", () => {
-  it("konaklamadan 2 yıl sonra kişisel verileri siler, istatistik verisi kalır", async () => {
+describe("retention period (2 years)", () => {
+  it("deletes personal data 2 years after the stay; statistics data remains", async () => {
     const old = await requestAt(new Date("2026-10-01T00:00:00Z"));
     const recent = await requestAt(new Date("2026-10-01T00:00:00Z"), { checkin: "2027-06-01", checkout: "2027-06-03" });
     await db.insert(user).values({ id: "u1", email: "e@example.com", name: "Emre" });
     await addReservationNote(db, old.id, "u1", "Misafirin telefonu değişti: 0555 999");
 
-    // Çıkış 2026-11-13 → 2028-11-13'ten sonra silinir
+    // Checkout 2026-11-13 → deleted after 2028-11-13
     expect(await anonymizeExpiredReservations(db, new Date("2028-11-12T00:00:00Z"))).toBe(0);
     expect(await anonymizeExpiredReservations(db, new Date("2028-11-15T00:00:00Z"))).toBe(1);
 
@@ -116,7 +116,7 @@ describe("saklama süresi (2 yıl)", () => {
     const [b] = await db.select().from(reservations).where(eq(reservations.id, recent.id));
     expect(b.guestName).toBe("Ayşe");
 
-    // İkinci çalıştırma bir şey değiştirmez
+    // A second run changes nothing
     expect(await anonymizeExpiredReservations(db, new Date("2028-11-15T00:00:00Z"))).toBe(0);
   });
 });

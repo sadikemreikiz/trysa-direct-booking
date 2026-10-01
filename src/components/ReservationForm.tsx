@@ -8,7 +8,7 @@ import { rangeHasLockedDay } from "@/lib/availability";
 import { WhatsAppIcon } from "./icons";
 import type { Dict, Locale } from "@/dictionaries";
 
-// Ekranda görünen ad → veritabanındaki kalıcı ünite kimliği (slug)
+// Display name → the unit's stable database id (slug)
 const roomUnits: [label: string, slug: string][] = [
   ["Ambar-1", "ambar-1"],
   ["Ambar-2", "ambar-2"],
@@ -39,7 +39,7 @@ export default function ReservationForm({
   t: Dict;
   lang: Locale;
   lockedByType?: Record<string, string[]>;
-  /** Google puanı ve yorum sayısı, ör. "★ 4,9 · 292 yorum" (sunucuda doldurulur) */
+  /** Google rating and review count, e.g. "★ 4,9 · 292 yorum" (filled in on the server) */
   reviewsChip: string;
 }) {
   const [data, setData] = useState<ReservationInput>(empty);
@@ -48,7 +48,7 @@ export default function ReservationForm({
   const [emailed, setEmailed] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Bot tuzakları: gizli alan + formun ne kadar sürede doldurulduğu
+  // Bot traps: hidden field + how long the form took to fill
   const [hp, setHp] = useState("");
   const openedAt = useRef<number | null>(null);
 
@@ -111,7 +111,7 @@ export default function ReservationForm({
       setEmailed(Boolean(res.emailed));
       setReference(res.reference ?? null);
     } catch {
-      /* e-posta başarısız olsa da WhatsApp ile devam ederiz */
+      /* even if the email fails we continue via WhatsApp */
       setEmailed(false);
     }
     setStatus("done");
@@ -199,7 +199,7 @@ export default function ReservationForm({
         }}
         className="mt-6 space-y-4 rounded-2xl border border-line bg-white p-5 md:p-7"
       >
-        {/* Gizli alan: insanlar görmez, botlar doldurur. */}
+        {/* Hidden field: humans don't see it, bots fill it in. */}
         <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
           <label>
             Website

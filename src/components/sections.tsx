@@ -11,8 +11,8 @@ type TL = { t: Dict; lang: Locale };
 type TLR = TL & { rating: RatingSummary };
 
 /**
- * Gerçek fotoğraf gelene kadar yer tutucu: yazısız, dekoratif desen + simge.
- * data-nosnippet: Google arama sonucu açıklamasında bu alanı kullanmasın.
+ * Placeholder until real photos arrive: decorative pattern + icon, no text.
+ * data-nosnippet: keeps Google from using this area in the search result description.
  */
 function Photo({ tone, className = "", labelDark = false }: { tone: string; className?: string; labelDark?: boolean }) {
   return (
@@ -31,7 +31,7 @@ function Photo({ tone, className = "", labelDark = false }: { tone: string; clas
         className={`h-10 w-14 ${labelDark ? "text-white/25" : "text-black/15"}`}
         fill="currentColor"
       >
-        {/* dağ + güneş: doğa */}
+        {/* mountain + sun: nature */}
         <circle cx="36" cy="8" r="4" />
         <path d="M0 32 L16 10 L26 22 L32 15 L48 32 Z" />
       </svg>
@@ -120,7 +120,7 @@ export function BookingBar({ t, lang }: TL) {
   );
 }
 
-/* ---------- İKİ YOL ---------- */
+/* ---------- TWO WAYS ---------- */
 export function TwoPath({ t, lang, rating }: TLR) {
   return (
     <section className={`${container} pt-8`}>
@@ -173,7 +173,7 @@ export function TwoPath({ t, lang, rating }: TLR) {
   );
 }
 
-/* ---------- NEDEN DİREKT ---------- */
+/* ---------- WHY BOOK DIRECT ---------- */
 export function WhyDirect({ t }: T) {
   return (
     <section className={`${container} pt-5`}>
@@ -189,7 +189,7 @@ export function WhyDirect({ t }: T) {
   );
 }
 
-/* ---------- KONAKLAMA ---------- */
+/* ---------- ACCOMMODATION ---------- */
 export function Accommodation({ t, lang }: TL) {
   return (
     <section id="konaklama" className={`${container} scroll-mt-20 pt-10`}>
@@ -232,7 +232,7 @@ export function Accommodation({ t, lang }: TL) {
   );
 }
 
-/* ---------- OLANAKLAR ---------- */
+/* ---------- AMENITIES ---------- */
 export function Amenities({ t }: T) {
   return (
     <section className={`${container} pt-10`}>
@@ -249,7 +249,7 @@ export function Amenities({ t }: T) {
   );
 }
 
-/* ---------- RESTORAN ---------- */
+/* ---------- RESTAURANT ---------- */
 export function Restaurant({ t, lang, rating }: TLR) {
   return (
     <section id="restoran" className={`${container} scroll-mt-20 pt-10`}>
@@ -273,7 +273,7 @@ export function Restaurant({ t, lang, rating }: TLR) {
   );
 }
 
-/* ---------- GALERİ ---------- */
+/* ---------- GALLERY ---------- */
 export function Gallery({ t }: T) {
   return (
     <section id="galeri" className={`${container} scroll-mt-20 pt-10`}>
@@ -296,7 +296,7 @@ export function Gallery({ t }: T) {
   );
 }
 
-/* ---------- TRYSA HİKAYESİ ---------- */
+/* ---------- TRYSA STORY ---------- */
 export function TrysaStory({ t }: T) {
   return (
     <section id="trysa" className={`${container} scroll-mt-20 pt-10`}>
@@ -320,7 +320,7 @@ export function TrysaStory({ t }: T) {
   );
 }
 
-/* ---------- DENEYİMLER ---------- */
+/* ---------- EXPERIENCES ---------- */
 export function Experiences({ t }: T) {
   return (
     <section className={`${container} pt-10`}>
@@ -338,7 +338,7 @@ export function Experiences({ t }: T) {
   );
 }
 
-/* ---------- MESAFELER ---------- */
+/* ---------- DISTANCES ---------- */
 export function Distances({ t, lang }: TL) {
   return (
     <section className={`${container} pt-10`}>
@@ -381,7 +381,7 @@ export function Distances({ t, lang }: TL) {
   );
 }
 
-/* ---------- YORUMLAR ---------- */
+/* ---------- REVIEWS ---------- */
 export function Reviews({ t, lang, google }: TL & { google?: GoogleReviewsData | null }) {
   const items =
     google && google.reviews.length > 0
@@ -417,7 +417,7 @@ export function Reviews({ t, lang, google }: TL & { google?: GoogleReviewsData |
   );
 }
 
-/* ---------- SSS ---------- */
+/* ---------- FAQ ---------- */
 export function Faq({ t }: T) {
   const faqLd = {
     "@context": "https://schema.org",

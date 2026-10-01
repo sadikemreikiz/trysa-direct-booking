@@ -44,7 +44,7 @@ beforeEach(async () => {
   await resetTestDb(client);
 });
 
-/** Kısıt ihlali mesajını yakalar (Drizzle hatayı sarmalayabilir). */
+/** Extracts the constraint violation message (Drizzle may wrap the error). */
 async function dbError(p: Promise<unknown>): Promise<string> {
   try {
     await p;
@@ -76,7 +76,7 @@ async function insertReservation(
 }
 
 describe("createReservation", () => {
-  it("rezervasyon, denetim kaydı, outbox ve ölçüm olayını tek seferde yazar", async () => {
+  it("writes the booking, audit event, outbox and analytics event in one go", async () => {
     const { reservation, outboxId } = await createReservation(db, valid, { now: NOW });
 
     expect(reservation.reference).toMatch(/^TRY-[2-9A-HJ-NP-Z]{5}$/);
@@ -94,7 +94,7 @@ describe("createReservation", () => {
     expect(tracked.map((e) => e.name)).toEqual(["reservation_submitted"]);
   });
 
-  it("'emin değilim' seçilince ünitesiz kaydeder", async () => {
+  it("saves without a unit when 'not sure' is chosen", async () => {
     const { reservation } = await createReservation(db, { ...valid, unit: "" }, { now: NOW });
     expect(reservation.unitId).toBeNull();
   });
@@ -113,20 +113,20 @@ describe("createReservation", () => {
     expect(await db.select().from(reservations)).toHaveLength(0);
   });
 
-  it("geçmiş tarihli girişi reddeder (işletme saat dilimine göre)", async () => {
+  it("rejects a check-in in the past (in the business's time zone)", async () => {
     await expect(
       createReservation(db, { ...valid, checkin: "2026-09-30", checkout: "2026-10-02" }, { now: NOW }),
     ).rejects.toThrow(/checkin:in_past/);
   });
 
-  it("bilinmeyen üniteyi reddeder ve hiçbir şey yazmaz", async () => {
+  it("rejects an unknown unit and writes nothing", async () => {
     await expect(createReservation(db, { ...valid, unit: "villa-99" }, { now: NOW })).rejects.toThrow(
       /unit:unknown/,
     );
     expect(await db.select().from(reservations)).toHaveLength(0);
   });
 
-  it("transaction içinde bir adım başarısız olursa rezervasyon da geri alınır", async () => {
+  it("if a step inside the transaction fails, the booking is rolled back too", async () => {
     await client.exec(`
       CREATE FUNCTION fail_outbox() RETURNS trigger AS $$
       BEGIN RAISE EXCEPTION 'outbox yazılamadı'; END; $$ LANGUAGE plpgsql;
@@ -142,24 +142,24 @@ describe("createReservation", () => {
   });
 });
 
-describe("çift rezervasyon koruması (veritabanı kısıtı)", () => {
-  it("aynı odada çakışan iki ONAYLI rezervasyona izin vermez", async () => {
+describe("double-booking protection (database constraint)", () => {
+  it("does not allow two overlapping CONFIRMED bookings in the same room", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13");
     const msg = await dbError(insertReservation(1, "2026-11-12", "2026-11-15"));
     expect(msg).toMatch(/reservations_no_overlap_confirmed/);
   });
 
-  it("çıkış günü yeni misafirin giriş günü olabilir", async () => {
+  it("a checkout day can be the next guest's check-in day", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13");
     await expect(insertReservation(1, "2026-11-13", "2026-11-15")).resolves.toBeDefined();
   });
 
-  it("bekleyen talepler çakışabilir — aile hangisini onaylayacağını seçer", async () => {
+  it("pending requests may overlap: the family chooses which one to confirm", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13", "pending");
     await expect(insertReservation(1, "2026-11-11", "2026-11-12", "pending")).resolves.toBeDefined();
   });
 
-  it("bekleyen talep, çakışan onaylı varken onaylanamaz", async () => {
+  it("a pending request cannot be confirmed while an overlapping confirmed one exists", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13");
     await insertReservation(1, "2026-11-11", "2026-11-12", "pending");
     const msg = await dbError(
@@ -168,25 +168,25 @@ describe("çift rezervasyon koruması (veritabanı kısıtı)", () => {
     expect(msg).toMatch(/reservations_no_overlap_confirmed/);
   });
 
-  it("farklı odalar ve ortak kamp alanı çakışabilir", async () => {
+  it("different rooms and the shared camping area may overlap", async () => {
     await insertReservation(1, "2026-11-10", "2026-11-13");
     await expect(insertReservation(2, "2026-11-10", "2026-11-13")).resolves.toBeDefined();
     await insertReservation(7, "2026-11-10", "2026-11-13");
     await expect(insertReservation(7, "2026-11-10", "2026-11-13")).resolves.toBeDefined();
   });
 
-  it("ünitesi olmayan rezervasyon onaylanamaz", async () => {
+  it("a booking without a unit cannot be confirmed", async () => {
     const msg = await dbError(insertReservation(null, "2026-11-10", "2026-11-13", "confirmed"));
     expect(msg).toMatch(/reservations_confirmed_has_unit/);
   });
 
-  it("çıkış tarihi girişten önce olamaz (uygulama atlansa bile)", async () => {
+  it("checkout cannot be before check-in (even if the app is bypassed)", async () => {
     const msg = await dbError(insertReservation(1, "2026-11-13", "2026-11-10", "pending"));
     expect(msg).toMatch(/reservations_dates_order/);
   });
 });
 
-/** Sahte gönderim kanalları: e-posta verilen fonksiyonla, bildirim varsayılan olarak başarılı. */
+/** Fake delivery channels: email uses the given function, push succeeds by default. */
 function via(
   email: ReturnType<typeof vi.fn>,
   push = vi.fn().mockResolvedValue({ ok: true }),
@@ -195,8 +195,8 @@ function via(
   return { email, push, guestEmail } as unknown as OutboxHandlers;
 }
 
-describe("outbox teslimi", () => {
-  it("başarılı gönderimde mesajı 'sent' yapar ve e-postada referans kodu olur", async () => {
+describe("outbox delivery", () => {
+  it("marks the message 'sent' on success and the email contains the reference code", async () => {
     const { reservation, outboxId } = await createReservation(db, valid, { now: NOW });
     const send = vi.fn().mockResolvedValue({ ok: true });
 
@@ -209,7 +209,7 @@ describe("outbox teslimi", () => {
     expect(row).toMatchObject({ status: "sent", attempts: 1, lastError: null });
   });
 
-  it("telefon bildirimi ayrı bir mesaj olarak panel linkiyle gider", async () => {
+  it("the phone notification goes out as a separate message with the panel link", async () => {
     const { reservation, pushOutboxId } = await createReservation(db, valid, { now: NOW });
     const email = vi.fn();
     const push = vi.fn().mockResolvedValue({ ok: true });
@@ -224,7 +224,7 @@ describe("outbox teslimi", () => {
     });
   });
 
-  it("e-posta başarısız olursa sadece e-posta tekrar denenir, bildirim etkilenmez", async () => {
+  it("if the email fails only the email is retried; the push is unaffected", async () => {
     const { outboxId, pushOutboxId } = await createReservation(db, valid, { now: NOW });
     const failingEmail = vi.fn().mockResolvedValue({ ok: false, error: "Resend 500" });
     const results = await deliverDueOutbox(db, via(failingEmail), NOW);
@@ -236,7 +236,7 @@ describe("outbox teslimi", () => {
     expect(byId.get(pushOutboxId)?.status).toBe("sent");
   });
 
-  it("başarısız gönderimi üstel beklemeyle yeniden planlar", async () => {
+  it("reschedules a failed delivery with exponential backoff", async () => {
     const { outboxId } = await createReservation(db, valid, { now: NOW });
     const send = vi.fn().mockResolvedValue({ ok: false, error: "Resend 500" });
 
@@ -248,7 +248,7 @@ describe("outbox teslimi", () => {
     expect(row.nextAttemptAt.getTime()).toBe(NOW.getTime() + backoffMs(1));
   });
 
-  it("zamanı gelmeden tekrar denemez, gelince dener", async () => {
+  it("doesn't retry before it's due, retries once it is", async () => {
     const { outboxId, pushOutboxId } = await createReservation(db, valid, { now: NOW });
     const ok = vi.fn().mockResolvedValue({ ok: true });
     await deliverOutboxMessage(db, pushOutboxId, via(ok), NOW);
@@ -258,7 +258,7 @@ describe("outbox teslimi", () => {
     expect(await deliverDueOutbox(db, via(ok), new Date(NOW.getTime() + backoffMs(1)))).toEqual(["sent"]);
   });
 
-  it(`${MAX_ATTEMPTS} denemeden sonra 'failed' olarak bırakır`, async () => {
+  it(`leaves it as 'failed' after ${MAX_ATTEMPTS} attempts`, async () => {
     const { outboxId } = await createReservation(db, valid, { now: NOW });
     const send = vi.fn().mockResolvedValue({ ok: false, error: "down" });
     let t = NOW.getTime();
@@ -271,7 +271,7 @@ describe("outbox teslimi", () => {
     expect(send).toHaveBeenCalledTimes(MAX_ATTEMPTS);
   });
 
-  it("aynı mesaj eşzamanlı iki işleyici tarafından iki kez gönderilmez", async () => {
+  it("the same message is not sent twice by two concurrent workers", async () => {
     const { outboxId } = await createReservation(db, valid, { now: NOW });
     let release!: () => void;
     const slow = vi.fn(
@@ -287,8 +287,8 @@ describe("outbox teslimi", () => {
   });
 });
 
-describe("misafire talep e-postası", () => {
-  it("sadece istenirse ve misafir e-posta verdiyse kuyruğa girer", async () => {
+describe("guest request email", () => {
+  it("is queued only when requested and the guest gave an email", async () => {
     expect((await createReservation(db, { ...valid, email: "a@example.com" }, { now: NOW })).guestAckOutboxId).toBeNull();
     expect(
       (await createReservation(db, { ...valid, email: "" }, { now: NOW, guestAck: true })).guestAckOutboxId,
@@ -298,7 +298,7 @@ describe("misafire talep e-postası", () => {
     ).not.toBeNull();
   });
 
-  it("misafirin dilinde, talep koduyla gönderilir", async () => {
+  it("is sent in the guest's language with the request code", async () => {
     const { reservation, guestAckOutboxId } = await createReservation(
       db,
       { ...valid, name: "Hans Müller", email: "hans@example.com", locale: "de" },
@@ -314,13 +314,13 @@ describe("misafire talep e-postası", () => {
     expect(text).toMatch(/^Hallo Hans,/);
     expect(text).toContain("noch keine Bestätigung");
     expect(text).toContain("https://trysacamping.com/anfahrt");
-    // Markalı HTML: logo, misafirin dili, yol tarifi düğmesi
+    // Branded HTML: logo, the guest's language, directions button
     expect(html).toContain('<html lang="de">');
     expect(html).toContain("/email-logo.png");
     expect(html).toContain('href="https://trysacamping.com/anfahrt"');
   });
 
-  it("HTML e-postada misafirin yazdığı ad kaçışlanır (HTML enjeksiyonu yok)", async () => {
+  it("the name typed by the guest is escaped in the HTML email (no HTML injection)", async () => {
     const { guestAckOutboxId } = await createReservation(
       db,
       { ...valid, name: '<img src=x onerror="alert(1)">', email: "x@example.com" },

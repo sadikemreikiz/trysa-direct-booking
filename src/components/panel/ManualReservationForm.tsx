@@ -38,7 +38,7 @@ export default function ManualReservationForm({ today }: { today: string }) {
 
   const datesValid = Boolean(checkIn && checkOut && checkOut > checkIn && checkIn >= today);
 
-  // Tarihler değişince boş odaları yeniden yükle
+  // Reload free rooms when the dates change
   useEffect(() => {
     if (!datesValid) return;
     let cancelled = false;

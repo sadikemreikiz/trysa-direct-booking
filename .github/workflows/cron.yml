@@ -1,6 +1,6 @@
-# Bakım işlerini (bildirim tekrar denemesi, cevapsız talep hatırlatması, veri silme)
-# 15 dakikada bir tetikler. Vercel Hobby planı cron'u günde bire sınırladığı için burada.
-# Gerekli repo sırları: SITE_URL (ör. https://trysacamping.com) ve CRON_SECRET (Vercel'dekiyle aynı).
+# Triggers maintenance jobs (notification retries, unanswered-request reminders, data retention)
+# every 15 minutes. Lives here because the Vercel Hobby plan limits cron jobs to once a day.
+# Required repository secrets: SITE_URL (e.g. https://trysacamping.com) and CRON_SECRET (same as on Vercel).
 name: cron
 
 on:

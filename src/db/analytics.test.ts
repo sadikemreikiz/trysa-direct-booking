@@ -18,8 +18,8 @@ beforeEach(async () => {
   await resetTestDb(client);
 });
 
-describe("dönüşüm olayları", () => {
-  it("WhatsApp tıklamasını kaydeder", async () => {
+describe("conversion events", () => {
+  it("records a WhatsApp click", async () => {
     const event = clientEventSchema.parse({
       name: "whatsapp_click",
       path: "/de/oda/ambar-1",
@@ -41,7 +41,7 @@ describe("dönüşüm olayları", () => {
     expect(clientEventSchema.safeParse(input).success).toBe(false);
   });
 
-  it("veritabanı da bilinmeyen olay adını reddeder (uygulama atlansa bile)", async () => {
+  it("the database also rejects unknown event names (even if the app is bypassed)", async () => {
     await expect(
       client.query("INSERT INTO analytics_events (name) VALUES ('purchase')"),
     ).rejects.toThrow(/analytics_events_name/);

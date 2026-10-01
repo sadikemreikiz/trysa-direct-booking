@@ -1,7 +1,7 @@
 /**
- * Panel doluluk takvimi: bir ayın her günü × her ünite için hücre durumu.
- * Öncelik: onaylı (site/elle) > Airbnb'de dolu > bekleyen talep > boş.
- * Kamp alanı ortak olduğu için hücrede kaç grup olduğu gösterilir.
+ * Staff occupancy calendar: a cell state for every day of a month × every unit.
+ * Priority: confirmed (site/manual) > taken on Airbnb > pending request > free.
+ * The camping area is shared, so the cell shows how many groups are staying.
  */
 export type CalendarUnit = { id: number; slug: string; name: string };
 export type CalendarStay = {
@@ -46,7 +46,7 @@ export function buildCalendar(
   return daysOfMonth(month).map((date) => {
     const next = new Date(Date.parse(date) + DAY_MS).toISOString().slice(0, 10);
     const cells = units.map((u): Cell => {
-      // Bu gece bu ünitede kalanlar: giriş ≤ gün < çıkış
+      // Guests in this unit tonight: check-in ≤ day < check-out
       const here = stays.filter((s) => s.unitId === u.id && s.checkIn < next && s.checkOut > date);
       const confirmed = here.filter((s) => s.status === "confirmed");
       const pending = here.filter((s) => s.status === "pending");

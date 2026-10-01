@@ -14,8 +14,8 @@ function urlBase64ToUint8Array(base64: string): Uint8Array<ArrayBuffer> {
 }
 
 /**
- * "Bildirimleri aç": servis çalışanını kaydeder, izin ister, aboneliği sunucuya kaydeder.
- * iPhone'da bildirim sadece ana ekrana eklenmiş panelde çalışır — o durumda yol gösterir.
+ * "Turn on notifications": registers the service worker, asks for permission, saves the subscription on the server.
+ * On iPhone notifications only work in a panel added to the home screen; in that case it shows how.
  */
 export default function PushToggle({ vapidPublicKey }: { vapidPublicKey: string | null }) {
   const [state, setState] = useState<State>("checking");

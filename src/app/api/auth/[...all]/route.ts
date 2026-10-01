@@ -1,7 +1,7 @@
 import { toNextJsHandler } from "better-auth/next-js";
 import { getAuth } from "@/lib/auth";
 
-// Better Auth uç noktaları (/api/auth/sign-in/social, /api/auth/callback/google, ...)
+// Better Auth endpoints (/api/auth/sign-in/social, /api/auth/callback/google, ...)
 export async function GET(request: Request) {
   return toNextJsHandler(getAuth()).GET(request);
 }

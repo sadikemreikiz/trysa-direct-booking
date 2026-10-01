@@ -1,8 +1,8 @@
 /**
- * Misafire kendi dilinde "talebini aldık" e-postası. Bu henüz ONAY değildir; aile
- * müsaitliği teyit edince misafire WhatsApp/telefonla döner (bkz. lib/whatsapp).
- * Aynı içerikten hem düz metin hem markalı HTML üretilir (görselleri kapalı e-posta
- * programları düz metni gösterir).
+ * "We got your request" email to the guest in their language. This is NOT a confirmation yet;
+ * the family gets back via WhatsApp/phone once availability is confirmed (see lib/whatsapp).
+ * Both plain text and branded HTML are built from the same content (email clients with
+ * images off show the plain text).
  */
 import { SITE_URL } from "./seo";
 import { place, site } from "./site";
@@ -110,7 +110,7 @@ function toText(c: Content, directionsLink: string): string {
   ].join("\n");
 }
 
-/** E-posta programlarında güvenli: tablo düzeni, satır içi stil, dış CSS yok. */
+/** Safe for email clients: table layout, inline styles, no external CSS. */
 function toHtml(c: Content, directionsLink: string, lang: Locale): string {
   const pine = "#2c3a2e";
   const clay = "#c1622f";

@@ -1,12 +1,12 @@
 /**
- * Veritabanı şeması (PostgreSQL / Drizzle ORM).
+ * Database schema (PostgreSQL / Drizzle ORM).
  *
- * Tasarım ilkeleri:
- * - Veritabanı tek doğruluk kaynağıdır; e-posta sadece bildirimdir (outbox).
- * - Kurallar mümkün olduğunca DB seviyesinde: CHECK kısıtları ve onaylı
- *   rezervasyonlar için çakışma engeli (EXCLUDE USING gist — bkz. migration 0001).
- * - Her durum değişikliği reservation_events tablosuna yazılır (denetim izi).
- * - analytics_events kişisel veri tutmaz (IP / user-agent yok).
+ * Design principles:
+ * - The database is the single source of truth; email is only a notification (outbox).
+ * - Rules live at the DB level where possible: CHECK constraints and an overlap guard for
+ *   confirmed bookings (EXCLUDE USING gist, see migration 0001).
+ * - Every status change is written to reservation_events (audit trail).
+ * - analytics_events holds no personal data (no IP / user agent).
  */
 import { sql } from "drizzle-orm";
 import {
@@ -28,10 +28,10 @@ import {
 export const unitKind = pgEnum("unit_kind", ["room", "tiny_house", "camp"]);
 
 export const reservationStatus = pgEnum("reservation_status", [
-  "pending", // misafir talep etti, aile henüz bakmadı
-  "confirmed", // aile onayladı — tarih o ünite için kesinleşti
-  "declined", // aile reddetti (ör. dolu)
-  "cancelled", // onaylıyken iptal edildi
+  "pending", // guest requested, the family hasn't looked yet
+  "confirmed", // the family confirmed; the dates are fixed for that unit
+  "declined", // the family declined (e.g. fully booked)
+  "cancelled", // cancelled after being confirmed
 ]);
 
 export const reservationSource = pgEnum("reservation_source", [
@@ -43,7 +43,7 @@ export const reservationSource = pgEnum("reservation_source", [
 
 export const outboxStatus = pgEnum("outbox_status", ["pending", "sent", "failed"]);
 
-/** Konaklama üniteleri (6 oda + kamp alanı). Referans veri — migration ile eklenir. */
+/** Accommodation units (6 rooms + camping area). Reference data, inserted by a migration. */
 export const units = pgTable("units", {
   id: smallint("id").primaryKey(),
   slug: text("slug").notNull().unique(),
@@ -57,9 +57,9 @@ export const reservations = pgTable(
   "reservations",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    /** Misafirle konuşurken kullanılan kısa kod, ör. TRY-7K3Q9 */
+    /** Short code used when talking to the guest, e.g. TRY-7K3Q9 */
     reference: text("reference").notNull().unique(),
-    /** null = misafir "emin değilim" dedi; aile onaylarken ünite atar */
+    /** null = the guest said "not sure"; the family assigns a unit when confirming */
     unitId: smallint("unit_id").references(() => units.id),
     checkIn: date("check_in").notNull(),
     checkOut: date("check_out").notNull(),
@@ -72,13 +72,13 @@ export const reservations = pgTable(
     locale: text("locale").notNull(),
     source: reservationSource("source").notNull().default("website"),
     status: reservationStatus("status").notNull().default("pending"),
-    /** KVKK/GDPR onayının verildiği an */
+    /** Moment KVKK/GDPR consent was given */
     consentAt: timestamp("consent_at", { withTimezone: true }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-    /** Uzun süre cevapsız kaldığı için yöneticiye hatırlatma gönderildiği an */
+    /** Moment the admin was reminded because the request went unanswered for too long */
     escalatedAt: timestamp("escalated_at", { withTimezone: true }),
-    /** Saklama süresi dolduğu için kişisel verilerin silindiği an (bkz. db/maintenance) */
+    /** Moment personal data was deleted because the retention period expired (see db/maintenance) */
     anonymizedAt: timestamp("anonymized_at", { withTimezone: true }),
   },
   (t) => [
@@ -94,7 +94,7 @@ export const reservations = pgTable(
   ],
 );
 
-/** Denetim izi: rezervasyonda olan her şey (oluşturma, durum değişikliği, not). */
+/** Audit trail: everything that happens to a booking (creation, status change, note). */
 export const reservationEvents = pgTable(
   "reservation_events",
   {
@@ -105,7 +105,7 @@ export const reservationEvents = pgTable(
     type: text("type").notNull(),
     fromStatus: reservationStatus("from_status"),
     toStatus: reservationStatus("to_status"),
-    /** "guest", "system" veya "admin:<e-posta>" */
+    /** "guest", "system" or "admin:<email>" */
     actor: text("actor").notNull(),
     note: text("note"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -117,8 +117,8 @@ export const reservationEvents = pgTable(
 );
 
 /**
- * Transactional outbox: gönderilecek bildirimler rezervasyonla AYNI transaction'da
- * yazılır. Gönderim başarısız olursa satır kalır ve tekrar denenir — talep kaybolmaz.
+ * Transactional outbox: notifications to send are written in the SAME transaction as the
+ * booking. If sending fails the row stays and is retried, so no request is lost.
  */
 export const outbox = pgTable(
   "outbox",
@@ -140,7 +140,7 @@ export const outbox = pgTable(
   ],
 );
 
-/** Dönüşüm ölçümü (form gönderimi, WhatsApp/telefon tıklaması). Kişisel veri yok. */
+/** Conversion tracking (form submission, WhatsApp/phone click). No personal data. */
 export const analyticsEvents = pgTable(
   "analytics_events",
   {
@@ -161,8 +161,8 @@ export const analyticsEvents = pgTable(
 );
 
 /**
- * Kötüye kullanım sınırı (spam koruması): anahtar başına sabit pencerede sayaç.
- * Anahtar IP'nin kendisi değil, gizli anahtarla alınmış özetidir (HMAC); satırlar 2 gün sonra silinir.
+ * Abuse limit (spam protection): a fixed-window counter per key.
+ * The key is not the IP itself but its keyed digest (HMAC); rows are deleted after 2 days.
  */
 export const rateLimits = pgTable("rate_limits", {
   key: text("key").primaryKey(),
@@ -171,7 +171,7 @@ export const rateLimits = pgTable("rate_limits", {
 });
 
 /* ------------------------------------------------------------------------ */
-/* Panel girişi — Better Auth çekirdek tabloları (isimler kütüphanenin beklediği gibi) */
+/* Panel sign-in: Better Auth core tables (names as the library expects)   */
 /* ------------------------------------------------------------------------ */
 
 const authTimestamps = {
@@ -241,17 +241,17 @@ export const verification = pgTable(
 );
 
 /* ------------------------------------------------------------------------ */
-/* Panel yetkisi ve bildirimler                                              */
+/* Panel access and notifications                                           */
 /* ------------------------------------------------------------------------ */
 
 export const staffRole = pgEnum("staff_role", [
-  "admin", // her şeyi görür, erişim isteklerini onaylar (Emre)
-  "staff", // talepleri yönetir, sade görünüm (dayı)
+  "admin", // sees everything, approves access requests (the developer)
+  "staff", // manages requests, simplified view (the owner)
 ]);
 
 export const staffStatus = pgEnum("staff_status", ["pending", "approved", "revoked"]);
 
-/** Kim panele girebilir? Google girişi tek başına yetmez; burada onaylı olmak gerekir. */
+/** Who can use the panel? Google sign-in alone isn't enough; the user must be approved here. */
 export const staff = pgTable("staff", {
   userId: text("user_id")
     .primaryKey()
@@ -263,7 +263,7 @@ export const staff = pgTable("staff", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-/** Telefona bildirim (Web Push) abonelikleri — cihaz başına bir satır. */
+/** Phone notification (Web Push) subscriptions, one row per device. */
 export const pushSubscriptions = pgTable(
   "push_subscriptions",
   {

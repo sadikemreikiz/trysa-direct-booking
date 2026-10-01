@@ -3,7 +3,7 @@ import ManualReservationForm from "@/components/panel/ManualReservationForm";
 import { todayInDemre } from "@/db/reservations";
 import { requireApprovedStaff } from "@/lib/panel-session";
 
-/** Telefonla, WhatsApp'tan ya da kapıdan gelen rezervasyonu elle ekleme. */
+/** Manually add a booking that came in by phone, WhatsApp or walk-in. */
 export default async function NewReservationPage() {
   const { staff } = await requireApprovedStaff();
   return (

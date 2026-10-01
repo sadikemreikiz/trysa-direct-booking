@@ -1,7 +1,7 @@
-// Lokal geliştirme veritabanı: PGlite (gerçek PostgreSQL motoru, WASM) + TCP sunucusu.
-// Docker gerekmez. Veri .pglite/ klasöründe kalıcıdır (git'e girmez).
+// Local development database: PGlite (real PostgreSQL engine in WASM) + a TCP server.
+// No Docker needed. Data persists in .pglite/ (git-ignored).
 //   npm run db:local   →  postgres://postgres@127.0.0.1:5433/postgres
-// .env.development.local içine DATABASE_URL olarak bu adresi yaz; `npm run dev` onu kullanır.
+// Put this address in .env.development.local as DATABASE_URL; `npm run dev` picks it up.
 import { PGlite } from "@electric-sql/pglite";
 import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";

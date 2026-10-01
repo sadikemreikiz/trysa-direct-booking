@@ -19,5 +19,5 @@ jobs:
       - run: npm run lint
       - run: npx tsc --noEmit
       - run: npm test
-      # Veritabanı ve dış anahtarlar olmadan: site yedek davranışlarla derlenmeli.
+      # Without a database or external keys the site must still build, using its fallbacks.
       - run: npm run build

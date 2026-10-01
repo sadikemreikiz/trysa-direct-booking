@@ -1,9 +1,9 @@
 /**
- * Panel girişi (Better Auth + Google). Oturumlar veritabanında tutulur (iptal edilebilir).
+ * Panel sign-in (Better Auth + Google). Sessions live in the database (revocable).
  *
- * Yetki modeli: Google ile giriş yapan herkes panele giremez. İlk girişte bir `staff`
- * kaydı "pending" (erişim isteği) olarak açılır; yönetici onaylayınca aktif olur.
- * ADMIN_EMAILS'teki adresler (virgülle ayrılmış) doğrudan onaylı yönetici olarak başlar.
+ * Permission model: signing in with Google does not grant panel access. On first sign-in a `staff`
+ * row is created as "pending" (access request); it becomes active once an admin approves it.
+ * Addresses in ADMIN_EMAILS (comma-separated) start directly as approved admins.
  */
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -35,7 +35,7 @@ function createAuth() {
       },
     },
     session: {
-      // Dayı bir kez girsin, uzun süre tekrar sorulmasın; her gün kullanımda uzar.
+      // Sign in once and don't get asked again for a long time; daily use extends the session.
       expiresIn: 60 * 60 * 24 * 90,
       updateAge: 60 * 60 * 24,
     },
@@ -45,7 +45,7 @@ function createAuth() {
           after: async (user) => {
             const status = await createStaffForNewUser(db, user, adminEmails());
             if (status === "pending") {
-              // Yöneticinin telefonuna: biri panele girmek istiyor.
+              // To the admin's phone: someone wants to access the panel.
               await sendPushToStaff(
                 db,
                 {
@@ -66,7 +66,7 @@ function createAuth() {
 
 let instance: ReturnType<typeof createAuth> | null = null;
 
-/** Veritabanı bağlantısı gerektiği için ilk kullanımda oluşturulur. */
+/** Created on first use because it needs a database connection. */
 export function getAuth() {
   instance ??= createAuth();
   return instance;

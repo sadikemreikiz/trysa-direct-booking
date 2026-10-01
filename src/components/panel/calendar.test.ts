@@ -16,8 +16,8 @@ const stay = (patch: Partial<CalendarStay>): CalendarStay => ({
   ...patch,
 });
 
-describe("doluluk takvimi", () => {
-  it("ayın günlerini ve ay geçişlerini doğru hesaplar", () => {
+describe("occupancy calendar", () => {
+  it("computes the days of the month and month boundaries correctly", () => {
     expect(daysOfMonth("2026-02")).toHaveLength(28);
     expect(daysOfMonth("2028-02")).toHaveLength(29);
     expect(daysOfMonth("2026-11")[29]).toBe("2026-11-30");
@@ -25,7 +25,7 @@ describe("doluluk takvimi", () => {
     expect(shiftMonth("2026-01", -1)).toBe("2025-12");
   });
 
-  it("konaklama gecelerini işaretler, çıkış günü boş kalır", () => {
+  it("marks the nights of a stay; the checkout day stays free", () => {
     const days = buildCalendar("2026-11", units, [stay({})], {}, "kamp");
     const at = (d: string) => days.find((x) => x.date === d)!.cells[0];
     expect(at("2026-11-09").kind).toBe("free");
@@ -34,7 +34,7 @@ describe("doluluk takvimi", () => {
     expect(at("2026-11-12").kind).toBe("free");
   });
 
-  it("öncelik: onaylı > Airbnb > bekleyen", () => {
+  it("priority: confirmed > Airbnb > pending", () => {
     const days = buildCalendar(
       "2026-11",
       units,
@@ -45,7 +45,7 @@ describe("doluluk takvimi", () => {
     expect(days.slice(0, 4).map((d) => d.cells[0].kind)).toEqual(["confirmed", "airbnb", "pending", "pending"]);
   });
 
-  it("kamp alanında aynı geceki grupları sayar", () => {
+  it("counts groups on the same night in the camping area", () => {
     const days = buildCalendar(
       "2026-11",
       units,

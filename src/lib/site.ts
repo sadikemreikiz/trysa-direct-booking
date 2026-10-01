@@ -7,35 +7,35 @@ export const site = {
   instagram: "https://instagram.com/trysarestaurant",
   instagramLabel: "@trysarestaurant",
   address: "Davazlar, Gölbaşı Mevkii, 07572 Demre / Antalya",
-  /** Google puanı canlı gelir (lib/reviews); bu sadece Google'a ulaşılamazsa gösterilen son bilinen değer (2026-09-30). */
+  /** The Google rating is live (lib/reviews); this is only the last known value, shown if Google is unreachable (2026-09-30). */
   ratingFallback: { rating: 4.9, count: 292 },
-  superhost: true, // Airbnb Superhost rozeti — teyit edilince kalır; değilse false yap
+  superhost: true, // Airbnb Superhost badge: keep once confirmed, otherwise set to false
 };
 
 /**
- * Konum — misafirlerin en çok zorlandığı konu. Tek kaynak: Google İşletme Profili
- * (Places API ile doğrulandı, 2026-09-30). Site, kartvizit, WhatsApp ve e-posta buradan alır.
+ * Location: what guests struggle with most. Single source: the Google Business Profile
+ * (verified via the Places API, 2026-09-30). The site, business card, WhatsApp and email all use it.
  */
 export const place = {
   lat: 36.2624282,
   lng: 29.8912955,
-  /** Google Haritalar'a yazınca tam noktayı bulur */
+  /** Typing this into Google Maps finds the exact spot */
   plusCode: "7V6R+XG Demre",
-  /** İşletme kaydı (fotoğraf, yorum, yol tarifi) */
+  /** Business listing (photos, reviews, directions) */
   googleMapsUrl: "https://maps.google.com/?cid=1839563921786307451",
   /**
-   * Doğrudan yol tarifi (navigasyon). destination koordinat (boşluksuz — yönlendirme başlığında
-   * boşluk bazı telefonlarda bozuluyor); place_id sayesinde Google işletmenin adını gösterir.
+   * Direct directions (navigation). destination is coordinates without spaces (a space in the
+   * redirect header breaks on some phones); thanks to place_id Google shows the business name.
    */
   directionsUrl:
     "https://www.google.com/maps/dir/?api=1&destination=36.2624282,29.8912955&destination_place_id=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk",
-  /** Google'da "yorum yaz" ekranı (yorum kartı QR'ı buraya gider: trysacamping.com/yorum) */
+  /** Google's "write a review" screen (the review card QR points here: trysacamping.com/yorum) */
   reviewUrl: "https://search.google.com/local/writereview?placeid=ChIJ9YlxOcPtwRQRe4Oy86Nxhxk",
-  /** Kısa yol tarifi linkleri (next.config.ts yönlendirir) — misafirin diline göre */
+  /** Short directions links (redirected in next.config.ts), per guest language */
   shortLink: { tr: "trysacamping.com/yol", en: "trysacamping.com/directions", de: "trysacamping.com/anfahrt" },
 };
 
-// Her oda ayrı. Fiyatlar Airbnb'den; güncelini Emre teyit edecek.
+// Each room is separate. Prices from Airbnb; to be confirmed with the family.
 export const stays = [
   {
     slug: "ambar-1",

@@ -38,15 +38,15 @@ beforeEach(async () => {
   await db.insert(user).values({ id: "u1", email: "e@example.com", name: "Emre" });
 });
 
-/** Talebi belirli bir anda gelmiş gibi kaydeder. */
+/** Saves a request as if it arrived at a given moment. */
 async function request(createdAt: string, patch: Partial<ReservationRequest> = {}) {
   const { reservation } = await createReservation(db, { ...base, ...patch }, { now: new Date("2026-09-01T00:00:00Z") });
   await db.update(reservations).set({ createdAt: new Date(createdAt) }).where(eq(reservations.id, reservation.id));
   return reservation;
 }
 
-describe("panel istatistikleri", () => {
-  it("son 6 ayı boş aylar dahil sırayla verir", async () => {
+describe("panel statistics", () => {
+  it("returns the last 6 months in order, including empty months", async () => {
     const stats = await getStats(db, NOW);
     expect(stats.months.map((m) => m.month)).toEqual([
       "2026-06",
@@ -59,12 +59,12 @@ describe("panel istatistikleri", () => {
     expect(stats.medianResponseMinutes).toBeNull();
   });
 
-  it("talepleri, onayları, geceleri ve tıklamaları aylara dağıtır", async () => {
+  it("spreads requests, confirmations, nights and clicks across months", async () => {
     const a = await request("2026-10-05T09:00:00Z");
     const b = await request("2026-10-20T09:00:00Z", { unit: "ambar-2" });
-    await request("2026-11-02T09:00:00Z", { unit: "ambar-3" }); // cevapsız
-    await confirmReservation(db, a.id, "u1", 1, { now: new Date("2026-10-05T09:30:00Z") }); // 30 dk
-    await declineReservation(db, b.id, "u1", { now: new Date("2026-10-20T11:00:00Z") }); // 120 dk
+    await request("2026-11-02T09:00:00Z", { unit: "ambar-3" }); // unanswered
+    await confirmReservation(db, a.id, "u1", 1, { now: new Date("2026-10-05T09:30:00Z") }); // 30 min
+    await declineReservation(db, b.id, "u1", { now: new Date("2026-10-20T11:00:00Z") }); // 120 min
     await createManualReservation(db, "u1", {
       unitId: 4,
       checkIn: "2026-11-15",
@@ -86,19 +86,19 @@ describe("panel istatistikleri", () => {
     const oct = stats.months.find((m) => m.month === "2026-10");
     const nov = stats.months.find((m) => m.month === "2026-11");
     expect(oct).toMatchObject({ requests: 2, confirmed: 1, whatsappClicks: 2, phoneClicks: 0 });
-    // Kasım: 1 site talebi (cevapsız); geceler giriş ayına göre: site 3 gece + telefon 2 gece
+    // November: 1 site request (unanswered); nights by check-in month: site 3 nights + phone 2 nights
     expect(nov).toMatchObject({ requests: 1, confirmed: 0, nights: 5, phoneClicks: 1 });
     expect(stats.bySource).toEqual({ website: 1, phone: 1 });
-    // Ortanca (30, 120) = 75 dk; elle eklenen ve cevapsız talep hesaba girmez
+    // Median of (30, 120) = 75 min; manual and unanswered requests don't count
     expect(stats.medianResponseMinutes).toBe(75);
     expect(stats.respondedCount).toBe(2);
-    // NOW = 20 Kasım: 10 Kasım girişli konaklama geçmişte, 15 Kasım da; yaklaşan yok
+    // NOW = 20 Nov: the stays starting 10 Nov and 15 Nov are in the past; nothing upcoming
     expect(stats.upcomingNights).toBe(0);
     expect((await getStats(db, new Date("2026-11-01T10:00:00Z"))).upcomingNights).toBe(5);
   });
 
-  it("ay sınırını İstanbul saatine göre belirler", async () => {
-    // UTC 31 Ekim 22:30 = İstanbul 1 Kasım 01:30
+  it("uses Istanbul time for month boundaries", async () => {
+    // UTC 31 Oct 22:30 = Istanbul 1 Nov 01:30
     const r = await request("2026-10-31T22:30:00Z");
     await db.delete(reservationEvents).where(eq(reservationEvents.reservationId, r.id));
     const stats = await getStats(db, NOW);

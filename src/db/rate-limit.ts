@@ -1,6 +1,6 @@
 /**
- * Spam koruması: sabit pencereli sayaç (fixed window), tek atomik SQL ile.
- * Sunucusuz ortamda (Vercel) bellek içi sayaç her örnekte ayrı olurdu; bu yüzden veritabanında.
+ * Spam protection: fixed-window counter in a single atomic SQL statement.
+ * On serverless (Vercel) an in-memory counter would be per instance, so it lives in the database.
  */
 import { lt, sql } from "drizzle-orm";
 import type { Db } from "./index";
@@ -8,7 +8,7 @@ import { rateLimits } from "./schema";
 
 export type RateLimitRule = { limit: number; windowMs: number };
 
-/** Anahtar için bir istek sayar; sınır aşıldıysa false döner. */
+/** Counts one request for the key; returns false if the limit is exceeded. */
 export async function hitRateLimit(
   db: Db,
   key: string,
@@ -31,7 +31,7 @@ export async function hitRateLimit(
   return row.count <= rule.limit;
 }
 
-/** Birden çok kuralı sırayla uygular (ör. 10 dakikada 3 ve günde 10). Hepsi sayılır. */
+/** Applies several rules in order (e.g. 3 per 10 minutes and 10 per day). All of them count. */
 export async function hitRateLimits(
   db: Db,
   key: string,
@@ -45,7 +45,7 @@ export async function hitRateLimits(
   return allowed;
 }
 
-/** Süresi çoktan dolmuş sayaçları siler (IP özetleri en fazla 2 gün tutulur). */
+/** Deletes long-expired counters (IP digests are kept for at most 2 days). */
 export async function pruneRateLimits(db: Db, now: Date = new Date()) {
   await db.delete(rateLimits).where(lt(rateLimits.windowStart, new Date(now.getTime() - 2 * 86_400_000)));
 }

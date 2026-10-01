@@ -1,15 +1,15 @@
-// Fiyatlar restorandaki basılı menüyle birebir (Emre teyit etti: 2026-09-30).
-// Güncelleme: aşağıdaki p (fiyat) değerlerini değiştirmen yeterli.
-// n = Türkçe ad (basılı menüdeki gibi); en/de = çeviri; d = kısa içerik açıklaması (dillere göre).
-// İngilizce/Almanca sayfada çeviri büyük, Türkçe ad küçük yazılır — misafir restoranda
-// basılı menüdeki adı gösterebilsin diye.
+// Prices match the printed menu in the restaurant (checked 2026-09-30).
+// To update: just change the p (price) values below.
+// n = Turkish name (as on the printed menu); en/de = translation; d = short description per language.
+// On the English/German pages the translation is large and the Turkish name small, so guests
+// can point to the name on the printed menu in the restaurant.
 import type { Locale } from "@/i18n-config";
 
 type Text = Record<Locale, string>;
 export type MenuItem = { n: string; en: string; de: string; p: string; d?: Text };
 export type MenuCategory = { cat: string; items: MenuItem[] };
 
-/** Menü kalemi adı, sayfanın diline göre. */
+/** Menu item name in the page's language. */
 export function itemName(item: MenuItem, lang: Locale): string {
   return lang === "tr" ? item.n : item[lang];
 }

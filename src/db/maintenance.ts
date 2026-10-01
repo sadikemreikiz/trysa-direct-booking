@@ -1,7 +1,7 @@
 /**
- * Zamanlanmış bakım işleri (bkz. /api/cron):
- *   - Uzun süre cevapsız kalan taleplerde yöneticiye hatırlatma (eskalasyon)
- *   - Saklama süresi dolan rezervasyonlarda kişisel verilerin silinmesi (KVKK/GDPR)
+ * Scheduled maintenance jobs (see /api/cron):
+ *   - Reminding the admin about requests left unanswered too long (escalation)
+ *   - Deleting personal data from bookings whose retention period has expired (KVKK/GDPR)
  */
 import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import type { Db } from "./index";
@@ -9,12 +9,12 @@ import { reservationEvents, reservations } from "./schema";
 import type { EmailResult } from "@/lib/email";
 import type { PushMessage } from "@/lib/push";
 
-/** Bu kadar süre cevapsız kalan talep için yöneticiye hatırlatma gider. */
+/** Requests unanswered for this long trigger a reminder to the admin. */
 export const ESCALATE_AFTER_MS = 3 * 3_600_000;
 
 /**
- * Cevap bekleyen ve henüz hatırlatılmamış eski talepler için TEK bir bildirim gönderir.
- * Bildirim başarısız olursa işaretlenmez → bir sonraki çalışmada tekrar denenir.
+ * Sends ONE notification for old pending requests that haven't been reminded yet.
+ * If the notification fails nothing is marked → retried on the next run.
  */
 export async function escalateStalePending(
   db: Db,
@@ -56,14 +56,14 @@ export async function escalateStalePending(
 }
 
 /**
- * Gizlilik politikasında söz verilen saklama süresi: konaklamadan (çıkış tarihinden)
- * sonra en fazla 2 yıl. Değişirse lib/privacy metnini de güncelle.
+ * Retention period promised in the privacy policy: at most 2 years after the stay
+ * (checkout date). If this changes, update the lib/privacy text as well.
  */
 export const RETENTION_DAYS = 730;
 
 /**
- * Süresi dolan rezervasyonlarda kişisel verileri siler; tarih, ünite ve durum kalır
- * (istatistik için). Notlarda kişisel bilgi olabileceği için geçmiş notları da siler.
+ * Deletes personal data from expired bookings; dates, unit and status remain
+ * (for statistics). Past notes are deleted too, since they may contain personal details.
  */
 export async function anonymizeExpiredReservations(db: Db, now: Date = new Date()): Promise<number> {
   const cutoff = new Date(now.getTime() - RETENTION_DAYS * 86_400_000).toISOString().slice(0, 10);

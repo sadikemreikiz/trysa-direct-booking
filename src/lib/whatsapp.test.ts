@@ -23,18 +23,18 @@ describe("guestMessage", () => {
     locale: "de",
   };
 
-  it("misafirin dilinde, ilk adıyla yazar", () => {
+  it("writes in the guest's language using their first name", () => {
     const text = guestMessage("confirmed", r, "Kulübe-1");
     expect(text).toBe(
       "Hallo Hans, dein Aufenthalt in Kulübe-1 vom 3. Dezember – 7. Dezember ist bestätigt ✅ (TRY-7K3Q9). Wir freuen uns auf dich!\n\n📍 Anfahrt: https://trysacamping.com/anfahrt\n— Trysa",
     );
   });
 
-  it("bilinmeyen dilde Türkçeye düşer", () => {
+  it("falls back to Turkish for an unknown language", () => {
     expect(guestMessage("reply", { ...r, locale: "fr" }, null)).toMatch(/^Merhaba Hans, Trysa'dan/);
   });
 
-  it("wa.me linkini kodlanmış metinle üretir", () => {
+  it("builds the wa.me link with the encoded text", () => {
     expect(whatsAppLink("0555 111 22 33", "Merhaba & hoş geldiniz")).toBe(
       "https://wa.me/905551112233?text=Merhaba%20%26%20ho%C5%9F%20geldiniz",
     );

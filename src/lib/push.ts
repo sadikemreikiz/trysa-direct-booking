@@ -1,6 +1,6 @@
 /**
- * Telefona bildirim (Web Push, VAPID). Panelde "Bildirimleri aç" diyen her cihaz
- * push_subscriptions tablosuna kaydolur; yeni talepte onaylı tüm panel kullanıcılarına gider.
+ * Phone notifications (Web Push, VAPID). Every device that taps "Turn on notifications"
+ * is stored in push_subscriptions; new requests go to all approved panel users.
  */
 import { and, eq, inArray } from "drizzle-orm";
 import webpush from "web-push";
@@ -23,15 +23,15 @@ function configure(): boolean {
 }
 
 /**
- * Onaylı panel kullanıcılarının tüm cihazlarına gönderir. Süresi dolmuş abonelikler
- * (404/410) silinir. Tüm gönderimler geçici bir hatayla düşerse tekrar denensin diye hata döner.
+ * Sends to all devices of approved panel users. Expired subscriptions (404/410)
+ * are deleted. If every send fails with a temporary error, an error is returned so it gets retried.
  */
 export async function sendPushToStaff(
   db: Db,
   message: PushMessage,
   opts: { roles?: StaffRole[] } = {},
 ): Promise<EmailResult> {
-  if (!configure()) return { ok: true }; // bildirim kurulmamış — e-posta yine gider
+  if (!configure()) return { ok: true }; // push not configured; the email still goes out
 
   const subs = await db
     .select({ id: pushSubscriptions.id, endpoint: pushSubscriptions.endpoint, p256dh: pushSubscriptions.p256dh, auth: pushSubscriptions.auth })
@@ -61,7 +61,7 @@ export async function sendPushToStaff(
       const status = (e as { statusCode?: number }).statusCode;
       if (status === 404 || status === 410) {
         await db.delete(pushSubscriptions).where(eq(pushSubscriptions.id, s.id));
-        delivered++; // cihaz artık yok — tekrar denemenin anlamı yok
+        delivered++; // the device is gone, retrying is pointless
       } else {
         errors.push(`${status ?? "ağ"}: ${e instanceof Error ? e.message : String(e)}`);
       }

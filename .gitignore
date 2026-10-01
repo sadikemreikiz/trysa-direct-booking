@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# lokal geliştirme veritabanı (PGlite)
+# local development database (PGlite)
 /.pglite/

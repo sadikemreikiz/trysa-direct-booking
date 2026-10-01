@@ -1,9 +1,9 @@
 /**
- * Panel işlemleri: listeleme, müsaitlik, durum geçişleri (state machine).
+ * Panel operations: listing, availability, status transitions (state machine).
  *
- * Geçişler:  pending → confirmed | declined      confirmed → cancelled
- * Her geçiş koşullu UPDATE ile yapılır (WHERE status = beklenen durum): iki kişi aynı
- * anda işlem yaparsa ikincisi "zaten işlendi" hatası alır, veri tutarlı kalır.
+ * Transitions:  pending → confirmed | declined      confirmed → cancelled
+ * Every transition is a conditional UPDATE (WHERE status = expected status): if two people
+ * act at the same time the second gets an "already handled" error and the data stays consistent.
  */
 import { and, asc, desc, eq, gte, inArray, lt, gt, ne } from "drizzle-orm";
 import { z } from "zod";
@@ -30,10 +30,10 @@ export class TransitionError extends Error {
   }
 }
 
-/** Kamp alanı ortak alan: aynı anda birden çok misafir olabilir (bkz. migration 0001). */
+/** The camping area is shared: several guests can stay at once (see migration 0001). */
 export const SHARED_UNIT_SLUG = "kamp";
 
-/* ------------------------------- Listeleme ------------------------------- */
+/* ------------------------------- Listing ------------------------------- */
 
 export async function listPanelReservations(db: Db, today: string) {
   const rows = await db
@@ -46,7 +46,7 @@ export async function listPanelReservations(db: Db, today: string) {
     .orderBy(asc(reservations.checkIn));
 
   const pending = rows.filter((x) => x.r.status === "pending");
-  // Bekleyenler: en eski talep en üstte (en uzun süredir cevap bekleyen)
+  // Pending: oldest request on top (the one waiting longest for an answer)
   pending.sort((a, b) => a.r.createdAt.getTime() - b.r.createdAt.getTime());
   const upcoming = rows.filter((x) => x.r.status === "confirmed" && x.r.checkOut >= today);
   return { pending, upcoming };
@@ -66,7 +66,7 @@ export async function getReservationDetail(db: Db, id: string) {
     .where(eq(reservationEvents.reservationId, id))
     .orderBy(desc(reservationEvents.createdAt), desc(reservationEvents.id));
 
-  // actor "user:<id>" → isim
+  // actor "user:<id>" → name
   const userIds = events
     .map((e) => (e.actor.startsWith("user:") ? e.actor.slice(5) : null))
     .filter((x): x is string => Boolean(x));
@@ -88,7 +88,7 @@ export async function getReservationDetail(db: Db, id: string) {
   };
 }
 
-/* ------------------------------- Müsaitlik ------------------------------- */
+/* ------------------------------- Availability ------------------------------- */
 
 export type UnitAvailability = {
   id: number;
@@ -99,8 +99,8 @@ export type UnitAvailability = {
 };
 
 /**
- * Tarih aralığı [checkIn, checkOut) için her ünitenin durumu.
- * airbnbLocked: ünite adı → Airbnb'de dolu günler (YYYY-MM-DD), bkz. lib/availability.
+ * Status of every unit for the date range [checkIn, checkOut).
+ * airbnbLocked: unit name → days taken on Airbnb (YYYY-MM-DD), see lib/availability.
  */
 export async function availabilityForRange(
   db: Db,
@@ -141,7 +141,7 @@ export async function availabilityForRange(
   });
 }
 
-/* ---------------------------- Durum geçişleri ---------------------------- */
+/* ---------------------------- Status transitions ---------------------------- */
 
 function isExclusionViolation(e: unknown): boolean {
   const err = e as { code?: string; cause?: { code?: string }; message?: string };
@@ -177,7 +177,7 @@ async function transition(
         .set({ status: to, unitId, updatedAt: now })
         .where(and(eq(reservations.id, id), eq(reservations.status, current.status)))
         .returning();
-      // Arada başka biri işlem yaptıysa koşullu UPDATE satır bulamaz.
+      // If someone else acted in the meantime, the conditional UPDATE finds no row.
       if (!updated) throw new TransitionError("invalid_transition");
 
       await tx.insert(reservationEvents).values({
@@ -226,11 +226,11 @@ export function cancelReservation(
   return transition(db, id, "cancelled", actorUserId, opts);
 }
 
-/* ------------------------- Elle rezervasyon ekleme ------------------------ */
+/* ------------------------- Manual bookings ------------------------ */
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Telefonla / WhatsApp'tan / kapıdan gelen rezervasyon — panelden doğrudan onaylı girilir. */
+/** A booking made by phone / WhatsApp / walk-in, entered in the panel directly as confirmed. */
 export const manualReservationSchema = z
   .object({
     unitId: z.number().int().positive(),
@@ -239,7 +239,7 @@ export const manualReservationSchema = z
     adults: z.number().int().min(1).max(20),
     children: z.number().int().min(0).max(20),
     guestName: z.string().trim().min(1).max(120),
-    /** Kapıdan gelen misafir telefon vermeyebilir */
+    /** Walk-in guests may not give a phone number */
     phone: z.string().trim().max(40),
     note: z.string().trim().max(2000),
     source: z.enum(["phone", "whatsapp", "walk_in"]),
@@ -268,7 +268,7 @@ export async function createManualReservation(
   const parsed = manualReservationSchema.safeParse(raw);
   if (!parsed.success) throw new ManualReservationError("invalid");
   const d = parsed.data;
-  // Geçmişe kayıt yok: Airbnb geçmiş günleri paylaşmadığı için çakışma kontrol edilemez.
+  // No past dates: Airbnb doesn't share past days, so conflicts can't be checked.
   if (d.checkIn < todayInDemre(now)) throw new ManualReservationError("in_past");
 
   try {
@@ -294,7 +294,7 @@ export async function createManualReservation(
           locale: "tr",
           source: d.source,
           status: "confirmed",
-          // Misafir verisini işletme doğrudan aldı (sözleşme ilişkisi); kayıt anı.
+          // The business received the guest data directly (contractual relationship); time of entry.
           consentAt: now,
           createdAt: now,
           updatedAt: now,
@@ -329,8 +329,8 @@ export async function addReservationNote(db: Db, id: string, actorUserId: string
 }
 
 /**
- * Sitede onaylanmış (direkt) rezervasyonların dolu günleri, ünite adına göre
- * (Airbnb doluluğuyla aynı biçim: ad → YYYY-MM-DD[]). Kamp alanı ortak olduğu için hariç.
+ * Taken days of bookings confirmed on the site (direct), by unit name
+ * (same shape as Airbnb occupancy: name → YYYY-MM-DD[]). The shared camping area is excluded.
  */
 export async function confirmedDaysByUnit(db: Db, fromDate: string): Promise<Record<string, string[]>> {
   const rows = await db
@@ -352,7 +352,7 @@ export async function confirmedDaysByUnit(db: Db, fromDate: string): Promise<Rec
   return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, [...v].sort()]));
 }
 
-/** İki doluluk haritasını (ünite adı → günler) birleştirir. */
+/** Merges two occupancy maps (unit name → days). */
 export function mergeLockedDays(
   a: Record<string, string[]>,
   b: Record<string, string[]>,
@@ -364,7 +364,7 @@ export function mergeLockedDays(
   return out;
 }
 
-/** Takvim görünümü: [from, to) aralığına değen onaylı ve bekleyen rezervasyonlar + üniteler. */
+/** Calendar view: confirmed and pending bookings touching [from, to) + the units. */
 export async function calendarData(db: Db, from: string, to: string) {
   const allUnits = await db
     .select({ id: units.id, slug: units.slug, name: units.name })
@@ -392,7 +392,7 @@ export async function calendarData(db: Db, from: string, to: string) {
   return { units: allUnits, stays };
 }
 
-/** Onaylı rezervasyonlar — Airbnb'ye verilecek takvim (iCal) için. */
+/** Confirmed bookings, for the calendar (iCal) handed to Airbnb. */
 export async function confirmedStaysForUnit(db: Db, unitSlug: string, fromDate: string) {
   return db
     .select({ id: reservations.id, checkIn: reservations.checkIn, checkOut: reservations.checkOut })

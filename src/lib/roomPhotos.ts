@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-/** Bir odanın public/img/rooms/<slug> klasöründeki tüm fotoğrafları (kapak önce). */
+/** All photos of a room in public/img/rooms/<slug> (cover first). */
 export function getRoomPhotos(slug: string): string[] {
   try {
     const dir = path.join(process.cwd(), "public", "img", "rooms", slug);

@@ -2,18 +2,18 @@ import type { NextConfig } from "next";
 import { place } from "./src/lib/site";
 
 const isDev = process.env.NODE_ENV === "development";
-// Vercel önizleme sürümlerinde yorum/araç çubuğu (vercel.live) yüklenir; canlıda yok.
+// Vercel preview deployments load the comments toolbar (vercel.live); production does not.
 const vercelLive = process.env.VERCEL_ENV === "preview" ? " https://vercel.live" : "";
 
 /**
- * İçerik güvenliği politikası (CSP), nonce'suz: sayfalar statik üretildiği için nonce
- * kullanılamaz (her istekte dinamik render gerekirdi). Yine de dışarıdan script yükleme,
- * sitenin başka sitede çerçeveye alınması (clickjacking) ve form yönlendirme engellenir.
- * Dış kaynaklar: Google Haritalar gömme (iframe). Vercel Analytics aynı alan adından çalışır.
+ * Content Security Policy without nonces: pages are statically generated, so a nonce
+ * is not possible (it would force dynamic rendering on every request). External scripts,
+ * framing the site elsewhere (clickjacking) and form redirection are still blocked.
+ * External sources: the Google Maps embed (iframe). Vercel Analytics runs on our own domain.
  */
 const csp = [
   "default-src 'self'",
-  // Geliştirmede: React hata ayıklama (eval) ve Vercel Analytics'in debug script'i
+  // In development: React debugging (eval) and Vercel Analytics' debug script
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval' https://va.vercel-scripts.com" : ""}${vercelLive}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' blob: data:",
@@ -38,10 +38,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Site ve panelin ayrı kök düzenleri var → tüm uygulama için tek 404 sayfası (app/global-not-found.tsx)
+  // The site and the panel have separate root layouts → one 404 page for the whole app (app/global-not-found.tsx)
   experimental: { globalNotFound: true },
-  // Kısa linkler (kartvizit, masa kartı, WhatsApp mesajı, tabela):
-  //   yol tarifi → Google Haritalar navigasyonu, yorum → Google'da "yorum yaz" ekranı
+  // Short links (business card, table card, WhatsApp message, signboard):
+  //   directions → Google Maps navigation, review → Google's "write a review" screen
   async redirects() {
     const to = (destination: string) => (source: string) => ({ source, destination, permanent: false });
     return [

@@ -3,8 +3,8 @@
 import { useEffect } from "react";
 
 /**
- * Sayfa genelinde WhatsApp ve telefon linki tıklamalarını sayar (event delegation).
- * Linklerin kendisine dokunmaz; sonradan eklenen linkler de otomatik ölçülür.
+ * Counts WhatsApp and phone link clicks across the page (event delegation).
+ * Doesn't touch the links themselves; links added later are tracked automatically.
  */
 export default function ClickTracker() {
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function ClickTracker() {
         const host = document.referrer ? new URL(document.referrer).host : "";
         if (host && host !== location.host) referrerHost = host;
       } catch {
-        /* geçersiz referrer — yok say */
+        /* invalid referrer, ignore */
       }
       const payload = JSON.stringify({
         name,
@@ -33,7 +33,7 @@ export default function ClickTracker() {
         locale: ["tr", "en", "de"].includes(locale) ? locale : undefined,
         referrerHost,
       });
-      // sendBeacon sayfa kapansa/yönlense bile gönderimi tamamlar.
+      // sendBeacon completes the request even if the page closes or navigates away.
       navigator.sendBeacon?.("/api/events", new Blob([payload], { type: "application/json" }));
     }
     document.addEventListener("click", onClick, { capture: true });

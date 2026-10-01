@@ -1,6 +1,6 @@
 /**
- * Panelden misafire WhatsApp: numarayı wa.me biçimine çevirir, misafirin dilinde
- * hazır mesaj üretir. Dayı sadece "gönder"e basar.
+ * WhatsApp from the panel to the guest: converts the number to wa.me format and builds a
+ * ready-made message in the guest's language. Staff just tap "send".
  */
 
 /** "0555 111 22 33" → "905551112233", "+49 170 1234567" → "491701234567" */

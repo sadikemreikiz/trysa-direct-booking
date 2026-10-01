@@ -10,7 +10,7 @@ import { requireApprovedStaff } from "@/lib/panel-session";
 const monthTitle = new Intl.DateTimeFormat("tr-TR", { month: "long", year: "numeric", timeZone: "UTC" });
 const weekday = new Intl.DateTimeFormat("tr-TR", { weekday: "short", timeZone: "UTC" });
 
-/** Sütun başlıkları dar ekrana sığsın diye kısaltılmış ünite adları */
+/** Shortened unit names so the column headers fit narrow screens */
 const SHORT: Record<string, string> = {
   "ambar-1": "A1",
   "ambar-2": "A2",
@@ -28,7 +28,7 @@ const cellStyle: Record<Cell["kind"], string> = {
   airbnb: "bg-[#ffd9d6] text-[#b0413e]",
 };
 
-/** Aylık doluluk: günler satır, odalar sütun. Onaylı hücreye dokununca rezervasyon açılır. */
+/** Monthly occupancy: days as rows, rooms as columns. Tapping a confirmed cell opens the booking. */
 export default async function CalendarPage({ searchParams }: { searchParams: Promise<{ ay?: string }> }) {
   const { db, staff } = await requireApprovedStaff();
   const today = todayInDemre(new Date());

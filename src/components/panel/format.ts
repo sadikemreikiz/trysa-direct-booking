@@ -1,4 +1,4 @@
-/** Panelde tarih ve süre gösterimi (Türkçe, dayının okuyacağı biçimde). */
+/** Date and duration formatting for the panel (Turkish, written for the family to read). */
 
 const dayFmt = new Intl.DateTimeFormat("tr-TR", {
   day: "numeric",
@@ -24,10 +24,10 @@ export function timeAgo(date: Date, now: Date = new Date()): string {
   return `${Math.round(hours / 24)} gün önce`;
 }
 
-/** Bu kadar süredir cevapsız bekleyen talep kırmızıyla vurgulanır. */
+/** Requests left unanswered this long are highlighted in red. */
 export const SLOW_RESPONSE_MS = 3 * 60 * 60 * 1000;
 
-/** Rezervasyon nereden geldi (site dışı olanlar panelde elle eklenir). */
+/** Where the booking came from (non-site bookings are added by hand in the panel). */
 export const sourceLabel: Record<string, string> = {
   website: "🌐 Site",
   phone: "📞 Telefon",

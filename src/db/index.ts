@@ -3,20 +3,20 @@ import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-/** Sürücüden bağımsız DB tipi — canlıda postgres.js, testlerde PGlite. */
+/** Driver-independent DB type: postgres.js in production, PGlite in tests. */
 export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 let cached: Db | null = null;
 
 /**
- * Canlı veritabanı (Neon, pooled bağlantı). DATABASE_URL yoksa null döner;
- * çağıran taraf veritabanısız (sadece e-posta) moda düşer, site çalışmaya devam eder.
+ * Production database (Neon, pooled connection). Returns null without DATABASE_URL;
+ * the caller falls back to database-less (email-only) mode and the site keeps working.
  */
 export function getDb(): Db | null {
   if (cached) return cached;
   const url = process.env.DATABASE_URL;
   if (!url) return null;
-  // Neon pooler (PgBouncer, transaction modu) prepared statement desteklemez.
+  // The Neon pooler (PgBouncer, transaction mode) doesn't support prepared statements.
   const client = postgres(url, { prepare: false, max: 1 });
   cached = drizzle(client, { schema });
   return cached;

@@ -1,6 +1,6 @@
 /**
- * Misafir formunda engellenecek günler: Airbnb doluluğu + sitede onaylanmış rezervasyonlar.
- * Sadece sunucuda kullanılır (veritabanına erişir); istemci tarafı lib/availability'yi kullanır.
+ * Days blocked in the guest form: Airbnb occupancy + bookings confirmed on the site.
+ * Server only (reads the database); the client side uses lib/availability.
  */
 import { getDb } from "@/db";
 import { confirmedDaysByUnit, mergeLockedDays } from "@/db/panel";

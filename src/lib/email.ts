@@ -1,9 +1,9 @@
 /**
- * E-posta (Resend). Anahtar yoksa gönderim denenmez.
- * - RESEND_FROM yoksa: Resend'in test adresinden gönderilir ve ücretsiz modda SADECE hesabın
- *   kayıtlı adresine (aileye) gidebilir → misafire e-posta kapalıdır.
- * - RESEND_FROM varsa (alan adı Resend'de doğrulanmış, ör. "Trysa <rezervasyon@trysacamping.com>"):
- *   misafire de kendi dilinde "talebini aldık" e-postası gider.
+ * Email (Resend). Without a key nothing is sent.
+ * - Without RESEND_FROM: sent from Resend's test address, which on the free tier can ONLY reach
+ *   the account's own address (the family) → guest emails are off.
+ * - With RESEND_FROM (a domain verified in Resend, e.g. "Trysa <rezervasyon@trysacamping.com>"):
+ *   guests also get a "we got your request" email in their language.
  */
 import { PRIVACY_CONTACT } from "./privacy";
 
@@ -15,7 +15,7 @@ function familyAddress(): string {
   return process.env.RESERVATION_EMAIL || PRIVACY_CONTACT;
 }
 
-/** Misafire e-posta gönderilebilir mi? (alan adı doğrulanmış gönderen adresi gerekli) */
+/** Can we email guests? (needs a sender on a verified domain) */
 export function guestEmailEnabled(): boolean {
   return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM);
 }
@@ -53,12 +53,12 @@ async function sendEmail(message: {
   }
 }
 
-/** Aileye yeni talep bildirimi. */
+/** New request notification to the family. */
 export function sendNotificationEmail(subject: string, text: string): Promise<EmailResult> {
   return sendEmail({ to: familyAddress(), subject, text });
 }
 
-/** Misafire e-posta; cevaplarsa aileye gider. */
+/** Email to the guest; replies go to the family. */
 export function sendGuestEmail(to: string, subject: string, text: string, html?: string): Promise<EmailResult> {
   if (!guestEmailEnabled()) return Promise.resolve({ ok: false, error: "RESEND_FROM tanımlı değil" });
   return sendEmail({ to, subject, text, html, replyTo: familyAddress() });

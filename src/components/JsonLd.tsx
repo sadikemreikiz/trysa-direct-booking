@@ -14,7 +14,7 @@ const AMENITIES: Record<Locale, string[]> = {
   de: ["Kostenloses WLAN", "Kostenlose Parkplätze", "Frühstück", "Haustierfreundlich", "Kinderspielplatz"],
 };
 
-/** Google'ın işletmeyi (konaklama + restoran, puan, konum) anlaması için yapısal veri. */
+/** Structured data so Google understands the business (lodging + restaurant, rating, location). */
 export default function JsonLd({
   rating,
   count,
@@ -29,7 +29,7 @@ export default function JsonLd({
     "@id": `${SITE_URL}/#business`,
     name: BUSINESS_NAME,
     alternateName: ["Trysa Camping", "Trysa Restaurant", "Trysa"],
-    // Google İşletme Profili ve sosyal hesaplar: site ile profilin aynı işletme olduğunu gösterir
+    // Google Business Profile and social accounts: shows the site and the profile are the same business
     sameAs: [GOOGLE_MAPS_URL, site.instagram],
     description: HOME_DESCRIPTION[lang],
     url: SITE_URL,
@@ -73,7 +73,7 @@ export default function JsonLd({
       : {}),
   };
 
-  // Sitenin adı (arama sonuçlarında URL'nin üstünde görünen ad) ve işletmeyle bağı
+  // The site's name (shown above the URL in search results) and its link to the business
   const website = {
     "@type": "WebSite",
     "@id": `${SITE_URL}/#website`,

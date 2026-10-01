@@ -19,7 +19,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/** Yönetim paneli — sitenin geri kalanından ayrı kök düzen (dil yönlendirmesi yok). */
+/** Staff panel: a separate root layout from the rest of the site (no locale routing). */
 export default function PanelLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr" className={`${fraunces.variable} ${manrope.variable} h-full antialiased`}>

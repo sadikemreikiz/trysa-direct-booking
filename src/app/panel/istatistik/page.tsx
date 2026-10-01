@@ -12,7 +12,7 @@ function formatDuration(minutes: number): string {
   return hours < 24 ? `${hours.toFixed(1).replace(".", ",")} saat` : `${Math.round(hours / 24)} gün`;
 }
 
-/** Ölçülmüş rakamlar: talepler, cevap süresi, tıklamalar, satılan geceler. Sadece yönetici. */
+/** Measured numbers only: requests, response time, clicks, nights sold. Admins only. */
 export default async function StatsPage() {
   const { db, staff } = await requireApprovedStaff();
   if (staff.role !== "admin") redirect("/panel");

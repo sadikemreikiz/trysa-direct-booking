@@ -7,13 +7,13 @@ import { sendGuestEmail, sendNotificationEmail } from "@/lib/email";
 import { sendPushToStaff } from "@/lib/push";
 
 /**
- * Zamanlanmış bakım: başarısız bildirimleri tekrar dener, cevapsız talepleri Emre'ye
- * hatırlatır, süresi dolan kişisel verileri siler, eski spam sayaçlarını temizler.
+ * Scheduled maintenance: retries failed notifications, reminds the admin about unanswered
+ * requests, deletes expired personal data and cleans up old spam counters.
  *
- * Çağıranlar (Authorization: Bearer $CRON_SECRET):
- *   - Vercel Cron (vercel.json) — Hobby planda günde bir; başlığı Vercel kendisi ekler.
- *   - GitHub Actions (.github/workflows/cron.yml) — 15 dakikada bir.
- * Her iş tekrar çalıştırılmaya dayanıklı (idempotent): sık ya da üst üste çağrılması sorun değil.
+ * Callers (Authorization: Bearer $CRON_SECRET):
+ *   - Vercel Cron (vercel.json): once a day on the Hobby plan; Vercel adds the header itself.
+ *   - GitHub Actions (.github/workflows/cron.yml): every 15 minutes.
+ * Every job is idempotent, so frequent or overlapping calls are safe.
  */
 export async function GET(request: Request) {
   if (!authorized(request.headers.get("authorization"))) {

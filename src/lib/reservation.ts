@@ -12,7 +12,7 @@ export type ReservationInput = {
 
 export const WHATSAPP_NUMBER = "905555721569";
 
-/** Talebi okunur bir metne çevirir (hem WhatsApp hem e-posta için). */
+/** Turns a request into readable text (for both WhatsApp and email). */
 export function reservationSummary(d: ReservationInput): string {
   const lines = [
     "Yeni rezervasyon talebi — Trysa",

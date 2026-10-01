@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { Db } from "./index";
 import { analyticsEvents } from "./schema";
 
-/** İstemciden gelebilecek olaylar. reservation_submitted sadece sunucuda yazılır. */
+/** Events the client may send. reservation_submitted is written only on the server. */
 export const clientEventSchema = z.object({
   name: z.enum(["whatsapp_click", "phone_click"]),
   path: z.string().startsWith("/").max(200),

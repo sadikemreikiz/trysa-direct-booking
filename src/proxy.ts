@@ -25,6 +25,6 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  // _next, /api, /panel (yönetim paneli, tek dil) ve uzantılı dosyalar (sitemap.xml, /img/...) hariç
+  // Excludes _next, /api, /panel (staff panel, single language) and files with extensions (sitemap.xml, /img/...)
   matcher: ["/((?!_next|api/|panel|.*\\..*).*)"],
 };

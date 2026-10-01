@@ -41,7 +41,7 @@ export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
             href={site.whatsapp}
             target="_blank"
             rel="noopener noreferrer"
-            // Telefonda alttaki sabit çubukta (MobileBar) zaten var
+            // On phones it's already in the fixed bottom bar (MobileBar)
             className="hidden items-center gap-2 rounded-xl bg-whatsapp px-3 py-2 text-sm font-bold text-white md:inline-flex"
           >
             <WhatsAppIcon className="h-4 w-4" />

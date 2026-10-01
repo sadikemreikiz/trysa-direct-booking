@@ -4,8 +4,8 @@ import NotFoundContent from "@/components/NotFoundContent";
 import "./globals.css";
 
 /**
- * Hiçbir yola uymayan adresler için (ör. /tr/olmayan-sayfa). Site ve panel ayrı kök düzenlere
- * sahip olduğu için tek bir düzenden 404 kurulamaz; bu sayfa kendi html/body'sini getirir.
+ * For URLs that match no route (e.g. /tr/missing-page). The site and the panel have separate root
+ * layouts, so no single layout can host the 404; this page brings its own html/body.
  */
 const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], display: "swap" });
 const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"], display: "swap" });

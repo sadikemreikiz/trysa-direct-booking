@@ -1,16 +1,16 @@
 /**
- * Airbnb iCal takvimlerinden müsaitlik hesaplar.
- * Amaç: sitede double-booking'i önlemek — bir tarih ancak o tipteki TÜM üniteler
- * doluysa engellenir (böylece boş oda varken müşteri yanlışlıkla geri çevrilmez).
- * Not: iCal senkronu anlık değildir (Airbnb dışa aktarımı gecikmeli; biz 15 dakikada bir okuruz).
- * Env değişkenleri (virgülle ayrılmış .ics linkleri, GİZLİ, git'e girmez):
- * Her oda ayrı — her biri tek ünite, kendi env anahtarı.
+ * Computes availability from Airbnb iCal calendars.
+ * Goal: prevent double bookings on the site. A date is blocked only when ALL units of that
+ * type are taken (so guests aren't turned away by mistake while a room is free).
+ * Note: iCal sync is not instant (Airbnb's export lags; we read it every 15 minutes).
+ * Env variables (comma-separated .ics links, SECRET, never committed):
+ * Each room is separate: a single unit with its own env key.
  *   AIRBNB_ICAL_AMBAR1/2/3, AIRBNB_ICAL_KULUBE1/2, AIRBNB_ICAL_TINY
  */
 
 type TypeConfig = { total: number; envKey: string };
 
-// Oda (rezervasyon seçeneği) → env anahtarı (her oda tek ünite)
+// Room (booking option) → env key (each room is a single unit)
 const TYPE_CONFIG: Record<string, TypeConfig> = {
   "Ambar-1": { total: 1, envKey: "AIRBNB_ICAL_AMBAR1" },
   "Ambar-2": { total: 1, envKey: "AIRBNB_ICAL_AMBAR2" },
@@ -20,7 +20,7 @@ const TYPE_CONFIG: Record<string, TypeConfig> = {
   "Tiny House": { total: 1, envKey: "AIRBNB_ICAL_TINY" },
 };
 
-/** Airbnb takviminin yeniden okunma aralığı (panel takviminde de yazıyor). */
+/** How often the Airbnb calendar is re-read (also shown in the panel calendar). */
 export const AIRBNB_REFRESH_SECONDS = 15 * 60;
 
 function urlsFor(envKey: string): string[] {
@@ -34,11 +34,11 @@ function toISO(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
 }
 
-/** Tek bir .ics linkindeki dolu günleri (YYYY-MM-DD) döndürür. */
+/** Returns the taken days (YYYY-MM-DD) from a single .ics link. */
 async function bookedSet(url: string): Promise<Set<string>> {
   const set = new Set<string>();
   try {
-    // Airbnb kendi dışa aktarımını da gecikmeli günceller; biz en geç 15 dakikada bir okuruz.
+    // Airbnb updates its own export with a delay too; we read it at least every 15 minutes.
     const res = await fetch(url, { next: { revalidate: AIRBNB_REFRESH_SECONDS } });
     if (!res.ok) return set;
     const text = await res.text();
@@ -56,7 +56,7 @@ async function bookedSet(url: string): Promise<Set<string>> {
         if (m) end = toISO(m[1]);
       } else if (line.startsWith("END:VEVENT") && start && end) {
         let d = new Date(`${start}T00:00:00Z`);
-        const last = new Date(`${end}T00:00:00Z`); // çıkış günü hariç
+        const last = new Date(`${end}T00:00:00Z`); // checkout day excluded
         while (d < last) {
           set.add(d.toISOString().slice(0, 10));
           d = new Date(d.getTime() + 86_400_000);
@@ -64,29 +64,29 @@ async function bookedSet(url: string): Promise<Set<string>> {
       }
     }
   } catch {
-    /* çekilemezse boş */
+    /* empty if it can't be fetched */
   }
   return set;
 }
 
 /**
- * Her konaklama tipi için ENGELLİ günleri döndürür.
- * Bir tarih ancak o tipin TÜM üniteleri bağlıysa ve hepsi o gün doluysa engellenir.
- * Eksik ünite varsa (örn. 5 odadan 2'si bağlı) engelleme yapılmaz — boş oda olabilir.
+ * Returns the BLOCKED days for each accommodation type.
+ * A date is blocked only if ALL units of the type are connected and all are taken that day.
+ * If a unit is missing (e.g. 2 of 5 rooms connected) nothing is blocked, since a room may be free.
  */
 export async function getLockedDatesByType(): Promise<Record<string, string[]>> {
   const out: Record<string, string[]> = {};
   await Promise.all(
     Object.entries(TYPE_CONFIG).map(async ([type, cfg]) => {
       const urls = urlsFor(cfg.envKey);
-      // Tüm üniteler bağlı değilse doluluk kararı veremeyiz → engelleme yok.
+      // If not all units are connected we can't decide occupancy → no blocking.
       if (urls.length === 0 || urls.length < cfg.total) {
         out[type] = [];
         return;
       }
       const sets = await Promise.all(urls.map(bookedSet));
       const [first, ...rest] = sets;
-      // Sadece HER ünitede dolu olan günler = tip tamamen dolu
+      // Only days taken in EVERY unit = the type is fully booked
       out[type] = [...first]
         .filter((day) => rest.every((s) => s.has(day)))
         .sort();
@@ -95,7 +95,7 @@ export async function getLockedDatesByType(): Promise<Record<string, string[]>> 
   return out;
 }
 
-/** Seçilen [giriş, çıkış) aralığında engelli bir gün var mı? */
+/** Is there a blocked day in the chosen [check-in, checkout) range? */
 export function rangeHasLockedDay(
   checkin: string,
   checkout: string,

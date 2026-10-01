@@ -1,7 +1,7 @@
-// SADECE LOKAL: panele Google'sız giriş için test kullanıcısı + oturum oluşturur ve
-// tarayıcıya konacak çerezi yazdırır (manuel test ve uçtan uca testler için).
+// LOCAL ONLY: creates a test user + session so the panel can be opened without Google, and
+// prints the cookie to set in the browser (for manual and end-to-end testing).
 //   node --env-file=.env.development.local scripts/dev-login.mjs
-// Güvenlik: yalnızca 127.0.0.1/localhost veritabanında çalışır; canlı veritabanına dokunmaz.
+// Safety: only runs against a 127.0.0.1/localhost database; never touches production.
 import { createHmac, randomBytes } from "node:crypto";
 import postgres from "postgres";
 
@@ -39,7 +39,7 @@ try {
     insert into session (id, token, user_id, expires_at)
     values (${randomBytes(12).toString("hex")}, ${token}, ${USER_ID}, now() + interval '1 day')`;
 
-  // better-call imzası: encodeURIComponent(`${değer}.${base64(HMAC-SHA256)}`)
+  // better-call signature: encodeURIComponent(`${value}.${base64(HMAC-SHA256)}`)
   const signature = createHmac("sha256", secret).update(token).digest("base64");
   console.log(`better-auth.session_token=${encodeURIComponent(`${token}.${signature}`)}`);
 } finally {

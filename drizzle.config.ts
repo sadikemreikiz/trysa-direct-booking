@@ -1,7 +1,7 @@
 import { defineConfig } from "drizzle-kit";
 
-// Migration'lar `drizzle/` klasöründe sürümlü SQL dosyaları olarak tutulur.
-// Üretmek: npm run db:generate  ·  Uygulamak: npm run db:migrate (DATABASE_URL gerekir)
+// Migrations live in `drizzle/` as versioned SQL files.
+// Generate: npm run db:generate  ·  Apply: npm run db:migrate (needs DATABASE_URL)
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/db/schema.ts",

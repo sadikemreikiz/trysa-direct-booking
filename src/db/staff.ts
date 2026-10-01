@@ -1,12 +1,12 @@
 /**
- * Panel yetkisi: kim girebilir, kim onaylar.
- * Google girişi kimliği doğrular (authentication); bu modül yetkiyi belirler (authorization).
+ * Panel authorization: who may sign in, who approves.
+ * Google sign-in verifies identity (authentication); this module decides permissions (authorization).
  */
 import { and, asc, eq } from "drizzle-orm";
 import type { Db } from "./index";
 import { staff, user, type StaffRole } from "./schema";
 
-/** Yeni Google kullanıcısı: yönetici listesindeyse onaylı admin, değilse erişim isteği. */
+/** New Google user: an approved admin if on the admin list, otherwise an access request. */
 export async function createStaffForNewUser(
   db: Db,
   newUser: { id: string; email: string },
@@ -68,7 +68,7 @@ export async function listStaff(db: Db) {
 
 export class AuthorizationError extends Error {}
 
-/** Sadece onaylı yöneticiler erişim kararı verebilir; kişi kendi yetkisini değiştiremez. */
+/** Only approved admins can decide on access; nobody can change their own permissions. */
 export async function decideAccess(
   db: Db,
   actor: StaffMember,

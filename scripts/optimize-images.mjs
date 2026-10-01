@@ -1,9 +1,9 @@
-// Fotoğrafları web için küçültür (bir kez / yeni fotoğraf eklenince çalıştırılır):
+// Shrinks photos for the web (run once / whenever new photos are added):
 //   node scripts/optimize-images.mjs
-// - Büyük sürüm: en fazla 1600 px (kapak görseli 1920 px), sıkıştırılmış JPEG.
-//   Zaten küçültülmüş dosyaya tekrar dokunmaz (kalite kaybı birikmesin).
-// - Küçük sürüm: yanına "<ad>.sm.jpg" (800 px) — telefonlar ve kartlar bunu indirir.
-// - Fotoğraf üst verisi (EXIF: konum, cihaz) silinir.
+// - Large version: at most 1600 px (hero image 1920 px), compressed JPEG.
+//   Files that are already resized are left alone (no compounding quality loss).
+// - Small version: "<name>.sm.jpg" next to it (800 px), which phones and cards download.
+// - Photo metadata (EXIF: location, device) is stripped.
 import fs from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
@@ -12,7 +12,7 @@ const ROOT = path.join(process.cwd(), "public", "img");
 const MAX_WIDTH = { "hero.jpg": 1920 };
 const DEFAULT_MAX = 1600;
 const SMALL_WIDTH = 800;
-/** Bu boyutun altındaki büyük sürümler zaten işlenmiş sayılır. */
+/** Large versions below this size count as already processed. */
 const ALREADY_OPTIMIZED_BYTES = 350_000;
 
 function* jpgs(dir) {
@@ -36,11 +36,11 @@ for (const file of jpgs(ROOT)) {
   if (original.length > ALREADY_OPTIMIZED_BYTES) {
     const max = MAX_WIDTH[name] ?? DEFAULT_MAX;
     const out = await sharp(original)
-      .rotate() // EXIF yönünü uygula, sonra üst veriyi at
+      .rotate() // apply EXIF orientation, then drop the metadata
       .resize({ width: max, withoutEnlargement: true })
       .jpeg({ quality: 74, mozjpeg: true, progressive: true })
       .toBuffer();
-    // Belirgin kazanç yoksa dokunma: zaten işlenmiş dosyayı tekrar sıkıştırıp kalite kaybetme.
+    // No clear gain → leave it: don't recompress an already processed file and lose quality.
     if (out.length < original.length * 0.9) {
       fs.writeFileSync(file, out);
       large = out;

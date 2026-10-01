@@ -5,9 +5,9 @@ import { getDb } from "@/db";
 import { getStaffMember } from "@/db/staff";
 import { getAuth } from "./auth";
 
-/** Oturum + panel yetkisi. Her panel sayfası ve işlemi buradan geçer. */
+/** Session + panel permission. Every panel page and action goes through here. */
 export async function getPanelContext() {
-  await connection(); // panel her zaman istek anında çalışır, asla önceden üretilmez
+  await connection(); // the panel always renders at request time, never prerendered
   const db = getDb();
   if (!db) return null;
   const session = await getAuth().api.getSession({ headers: await headers() });
@@ -16,7 +16,7 @@ export async function getPanelContext() {
   return { db, session, staff };
 }
 
-/** Giriş yapmamışsa giriş sayfasına, onaysızsa bekleme sayfasına yönlendirir. */
+/** Redirects to sign-in if not signed in, to the waiting page if not approved. */
 export async function requireApprovedStaff() {
   const ctx = await getPanelContext();
   if (!ctx) throw new Error("Panel için veritabanı gerekli");

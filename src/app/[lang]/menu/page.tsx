@@ -58,7 +58,7 @@ export default async function MenuPage({
                       <span className="text-[15px] text-ink">
                         {itemName(it, lang)}
                         {it.d?.[lang] && <span className="block text-[13px] text-muted">{it.d[lang]}</span>}
-                        {/* Çeviride Türkçe adı da göster (eğik): misafir basılı menüde bulabilsin */}
+                        {/* In translations also show the Turkish name (italic) so guests can find it on the printed menu */}
                         {lang !== "tr" && (
                           <span className="mt-0.5 block text-xs italic text-muted/80" lang="tr">
                             {it.n}

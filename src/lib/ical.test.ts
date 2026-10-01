@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildIcs, icalToken, verifyIcalToken } from "./ical";
 
-describe("Airbnb takvim linki", () => {
-  it("ünite başına farklı, sırrı bilmeden üretilemeyen token", () => {
+describe("Airbnb calendar link", () => {
+  it("a token that differs per unit and can't be produced without the secret", () => {
     const a = icalToken("ambar-1", "s3cret");
     expect(a).toMatch(/^[0-9a-f]{32}$/);
     expect(icalToken("ambar-2", "s3cret")).not.toBe(a);
@@ -12,7 +12,7 @@ describe("Airbnb takvim linki", () => {
     expect(verifyIcalToken("ambar-1", "kisa", "s3cret")).toBe(false);
   });
 
-  it("geçerli iCal üretir; tarih aralığı çıkış günü hariç, kişisel veri yok", () => {
+  it("produces valid iCal; date range excludes the checkout day, no personal data", () => {
     const ics = buildIcs(
       "Ambar-1",
       [{ id: "abc", checkIn: "2026-11-10", checkOut: "2026-11-13" }],

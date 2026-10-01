@@ -1,6 +1,6 @@
 /**
- * Panel istatistikleri — sadece ölçülmüş veriler (tahmin yok).
- * Aylar işletmenin saat dilimine (Europe/Istanbul) göre gruplanır.
+ * Panel statistics: measured data only (no estimates).
+ * Months are grouped in the business's time zone (Europe/Istanbul).
  */
 import { sql, type SQL } from "drizzle-orm";
 import type { Db } from "./index";
@@ -8,11 +8,11 @@ import type { Db } from "./index";
 export type MonthStats = {
   /** YYYY-MM */
   month: string;
-  /** Siteden gelen rezervasyon talepleri */
+  /** Booking requests from the site */
   requests: number;
-  /** Bu taleplerden onaylananlar */
+  /** Of these requests, the confirmed ones */
   confirmed: number;
-  /** Tüm kaynaklardan onaylı konaklamaların gece sayısı (giriş ayına göre) */
+  /** Nights of confirmed stays from all sources (by check-in month) */
   nights: number;
   whatsappClicks: number;
   phoneClicks: number;
@@ -20,12 +20,12 @@ export type MonthStats = {
 
 export type Stats = {
   months: MonthStats[];
-  /** Onaylı rezervasyonların kaynağa göre dağılımı (tüm zamanlar) */
+  /** Confirmed bookings by source (all time) */
   bySource: Record<string, number>;
-  /** Siteden gelen talebe ilk cevabın (onay/red) ortanca süresi, dakika; veri yoksa null */
+  /** Median time to first answer (confirm/decline) for site requests, in minutes; null without data */
   medianResponseMinutes: number | null;
   respondedCount: number;
-  /** Bugünden sonra girişi olan onaylı konaklamaların gece sayısı (tüm kaynaklar) */
+  /** Nights of confirmed stays checking in after today (all sources) */
   upcomingNights: number;
 };
 
@@ -75,7 +75,7 @@ export async function getStats(db: Db, now: Date = new Date(), monthCount = 6): 
   const sources = await query<{ source: string; n: number }>(db, sql`
     select source, count(*)::int as n from reservations where status = 'confirmed' group by 1`);
 
-  // İlk karar (onay/red) ile talebin geliş anı arasındaki süre
+  // Time between the request arriving and the first decision (confirm/decline)
   const [response] = await query<{ median: number | null; n: number }>(db, sql`
       select percentile_cont(0.5) within group (order by minutes) as median, count(*)::int as n
       from (
@@ -105,7 +105,7 @@ export async function getStats(db: Db, now: Date = new Date(), monthCount = 6): 
   };
 }
 
-/** Ham SQL sorgusu. postgres.js dizi döner, PGlite { rows } döner — ikisini de destekle. */
+/** Raw SQL query. postgres.js returns an array, PGlite returns { rows }; support both. */
 async function query<T>(db: Db, q: SQL): Promise<T[]> {
   const result: unknown = await db.execute(q);
   return Array.isArray(result) ? (result as T[]) : ((result as { rows?: T[] }).rows ?? []);

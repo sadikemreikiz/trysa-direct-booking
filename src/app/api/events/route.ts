@@ -3,12 +3,12 @@ import { clientEventSchema, recordClientEvent } from "@/db/analytics";
 import { hitRateLimit } from "@/db/rate-limit";
 import { clientKey } from "@/lib/client-key";
 
-/** Aynı kişiden saatte en fazla bu kadar olay sayılır (bot istatistikleri şişirmesin). */
+/** At most this many events per visitor per hour are counted (so bots can't inflate the stats). */
 const EVENTS_PER_HOUR = 30;
 
 /**
- * Dönüşüm olayı toplama (WhatsApp / telefon tıklaması). navigator.sendBeacon ile çağrılır.
- * Kişisel veri saklanmaz; bilinmeyen olay adları reddedilir. Sınır aşılırsa olay sessizce sayılmaz.
+ * Collects conversion events (WhatsApp / phone clicks). Called via navigator.sendBeacon.
+ * No personal data is stored; unknown event names are rejected. Over the limit, events are silently dropped.
  */
 export async function POST(request: Request) {
   const body = await request.text();

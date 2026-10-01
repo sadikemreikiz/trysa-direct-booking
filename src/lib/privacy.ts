@@ -1,7 +1,7 @@
 /**
- * Gizlilik politikası / KVKK aydınlatma metni (TR/EN/DE).
- * Sitenin gerçek veri akışını anlatır: rezervasyon formu → veritabanı (Neon, Frankfurt)
- * → e-posta bildirimi (Resend) + panel. Hukuki inceleme önerilir; değişince UPDATED'ı güncelle.
+ * Privacy policy / KVKK notice (TR/EN/DE).
+ * Describes the site's real data flow: booking form → database (Neon, Frankfurt)
+ * → email notification (Resend) + panel. Legal review recommended; update UPDATED when it changes.
  */
 import type { Locale } from "@/i18n-config";
 

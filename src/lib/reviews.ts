@@ -1,10 +1,10 @@
 /**
- * Google Places API (New) ile gerçek Google yorumlarını çeker.
- * Env: GOOGLE_PLACES_API_KEY (gerekli), GOOGLE_PLACE_ID (opsiyonel; yoksa isimden bulunur).
- * Anahtar yoksa null döner → site statik örnek yorumlara düşer.
- * Google API en fazla ~5 öne çıkan yorum verir; günde bir yenilenir.
- * Dile göre istenir: Google önce o dilde yazılmış yorumları verir (EN sayfada İngilizce
- * yorumlar); çevrilmiş olanlar `translated` ile işaretlenir.
+ * Fetches real Google reviews via the Google Places API (New).
+ * Env: GOOGLE_PLACES_API_KEY (required), GOOGLE_PLACE_ID (optional; otherwise found by name).
+ * Without a key it returns null → the site falls back to static sample reviews.
+ * The Google API returns at most ~5 featured reviews; refreshed once a day.
+ * Requested per language: Google returns reviews written in that language first (English
+ * reviews on the EN page); translated ones are flagged with `translated`.
  */
 import type { Locale } from "@/i18n-config";
 import { site } from "./site";
@@ -14,7 +14,7 @@ export type GoogleReview = {
   rating: number;
   text: string;
   when: string;
-  /** Google, yorumu sayfanın diline çevirdiyse true (altında "Google çevirisi" yazar) */
+  /** true if Google translated the review into the page's language (shows "Google translation" below it) */
   translated: boolean;
 };
 
@@ -65,19 +65,19 @@ async function resolvePlaceId(): Promise<string | null> {
 
 export type RatingSummary = { rating: number; count: number };
 
-/** Sitede gösterilen puan ve yorum sayısı: Google'dan canlı, ulaşılamazsa son bilinen değer. */
+/** Rating and review count shown on the site: live from Google, last known value if unreachable. */
 export async function getRatingSummary(): Promise<RatingSummary> {
   const google = await getGoogleReviews();
   if (google && google.count > 0) return { rating: google.rating, count: google.count };
   return site.ratingFallback;
 }
 
-/** "4,9" (tr/de) veya "4.9" (en) */
+/** "4,9" (tr/de) or "4.9" (en) */
 export function formatRating(rating: number, lang: Locale): string {
   return new Intl.NumberFormat(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(rating);
 }
 
-/** Metindeki {rating} ve {count} yerlerini doldurur. */
+/** Fills in {rating} and {count} in the text. */
 export function fillRating(template: string, summary: RatingSummary, lang: Locale): string {
   return template
     .replaceAll("{rating}", formatRating(summary.rating, lang))
@@ -91,14 +91,14 @@ export async function getGoogleReviews(lang: Locale = "tr"): Promise<GoogleRevie
   const placeId = await resolvePlaceId();
   if (!placeId) return null;
   try {
-    // languageCode adrese yazılır: her dil ayrı önbelleğe alınır
+    // languageCode goes into the URL, so each language is cached separately
     const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}?languageCode=${lang}`, {
       headers: {
         "X-Goog-Api-Key": KEY,
         "X-Goog-FieldMask": "rating,userRatingCount,reviews",
         "Accept-Language": lang,
       },
-      next: { revalidate: 86_400 }, // günde bir yenile
+      next: { revalidate: 86_400 }, // refresh once a day
     });
     if (!res.ok) return null;
     const data = (await res.json()) as PlaceResponse;

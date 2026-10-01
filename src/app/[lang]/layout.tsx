@@ -22,7 +22,7 @@ export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-/** Telefon tarayıcısının üst çubuğu sitenin başlığıyla aynı renk (krem) */
+/** Mobile browser toolbar uses the same colour as the site header (cream) */
 export const viewport: Viewport = { themeColor: "#f6f1e7" };
 
 export async function generateMetadata({
@@ -33,7 +33,7 @@ export async function generateMetadata({
   const { lang } = await params;
   const loc = isLocale(lang) ? lang : defaultLocale;
   const title = HOME_TITLE[loc];
-  // Arama sonucu açıklaması: işletmenin tam adı + ne sunduğu (Google bunu yoksa sayfadan rastgele metin toplar)
+  // Search result description: the business's full name + what it offers (otherwise Google picks random page text)
   const description = HOME_DESCRIPTION[loc];
 
   return {
@@ -70,9 +70,9 @@ export default async function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-ivory text-ink">
         {children}
-        {/* Ziyaretçi ölçümü (Vercel Web Analytics) — çerezsiz, sadece canlıda veri toplar */}
+        {/* Visitor analytics (Vercel Web Analytics): cookie-free, collects data only in production */}
         <Analytics />
-        {/* Dönüşüm ölçümü: WhatsApp / telefon tıklamaları → kendi veritabanımız */}
+        {/* Conversion tracking: WhatsApp / phone clicks → our own database */}
         <ClickTracker />
       </body>
     </html>

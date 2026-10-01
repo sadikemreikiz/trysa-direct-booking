@@ -1,11 +1,11 @@
 /**
- * Rezervasyon talebi: doğrulama → tek transaction'da kayıt → bildirim (outbox).
+ * Booking request: validation → saved in one transaction → notification (outbox).
  *
- * Akış:
- *   1. createReservation: rezervasyon + denetim kaydı + outbox satırı + ölçüm olayı
- *      AYNI transaction'da yazılır. Ya hepsi ya hiçbiri.
- *   2. deliverOutboxMessage: e-postayı gönderir. Başarısızsa satır "pending" kalır
- *      ve üstel bekleme (exponential backoff) ile tekrar denenir.
+ * Flow:
+ *   1. createReservation: booking + audit event + outbox rows + analytics event
+ *      are written in the SAME transaction. All or nothing.
+ *   2. deliverOutboxMessage: sends the email. On failure the row stays "pending"
+ *      and is retried with exponential backoff.
  */
 import { and, asc, eq, lte, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -18,14 +18,14 @@ import type { PushMessage } from "@/lib/push";
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_NIGHTS = 60;
 
-/** Formdan gelen ham veri (select'ler string döner: "5+", "3+"). */
+/** Raw form data (selects return strings: "5+", "3+"). */
 export const reservationRequestSchema = z
   .object({
     checkin: z.string().regex(ISO_DATE),
     checkout: z.string().regex(ISO_DATE),
     adults: z.string().regex(/^\d+\+?$/),
     children: z.string().regex(/^\d+\+?$/),
-    /** Ünite slug'ı; "" = misafir emin değil */
+    /** Unit slug; "" = the guest isn't sure */
     unit: z.string().max(40),
     name: z.string().trim().min(1).max(120),
     phone: z.string().trim().min(5).max(40),
@@ -52,12 +52,12 @@ function nightsBetween(a: string, b: string): number {
   return Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000);
 }
 
-/** İşletmenin saat dilimine göre bugünün tarihi (YYYY-MM-DD). */
+/** Today's date in the business's time zone (YYYY-MM-DD). */
 export function todayInDemre(now: Date): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(now);
 }
 
-const REF_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // 0/O, 1/I karışmasın
+const REF_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ"; // no 0/O, 1/I mix-ups
 
 export function generateReference(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(5));
@@ -67,7 +67,7 @@ export function generateReference(): string {
 export async function createReservation(
   db: Db,
   raw: ReservationRequest,
-  /** guestAck: misafir e-posta verdiyse ona "talebini aldık" e-postası da kuyruğa eklenir */
+  /** guestAck: if the guest gave an email, a "we got your request" email is queued too */
   opts: { now?: Date; guestAck?: boolean } = {},
 ) {
   const now = opts.now ?? new Date();
@@ -121,9 +121,9 @@ export async function createReservation(
       createdAt: now,
     });
 
-    // İki bağımsız bildirim: aileye e-posta + panel kullanıcılarının telefonuna bildirim.
-    // Ayrı satırlar oldukları için biri başarısız olursa sadece o tekrar denenir.
-    // Zamanlar veritabanı saatinden değil `now`dan: teslim de aynı `now` ile karşılaştırır.
+    // Two independent notifications: email to the family + push to panel users' phones.
+    // They are separate rows, so if one fails only that one is retried.
+    // Timestamps come from `now`, not the database clock: delivery compares against the same `now`.
     const queued = { nextAttemptAt: now, createdAt: now };
     const [message, push] = await tx
       .insert(outbox)
@@ -150,20 +150,20 @@ export async function createReservation(
   });
 }
 
-/* ---------------------------- Bildirim (outbox) ---------------------------- */
+/* ---------------------------- Notifications (outbox) ---------------------------- */
 
 export const MAX_ATTEMPTS = 6;
-/** Gönderim sürerken satırı başka bir işleyicinin almaması için kilit süresi. */
+/** Lease time, so no other worker picks up the row while it is being sent. */
 const LEASE_MS = 2 * 60_000;
 
-/** 1. deneme sonrası 2 dk, sonra 4, 8, 16… en fazla 6 saat. */
+/** 2 min after the 1st attempt, then 4, 8, 16… at most 6 hours. */
 export function backoffMs(attempts: number): number {
   return Math.min(2 ** attempts * 60_000, 6 * 3_600_000);
 }
 
 type Sender = (subject: string, text: string) => Promise<EmailResult>;
 
-/** Outbox türüne göre gönderim kanalları (testlerde sahte olarak verilir). */
+/** Delivery channels per outbox kind (faked in tests). */
 export type OutboxHandlers = {
   email: Sender;
   push: (message: PushMessage) => Promise<EmailResult>;
@@ -176,7 +176,7 @@ function shortDate(iso: string): string {
   return `${Number(d)} ${months[Number(m) - 1]}`;
 }
 
-/** Panel kullanıcılarının telefonuna gidecek kısa bildirim. */
+/** Short notification for panel users' phones. */
 export async function buildReservationPush(db: Db, reservationId: string): Promise<PushMessage> {
   const [row] = await db
     .select({ r: reservations, unitName: units.name })
@@ -193,7 +193,7 @@ export async function buildReservationPush(db: Db, reservationId: string): Promi
   };
 }
 
-/** Rezervasyon satırından aileye gidecek e-postayı üretir. */
+/** Builds the email to the family from a booking row. */
 export async function buildReservationEmail(db: Db, reservationId: string) {
   const [row] = await db
     .select({ r: reservations, unitName: units.name })
@@ -226,8 +226,8 @@ export async function buildReservationEmail(db: Db, reservationId: string) {
 export type DeliveryResult = "sent" | "retry_scheduled" | "failed" | "skipped";
 
 /**
- * Tek bir outbox mesajını göndermeyi dener. Önce satırı "kilitler" (koşullu UPDATE),
- * böylece aynı anda çalışan iki işleyici aynı e-postayı iki kez göndermez.
+ * Tries to deliver a single outbox message. First it "claims" the row (conditional UPDATE),
+ * so two workers running at once never send the same email twice.
  */
 export async function deliverOutboxMessage(
   db: Db,
@@ -260,7 +260,7 @@ export async function deliverOutboxMessage(
         .leftJoin(units, eq(units.id, reservations.unitId))
         .where(eq(reservations.id, reservationId));
       if (!row?.r.email) {
-        result = { ok: true }; // e-posta silinmiş (ör. saklama süresi) — gönderilecek bir şey yok
+        result = { ok: true }; // email was deleted (e.g. retention period), nothing to send
       } else {
         const ack = buildGuestAck({ ...row.r, unitName: row.unitName });
         result = await handlers.guestEmail(row.r.email, ack.subject, ack.text, ack.html);
@@ -292,7 +292,7 @@ export async function deliverOutboxMessage(
   return giveUp ? "failed" : "retry_scheduled";
 }
 
-/** Zamanı gelmiş bekleyen mesajları sırayla gönderir (tekrar deneme taraması). */
+/** Sends due pending messages in order (the retry sweep). */
 export async function deliverDueOutbox(
   db: Db,
   handlers: OutboxHandlers,

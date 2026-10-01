@@ -42,7 +42,7 @@ async function run(id: string, fn: () => Promise<unknown>): Promise<ActionResult
   }
 }
 
-/** Onay/iptal misafir formundaki dolu günleri değiştirir → rezervasyon sayfasını yenile. */
+/** Confirming/cancelling changes the taken dates in the guest form → revalidate the booking page. */
 function refreshGuestForm() {
   revalidatePath("/[lang]/rezervasyon", "page");
 }
@@ -52,7 +52,7 @@ export async function confirmAction(id: string, unitId: number, note: string): P
   const detail = await getReservationDetail(db, id);
   if (!detail) return { ok: false, error: MESSAGES.not_found };
 
-  // Veritabanı kısıtı sitedeki onayları korur; Airbnb doluluğunu ise burada kontrol ederiz.
+  // The database constraint protects direct bookings; Airbnb occupancy is checked here.
   const availability = await availabilityForRange(
     db,
     detail.r.checkIn,
@@ -73,7 +73,7 @@ export async function confirmAction(id: string, unitId: number, note: string): P
   return result;
 }
 
-/** Elle ekleme formu: seçilen tarihlerde hangi odalar boş? */
+/** Manual booking form: which rooms are free on the chosen dates? */
 export async function availabilityAction(checkIn: string, checkOut: string): Promise<UnitAvailability[]> {
   const { db } = await requireApprovedStaff();
   if (

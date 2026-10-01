@@ -22,24 +22,24 @@ export type SubmitResult = {
   ok: boolean;
   error?: "required" | "invalid" | "blocked" | "rate_limited";
   emailed?: boolean;
-  /** Misafire gösterilen talep kodu (veritabanına kaydedildiyse) */
+  /** Request code shown to the guest (when the request was saved to the database) */
   reference?: string;
 };
 
-/** Aynı kişiden (IP özeti) gelen talep sınırı: 10 dakikada 3, günde 8. */
+/** Request limit per visitor (IP digest): 3 per 10 minutes, 8 per day. */
 const RESERVATION_LIMITS = {
   "10m": { limit: 3, windowMs: 10 * 60_000 },
   "1d": { limit: 8, windowMs: 86_400_000 },
 };
 
-/** Bir insanın formu bundan hızlı doldurması pek mümkün değil (tarih + ad + telefon). */
+/** A human can hardly fill the form faster than this (dates + name + phone). */
 const MIN_FILL_MS = 3_000;
 
 /**
- * Rezervasyon talebini işler.
- * Veritabanı varsa: talep önce kaydedilir (tek doğruluk kaynağı), sonra e-posta outbox
- * üzerinden gönderilir — gönderim başarısız olursa arka planda tekrar denenir.
- * Veritabanı yoksa ya da hata verirse: eski davranış (doğrudan e-posta), site çalışmaya devam eder.
+ * Handles a booking request.
+ * With a database: the request is saved first (single source of truth), then the email goes out
+ * through the outbox; if sending fails it is retried in the background.
+ * Without a database, or if it errors: legacy behaviour (direct email), so the site keeps working.
  */
 export async function submitReservation(
   data: ReservationInput,
@@ -47,18 +47,18 @@ export async function submitReservation(
     unitSlug: string;
     locale: Locale;
     consent: boolean;
-    /** Bot tuzakları: gizli alan (insanlar görmez, boş kalır) ve formun doldurulma süresi */
+    /** Bot traps: hidden field (humans never see it, so it stays empty) and form fill time */
     trap?: { hp: string; elapsedMs: number };
   },
 ): Promise<SubmitResult> {
   if (!data.checkin || !data.checkout || !data.name.trim() || !data.phone.trim()) {
     return { ok: false, error: "required" };
   }
-  // Bot: sessizce "başarılı" dön ki denemeyi değiştirmesin; hiçbir şey kaydedilmez, bildirim gitmez.
+  // Bot: silently report "success" so it doesn't adapt; nothing is saved and no notification is sent.
   if (!meta.trap || meta.trap.hp || meta.trap.elapsedMs < MIN_FILL_MS) {
     return { ok: true, emailed: false };
   }
-  // Sayfa önbellekten gelmiş olabilir: seçilen oda bu arada dolduysa talebi baştan reddet.
+  // The page may have come from cache: if the chosen room was taken in the meantime, reject up front.
   if (meta.unitSlug && meta.unitSlug !== "kamp") {
     const locked = (await getGuestLockedDates())[data.unit] ?? [];
     if (rangeHasLockedDay(data.checkin, data.checkout, locked)) return { ok: false, error: "blocked" };
@@ -88,7 +88,7 @@ export async function submitReservation(
         deliverOutboxMessage(db, outboxId, handlers),
         deliverOutboxMessage(db, pushOutboxId, handlers),
       ]);
-      // Yanıt döndükten sonra: misafirin e-postası ve daha önce başarısız olmuş bildirimler.
+      // After the response is sent: the guest's email and any previously failed notifications.
       after(() => deliverDueOutbox(db, handlers).catch(console.error));
       return { ok: true, emailed: delivery === "sent", reference: reservation.reference };
     } catch (e) {

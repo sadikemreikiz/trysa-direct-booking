@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 import { WhatsAppIcon } from "./icons";
 import LogoMark from "./LogoMark";
 
-/** Bulunamayan sayfa — ziyaretçinin dili bilinmediği için üç dilde kısa metin. */
+/** Not-found page: the visitor's language is unknown, so a short text in all three languages. */
 const TEXT = [
   { lang: "tr", title: "Aradığın sayfa burada değil", home: "Ana sayfaya dön" },
   { lang: "en", title: "This page isn't here", home: "Back to home" },

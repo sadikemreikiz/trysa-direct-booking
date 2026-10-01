@@ -1,4 +1,4 @@
-// Dil ayarı — hem sunucu hem istemci bileşenlerinden güvenle kullanılır (server-only DEĞİL).
+// Locale config: safe to import from both server and client components (NOT server-only).
 export const locales = ["tr", "en", "de"] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = "tr";

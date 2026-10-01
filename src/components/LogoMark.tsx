@@ -1,7 +1,7 @@
 /**
- * Trysa logo işareti: iki tepe ve arkasından doğan güneş (2026-09-30, Emre onayladı).
- * Güneş ve arka tepe, öndeki şeklin çevresinde ince bir boşlukla ayrılır (maske).
- * Aynı sayfada birden çok kez kullanılırsa her birine farklı `id` ver (maske kimlikleri çakışmasın).
+ * Trysa logo mark: two hills with the sun rising behind them.
+ * The sun and the back hill are separated from the front shape by a thin gap (mask).
+ * When used more than once on a page, give each a different `id` (so mask ids don't clash).
  */
 const FRONT = "M3 80 L 34.2 31.6 Q 38 25.8 41.8 31.6 L 73 80 Z";
 const BACK = "M45 80 L 66.6 47.2 Q 69.5 42.8 72.4 47.2 L 97 80 Z";
