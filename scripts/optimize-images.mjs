@@ -33,7 +33,10 @@ for (const file of jpgs(ROOT)) {
   before += original.length;
 
   let large = original;
-  if (original.length > ALREADY_OPTIMIZED_BYTES) {
+  // A photo turned by an EXIF tag (as phones save them) is always rewritten upright: the tag is
+  // stripped below, and without it browsers would show the photo on its side.
+  const turned = ((await sharp(original).metadata()).orientation ?? 1) > 1;
+  if (original.length > ALREADY_OPTIMIZED_BYTES || turned) {
     const max = MAX_WIDTH[name] ?? DEFAULT_MAX;
     const out = await sharp(original)
       .rotate() // apply EXIF orientation, then drop the metadata
@@ -41,13 +44,14 @@ for (const file of jpgs(ROOT)) {
       .jpeg({ quality: 74, mozjpeg: true, progressive: true })
       .toBuffer();
     // No clear gain → leave it: don't recompress an already processed file and lose quality.
-    if (out.length < original.length * 0.9) {
+    if (turned || out.length < original.length * 0.9) {
       fs.writeFileSync(file, out);
       large = out;
     }
   }
 
   const small = await sharp(large)
+    .rotate()
     .resize({ width: SMALL_WIDTH, withoutEnlargement: true })
     .jpeg({ quality: 72, mozjpeg: true, progressive: true })
     .toBuffer();
