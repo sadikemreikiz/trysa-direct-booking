@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listPanelReservations } from "@/features/panel/reservation-admin";
-import { todayInDemre } from "@/features/booking/reservations";
+import { todayInDemre } from "@/lib/dates";
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import PushToggle from "@/features/panel/components/PushToggle";
 import { formatDay, localeFlag, nights, SLOW_RESPONSE_MS, sourceLabel, timeAgo } from "@/features/panel/format";

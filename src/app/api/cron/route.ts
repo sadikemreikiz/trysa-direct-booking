@@ -2,7 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { getDb } from "@/db";
 import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
 import { pruneRateLimits } from "@/features/booking/rate-limit";
-import { deliverDueOutbox } from "@/features/booking/reservations";
+import { deliverDueOutbox } from "@/features/notifications/outbox";
 import { sendGuestEmail, sendNotificationEmail } from "@/features/notifications/email";
 import { sendPushToStaff } from "@/features/notifications/push";
 

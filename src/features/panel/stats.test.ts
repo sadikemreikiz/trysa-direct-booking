@@ -1,7 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { confirmReservation, createManualReservation, declineReservation } from "./reservation-admin";
 import { createReservation, type ReservationRequest } from "@/features/booking/reservations";
 import { analyticsEvents, reservationEvents, reservations, user } from "@/db/schema";

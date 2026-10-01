@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { analyticsEvents } from "@/db/schema";
 
 /** Events the client may send. reservation_submitted is written only on the server. */

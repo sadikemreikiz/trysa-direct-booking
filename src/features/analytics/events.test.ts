@@ -1,7 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { clientEventSchema, recordClientEvent } from "./events";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { analyticsEvents } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
 

@@ -15,7 +15,7 @@ import {
   type UnitAvailability,
 } from "./reservation-admin";
 import { AuthorizationError, decideAccess } from "./staff";
-import { todayInDemre } from "@/features/booking/reservations";
+import { todayInDemre } from "@/lib/dates";
 import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
 import { requireApprovedStaff } from "./session";
 import { savePushSubscription } from "@/features/notifications/push";

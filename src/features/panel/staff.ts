@@ -3,7 +3,7 @@
  * Google sign-in verifies identity (authentication); this module decides permissions (authorization).
  */
 import { and, asc, eq } from "drizzle-orm";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { staff, user, type StaffRole } from "@/db/schema";
 
 /** New Google user: an approved admin if on the admin list, otherwise an access request. */

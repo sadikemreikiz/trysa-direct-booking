@@ -4,7 +4,7 @@
  */
 import { and, eq, inArray } from "drizzle-orm";
 import webpush from "web-push";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { pushSubscriptions, staff, type StaffRole } from "@/db/schema";
 import type { EmailResult } from "./email";
 

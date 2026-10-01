@@ -3,7 +3,7 @@
  * Months are grouped in the business's time zone (Europe/Istanbul).
  */
 import { sql, type SQL } from "drizzle-orm";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 
 export type MonthStats = {
   /** YYYY-MM */

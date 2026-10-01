@@ -3,7 +3,7 @@ import PanelHeader from "@/features/panel/components/PanelHeader";
 import { buildCalendar, daysOfMonth, shiftMonth, type Cell } from "@/features/panel/calendar";
 import { formatDay } from "@/features/panel/format";
 import { calendarData, SHARED_UNIT_SLUG } from "@/features/panel/reservation-admin";
-import { todayInDemre } from "@/features/booking/reservations";
+import { todayInDemre } from "@/lib/dates";
 import { AIRBNB_REFRESH_SECONDS, getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
 import { requireApprovedStaff } from "@/features/panel/session";
 

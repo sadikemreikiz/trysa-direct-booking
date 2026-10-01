@@ -1,7 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import {
   addReservationNote,
   availabilityForRange,

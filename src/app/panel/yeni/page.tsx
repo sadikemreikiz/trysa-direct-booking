@@ -1,6 +1,6 @@
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import ManualReservationForm from "@/features/panel/components/ManualReservationForm";
-import { todayInDemre } from "@/features/booking/reservations";
+import { todayInDemre } from "@/lib/dates";
 import { requireApprovedStaff } from "@/features/panel/session";
 
 /** Manually add a booking that came in by phone, WhatsApp or walk-in. */

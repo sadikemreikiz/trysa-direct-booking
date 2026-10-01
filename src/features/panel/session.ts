@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { getDb } from "@/db/index";
+import { getDb } from "@/db";
 import { getStaffMember } from "./staff";
 import { getAuth } from "@/lib/auth";
 

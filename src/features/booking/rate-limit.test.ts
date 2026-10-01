@@ -1,7 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { clientKey } from "./client-key";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { hitRateLimit, hitRateLimits, pruneRateLimits } from "./rate-limit";
 import { rateLimits } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";

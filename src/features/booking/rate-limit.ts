@@ -3,7 +3,7 @@
  * On serverless (Vercel) an in-memory counter would be per instance, so it lives in the database.
  */
 import { lt, sql } from "drizzle-orm";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { rateLimits } from "@/db/schema";
 
 export type RateLimitRule = { limit: number; windowMs: number };

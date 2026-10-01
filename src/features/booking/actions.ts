@@ -2,14 +2,10 @@
 
 import { headers } from "next/headers";
 import { after } from "next/server";
-import { getDb } from "@/db/index";
+import { getDb } from "@/db";
 import { hitRateLimits, pruneRateLimits } from "./rate-limit";
-import {
-  createReservation,
-  deliverDueOutbox,
-  deliverOutboxMessage,
-  ReservationValidationError,
-} from "./reservations";
+import { createReservation, ReservationValidationError } from "./reservations";
+import { deliverDueOutbox, deliverOutboxMessage } from "@/features/notifications/outbox";
 import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
 import { clientKey } from "./client-key";
 import { guestEmailEnabled, sendGuestEmail, sendNotificationEmail } from "@/features/notifications/email";

@@ -4,7 +4,7 @@
  *   - Deleting personal data from bookings whose retention period has expired (KVKK/GDPR)
  */
 import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
-import type { Db } from "@/db/index";
+import type { Db } from "@/db";
 import { reservationEvents, reservations } from "@/db/schema";
 import type { EmailResult } from "@/features/notifications/email";
 import type { PushMessage } from "@/features/notifications/push";

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { confirmedStaysForUnit } from "@/features/panel/reservation-admin";
-import { todayInDemre } from "@/features/booking/reservations";
+import { todayInDemre } from "@/lib/dates";
 import { units } from "@/db/schema";
 import { buildIcs, verifyIcalToken } from "@/features/airbnb-sync/ical-feed";
 

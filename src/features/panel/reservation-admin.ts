@@ -7,8 +7,9 @@
  */
 import { and, asc, desc, eq, gte, inArray, lt, gt, ne } from "drizzle-orm";
 import { z } from "zod";
-import type { Db } from "@/db/index";
-import { generateReference, todayInDemre } from "@/features/booking/reservations";
+import type { Db } from "@/db";
+import { generateReference } from "@/features/booking/reservations";
+import { todayInDemre } from "@/lib/dates";
 import { reservationEvents, reservations, units, user, type Reservation } from "@/db/schema";
 
 export type ReservationStatus = Reservation["status"];
