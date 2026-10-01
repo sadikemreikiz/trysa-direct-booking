@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { WhatsAppIcon } from "@/components/icons";
 import type { Dict, Locale } from "@/content/dictionaries";
 import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
 import { submitReservation } from "@/features/booking/actions";
+import { fullyBookedDays, nightsBetween, rangeFromParams } from "@/features/booking/calendar";
+import AvailabilityCalendar, {
+  nightsLabel,
+  shortDate,
+} from "@/features/booking/components/AvailabilityCalendar";
 import { whatsappUrl, type ReservationInput } from "@/features/booking/summary";
+import { todayInDemre } from "@/lib/dates";
 
 // Display name → the unit's stable database id (slug)
 const roomUnits: [label: string, slug: string][] = [
@@ -30,19 +36,68 @@ const empty: ReservationInput = {
   note: "",
 };
 
-export default function ReservationForm({
-  t,
-  lang,
-  lockedByType = {},
-  reviewsChip,
-}: {
+type Props = {
   t: Dict;
   lang: Locale;
   lockedByType?: Record<string, string[]>;
   /** Google rating and review count, e.g. "★ 4,9 · 292 yorum" (filled in on the server) */
   reviewsChip: string;
-}) {
-  const [data, setData] = useState<ReservationInput>(empty);
+};
+
+const noSubscription = () => () => {};
+
+/**
+ * The booking page is prerendered, so "today" and the URL's query (dates and room from
+ * the home page or a room page) are only known in the browser. Both are read after
+ * hydration; the form then starts fresh with them as its initial values.
+ */
+export default function ReservationForm(props: Props) {
+  const today = useSyncExternalStore(
+    noSubscription,
+    () => todayInDemre(new Date()),
+    () => "",
+  );
+  const search = useSyncExternalStore(
+    noSubscription,
+    () => window.location.search,
+    () => "",
+  );
+  return <BookingForm key={`${today}${search}`} {...props} today={today} search={search} />;
+}
+
+function initialData(
+  search: string,
+  today: string,
+  unitOptions: [string, string][],
+): ReservationInput {
+  if (!today) return empty;
+  const params = new URLSearchParams(search);
+  const { checkin, checkout } = rangeFromParams(params, today);
+  const unit = unitOptions.find(([, slug]) => slug && slug === params.get("unit"))?.[0];
+  const guests = params.get("guests");
+  return {
+    ...empty,
+    checkin,
+    checkout,
+    unit: unit ?? empty.unit,
+    adults: guests && /^[1-4]$/.test(guests) ? guests : empty.adults,
+  };
+}
+
+function BookingForm({
+  t,
+  lang,
+  lockedByType = {},
+  reviewsChip,
+  today,
+  search,
+}: Props & { today: string; search: string }) {
+  const unitOptions: [label: string, slug: string][] = [
+    ...roomUnits,
+    [t.reservation.unitKamp, "kamp"],
+    [t.reservation.uninameEmin, ""],
+  ];
+  const [data, setData] = useState<ReservationInput>(() => initialData(search, today, unitOptions));
   const [kvkk, setKvkk] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [emailed, setEmailed] = useState(false);
@@ -52,15 +107,24 @@ export default function ReservationForm({
   const [hp, setHp] = useState("");
   const openedAt = useRef<number | null>(null);
 
-  const today = new Date().toISOString().slice(0, 10);
-  const lockedDates = lockedByType[data.unit] ?? [];
+  const unitSlug = unitOptions.find(([label]) => label === data.unit)?.[1] ?? "";
+  // Camping is shared, so it's never closed; "not sure" closes only days when every room is full.
+  const lockedDates =
+    unitSlug === "kamp"
+      ? []
+      : unitSlug === ""
+        ? fullyBookedDays(
+            lockedByType,
+            roomUnits.map(([label]) => label),
+          )
+        : (lockedByType[data.unit] ?? []);
   const dateBlocked = rangeHasLockedDay(data.checkin, data.checkout, lockedDates);
-
-  const unitOptions: [label: string, slug: string][] = [
-    ...roomUnits,
-    [t.reservation.unitKamp, "kamp"],
-    [t.reservation.uninameEmin, ""],
-  ];
+  const calendarNote =
+    unitSlug === "kamp"
+      ? t.reservation.calNoteKamp
+      : unitSlug === ""
+        ? t.reservation.calNoteAny
+        : undefined;
   const units = unitOptions.map(([label]) => label);
 
   const fld =
@@ -88,7 +152,6 @@ export default function ReservationForm({
     }
     setStatus("sending");
     try {
-      const unitSlug = unitOptions.find(([label]) => label === data.unit)?.[1] ?? "";
       const res = await submitReservation(data, {
         unitSlug,
         locale: lang,
@@ -145,7 +208,13 @@ export default function ReservationForm({
           <div className="mb-3 text-xs font-bold tracking-widest text-clay">
             {t.reservation.summaryTitle}
           </div>
-          <Row k={t.reservation.sumDate} v={`${data.checkin} → ${data.checkout}`} />
+          <Row
+            k={t.reservation.sumDate}
+            v={`${shortDate(data.checkin, lang)} → ${shortDate(data.checkout, lang)} · ${nightsLabel(
+              nightsBetween(data.checkin, data.checkout),
+              t,
+            )}`}
+          />
           <Row
             k={t.reservation.sumGuests}
             v={`${data.adults} ${t.reservation.adultsWord}${
@@ -211,27 +280,57 @@ export default function ReservationForm({
             />
           </label>
         </div>
+        <div>
+          <span className={lbl}>{t.reservation.forWhat}</span>
+          <div className="mt-2 grid grid-cols-2 gap-2">
+            {units.map((u) => {
+              const active = data.unit === u;
+              return (
+                <button
+                  type="button"
+                  key={u}
+                  onClick={() => set("unit", u)}
+                  className={`rounded-xl border p-3 text-sm font-semibold ${
+                    active
+                      ? "border-2 border-clay bg-[#fbf0e7] text-pine"
+                      : "border-line bg-white text-pine/80"
+                  }`}
+                >
+                  {u}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <span className={lbl}>{t.reservation.dates}</span>
+          <div className="mt-2">
+            {today ? (
+              <AvailabilityCalendar
+                t={t}
+                lang={lang}
+                today={today}
+                booked={new Set(lockedDates)}
+                range={{ checkin: data.checkin, checkout: data.checkout }}
+                onChange={({ checkin, checkout }) => setData((d) => ({ ...d, checkin, checkout }))}
+                note={calendarNote}
+              />
+            ) : (
+              <div className="min-h-[430px] rounded-2xl border border-line bg-white p-4 text-sm font-semibold text-clay">
+                {t.reservation.calPickIn}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {dateBlocked && (
+          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-clay-dark">
+            {t.reservation.blockedMsg}
+          </p>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block">
-            <span className={lbl}>{t.reservation.checkin}</span>
-            <input
-              type="date"
-              className={fld}
-              min={today}
-              value={data.checkin}
-              onChange={(e) => set("checkin", e.target.value)}
-            />
-          </label>
-          <label className="block">
-            <span className={lbl}>{t.reservation.checkout}</span>
-            <input
-              type="date"
-              className={fld}
-              min={data.checkin || today}
-              value={data.checkout}
-              onChange={(e) => set("checkout", e.target.value)}
-            />
-          </label>
           <label className="block">
             <span className={lbl}>{t.reservation.adults}</span>
             <select
@@ -256,35 +355,6 @@ export default function ReservationForm({
               ))}
             </select>
           </label>
-        </div>
-
-        {dateBlocked && (
-          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-clay-dark">
-            {t.reservation.blockedMsg}
-          </p>
-        )}
-
-        <div>
-          <span className={lbl}>{t.reservation.forWhat}</span>
-          <div className="mt-2 grid grid-cols-2 gap-2">
-            {units.map((u) => {
-              const active = data.unit === u;
-              return (
-                <button
-                  type="button"
-                  key={u}
-                  onClick={() => set("unit", u)}
-                  className={`rounded-xl border p-3 text-sm font-semibold ${
-                    active
-                      ? "border-2 border-clay bg-[#fbf0e7] text-pine"
-                      : "border-line bg-white text-pine/80"
-                  }`}
-                >
-                  {u}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         <div className="h-px bg-line/70" />

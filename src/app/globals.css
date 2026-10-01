@@ -28,3 +28,12 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
+
+/* Booked days in the availability calendar: light diagonal hatching */
+@utility bg-booked {
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 5px,
+    rgb(34 39 31 / 0.07) 5px 6px
+  );
+}
