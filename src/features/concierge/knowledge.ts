@@ -1,11 +1,12 @@
 /**
  * The concierge's system prompt: its rules plus everything it may say about Trysa, built
  * from the same content the website shows (rooms and prices, menu, FAQ, distances), so the
- * assistant can never drift from the site. The text is deterministic (no dates, no request
- * data), which keeps it byte-identical between requests and lets the API cache it.
+ * assistant can never drift from the site. The menu is the live one from the database, as
+ * staff edit it in the panel. The text is deterministic (no dates, no request data), so it
+ * stays byte-identical between requests until the menu changes, which lets the API cache it.
  */
 import { getDictionary } from "@/content/dictionaries";
-import { menu } from "@/content/menu";
+import type { MenuCategory } from "@/content/menu";
 import { place, site, stays } from "@/content/site";
 
 const RULES = `You are the AI assistant on the website of Trysa Restaurant Camping, a small family-run guesthouse, campsite and restaurant in Davazlar, Demre (Antalya, Türkiye). You help guests with questions about staying and eating at Trysa and about getting here. You are not a person, and you say so if asked.
@@ -33,12 +34,17 @@ function rooms(): string {
     .join("\n");
 }
 
-function restaurantMenu(): string {
+function restaurantMenu(menu: MenuCategory[]): string {
   const en = getDictionary("en");
   return menu
     .map((c) => {
       const name = en.menu.cats[c.cat as keyof typeof en.menu.cats] ?? c.cat;
-      const items = c.items.map((i) => `${i.n} (${i.en}) ${i.p} ₺`).join("; ");
+      const items = c.items
+        .map(
+          (i) =>
+            `${i.n} (${i.en}) ${i.p} ₺${i.available === false ? " [not available today]" : ""}`,
+        )
+        .join("; ");
       return `- ${name}: ${items}`;
     })
     .join("\n");
@@ -50,7 +56,7 @@ function faq(): string {
     .join("\n");
 }
 
-function knowledge(): string {
+function knowledge(menu: MenuCategory[]): string {
   const en = getDictionary("en");
   return `# Knowledge about Trysa
 
@@ -70,8 +76,8 @@ ${en.amenities.list.join(", ")}. The family is still finalising this list, so fo
 
 ## Restaurant
 ${en.restaurant.desc} The restaurant is open to guests and to visitors who aren't staying.
-Menu (Turkish name, English name, price in Turkish lira). ${en.menu.note}
-${restaurantMenu()}
+Menu (Turkish name, English name, price in Turkish lira). ${en.menu.note} Dishes marked [not available today] are on the menu but can't be ordered today.
+${restaurantMenu(menu)}
 
 ## The area
 - ${en.trysaStory.desc}
@@ -81,8 +87,10 @@ ${restaurantMenu()}
 ${faq()}`;
 }
 
-/** The full, cacheable system prompt. */
-export const CONCIERGE_SYSTEM_PROMPT = `${RULES}\n\n${knowledge()}`;
+/** The full, cacheable system prompt, with the restaurant menu as it is now. */
+export function conciergeSystemPrompt(menu: MenuCategory[]): string {
+  return `${RULES}\n\n${knowledge(menu)}`;
+}
 
 /**
  * The per-request part, kept in a separate system block after the cache breakpoint so it

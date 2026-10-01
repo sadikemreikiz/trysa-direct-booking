@@ -8,6 +8,7 @@ import { hitRateLimit, hitRateLimits } from "@/features/booking/rate-limit";
 import { saveExchange } from "@/features/concierge/conversations";
 import { emptyUsage, runConcierge, type ChatTurn } from "@/features/concierge/run";
 import type { UiAction } from "@/features/concierge/tools";
+import { getMenu } from "@/features/restaurant/menu-store";
 import { todayInDemre } from "@/lib/dates";
 
 export const maxDuration = 60;
@@ -66,6 +67,7 @@ export async function POST(request: Request) {
     today: todayInDemre(new Date()),
     locale,
     lockedByRoom: await getGuestLockedDates(),
+    menu: await getMenu(db),
   };
   client ??= new Anthropic();
   const usage = emptyUsage();

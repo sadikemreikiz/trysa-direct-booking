@@ -6,7 +6,8 @@
  * The SDK client is passed in, so tests drive the loop with a fake instead of the API.
  */
 import Anthropic from "@anthropic-ai/sdk";
-import { CONCIERGE_SYSTEM_PROMPT, requestContext } from "./knowledge";
+import type { MenuCategory } from "@/content/menu";
+import { conciergeSystemPrompt, requestContext } from "./knowledge";
 import { CONCIERGE_TOOLS, runTool, type ToolContext, type UiAction } from "./tools";
 
 /** Chosen by the owner for speed and cost; the prompt and tools are kept simple for it. */
@@ -17,6 +18,11 @@ const MAX_TOKENS = 2048;
 export const MAX_TOOL_ROUNDS = 3;
 
 export type ChatTurn = { role: "user" | "assistant"; text: string };
+
+export type ConciergeContext = ToolContext & {
+  /** The restaurant menu as staff last edited it. */
+  menu: MenuCategory[];
+};
 
 export type ConciergeEvent =
   | { type: "text"; text: string }
@@ -60,14 +66,18 @@ function addUsage(total: ConciergeUsage, usage: Anthropic.Usage) {
 export async function* runConcierge(
   client: MessageStreamer,
   history: ChatTurn[],
-  ctx: ToolContext,
+  ctx: ConciergeContext,
   usage: ConciergeUsage,
 ): AsyncGenerator<ConciergeEvent> {
   const system: Anthropic.TextBlockParam[] = [
-    // Rules and knowledge: identical on every request, so they can be cached. Haiku 4.5 only
-    // caches prefixes from 4096 tokens; today's ~3K-token prompt is below that, so this marker
-    // takes effect once the knowledge grows (check usage.cacheReadTokens).
-    { type: "text", text: CONCIERGE_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } },
+    // Rules and knowledge: identical on every request until the menu is edited, so they can be
+    // cached. Haiku 4.5 only caches prefixes from 4096 tokens; today's ~3K-token prompt is below
+    // that, so this marker takes effect once the knowledge grows (check usage.cacheReadTokens).
+    {
+      type: "text",
+      text: conciergeSystemPrompt(ctx.menu),
+      cache_control: { type: "ephemeral" },
+    },
     // Today's date and the site language: after the breakpoint, so they don't break the cache.
     { type: "text", text: requestContext(ctx.today, ctx.locale) },
   ];

@@ -1,33 +1,50 @@
 import type Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it } from "vitest";
-import { CONCIERGE_SYSTEM_PROMPT, requestContext } from "./knowledge";
+import { menu as printedMenu } from "@/content/menu";
+import { conciergeSystemPrompt, requestContext } from "./knowledge";
 import { maskPersonalData } from "./mask";
 import {
   emptyUsage,
   MAX_TOOL_ROUNDS,
   runConcierge,
+  type ConciergeContext,
   type ConciergeEvent,
   type MessageStreamer,
 } from "./run";
-import { runTool, type ToolContext } from "./tools";
+import { runTool } from "./tools";
 
-const ctx: ToolContext = {
+const ctx: ConciergeContext = {
   today: "2026-10-01",
   locale: "en",
   // Nights of 10 and 11 October are booked in Ambar-1
   lockedByRoom: { "Ambar-1": ["2026-10-10", "2026-10-11"] },
+  menu: printedMenu,
 };
+
+const prompt = conciergeSystemPrompt(printedMenu);
 
 describe("knowledge", () => {
   it("is built from the site's content: rooms, prices, menu and FAQ", () => {
-    expect(CONCIERGE_SYSTEM_PROMPT).toContain("Tiny House (id: tiny-house)");
-    expect(CONCIERGE_SYSTEM_PROMPT).toContain("1.750 ₺ per night");
-    expect(CONCIERGE_SYSTEM_PROMPT).toContain("Kuzu Şiş (Lamb skewer) 650 ₺");
-    expect(CONCIERGE_SYSTEM_PROMPT).toContain("Check-out is 12:00");
+    expect(prompt).toContain("Tiny House (id: tiny-house)");
+    expect(prompt).toContain("1.750 ₺ per night");
+    expect(prompt).toContain("Kuzu Şiş (Lamb skewer) 650 ₺");
+    expect(prompt).toContain("Check-out is 12:00");
+  });
+
+  it("knows the menu as staff edited it: prices and dishes not available today", () => {
+    const edited = printedMenu.map((c) => ({
+      ...c,
+      items: c.items.map((i) => (i.n === "Kuzu Şiş" ? { ...i, p: "690", available: false } : i)),
+    }));
+    const live = conciergeSystemPrompt(edited);
+    expect(live).toContain("Kuzu Şiş (Lamb skewer) 690 ₺ [not available today]");
+    expect(live).toContain("Köfte (Grilled meatballs) 500 ₺;");
+    expect(prompt).not.toContain("[not available today];");
   });
 
   it("contains nothing that changes per request, so it stays cacheable", () => {
-    expect(CONCIERGE_SYSTEM_PROMPT).not.toMatch(/20\d\d-\d\d-\d\d/);
+    expect(conciergeSystemPrompt(printedMenu)).toBe(prompt);
+    expect(prompt).not.toMatch(/20\d\d-\d\d-\d\d/);
     expect(requestContext("2026-10-01", "de")).toBe(
       'Today\'s date in Demre is 2026-10-01 (Thursday). The guest is browsing the website in "de".',
     );
