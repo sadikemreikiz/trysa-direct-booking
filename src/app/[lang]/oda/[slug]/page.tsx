@@ -111,7 +111,7 @@ export default async function RoomPage({ params }: Params) {
             </h2>
             <p className="mt-1.5 text-sm text-[#fdf1e8]">{t.room.ctaSub}</p>
             <Link
-              href={`/${lang}/rezervasyon`}
+              href={`/${lang}/rezervasyon?unit=${room.slug}`}
               className="mt-4 inline-block rounded-xl bg-white px-8 py-3.5 text-base font-bold text-clay"
             >
               {t.room.ctaBtn}
