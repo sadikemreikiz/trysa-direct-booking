@@ -183,6 +183,31 @@ const tr = {
       kamp: "Kendi çadırın veya karavanınla",
     } as Record<string, string>,
   },
+  concierge: {
+    open: "Soru sor",
+    title: "Trysa asistanı",
+    aiBadge: "Yapay zekâ",
+    close: "Kapat",
+    welcome:
+      "Merhaba! Ben Trysa'nın yapay zekâ asistanıyım. Odalar, müsaitlik, restoran ya da yol hakkında sorabilirsin. Rezervasyonu her zaman aile onaylar.",
+    suggestions: [
+      "Bu hafta sonu boş oda var mı?",
+      "Kahvaltı dahil mi?",
+      "Havalimanından nasıl gelirim?",
+    ],
+    placeholder: "Sorunu yaz…",
+    send: "Gönder",
+    thinking: "Yazıyor…",
+    bookingButton: "Rezervasyon formunu aç",
+    whatsappButton: "WhatsApp'tan aileye yaz",
+    errorUnavailable: "Şu an cevap veremiyorum. Aileye WhatsApp'tan hemen ulaşabilirsin.",
+    errorRateLimited:
+      "Kısa sürede çok fazla mesaj geldi. Biraz sonra tekrar dene ya da WhatsApp'tan yaz.",
+    errorRefused: "Bu konuda yardımcı olamıyorum. Aileye WhatsApp'tan sorabilirsin.",
+    disclaimer: "Yapay zekâ yanılabilir; kesin bilgiyi aile verir.",
+    privacy: "Gizlilik",
+    reset: "Yeni sohbet",
+  },
   reservation: {
     title: "Rezervasyon Talebi",
     intro:
@@ -426,6 +451,32 @@ const en: Dict = {
       kamp: "Bring your own tent or caravan",
     },
   },
+  concierge: {
+    open: "Ask us",
+    title: "Trysa assistant",
+    aiBadge: "AI",
+    close: "Close",
+    welcome:
+      "Hi! I'm Trysa's AI assistant. Ask me about rooms, availability, the restaurant or getting here. The family always confirms bookings.",
+    suggestions: [
+      "Any rooms free this weekend?",
+      "Is breakfast included?",
+      "How do I get here from the airport?",
+    ],
+    placeholder: "Type your question…",
+    send: "Send",
+    thinking: "Typing…",
+    bookingButton: "Open the booking form",
+    whatsappButton: "Message the family on WhatsApp",
+    errorUnavailable:
+      "I can't answer right now. You can reach the family on WhatsApp straight away.",
+    errorRateLimited:
+      "Too many messages in a short time. Please try again later or message us on WhatsApp.",
+    errorRefused: "I can't help with that. You can ask the family on WhatsApp.",
+    disclaimer: "AI can make mistakes; the family has the final word.",
+    privacy: "Privacy",
+    reset: "New chat",
+  },
   reservation: {
     title: "Booking request",
     intro:
@@ -666,6 +717,32 @@ const de: Dict = {
       "tiny-house": "Komfortabel, freistehend, mit Naturblick",
       kamp: "Mit eigenem Zelt oder Wohnwagen",
     },
+  },
+  concierge: {
+    open: "Frag uns",
+    title: "Trysa-Assistent",
+    aiBadge: "KI",
+    close: "Schließen",
+    welcome:
+      "Hallo! Ich bin der KI-Assistent von Trysa. Frag mich zu Zimmern, Verfügbarkeit, dem Restaurant oder der Anreise. Buchungen bestätigt immer die Familie.",
+    suggestions: [
+      "Ist am Wochenende ein Zimmer frei?",
+      "Ist Frühstück inklusive?",
+      "Wie komme ich vom Flughafen hin?",
+    ],
+    placeholder: "Schreib deine Frage…",
+    send: "Senden",
+    thinking: "Schreibt…",
+    bookingButton: "Buchungsformular öffnen",
+    whatsappButton: "Der Familie auf WhatsApp schreiben",
+    errorUnavailable:
+      "Ich kann gerade nicht antworten. Die Familie erreichst du sofort auf WhatsApp.",
+    errorRateLimited:
+      "Zu viele Nachrichten in kurzer Zeit. Versuch es später noch einmal oder schreib uns auf WhatsApp.",
+    errorRefused: "Dabei kann ich nicht helfen. Frag gern die Familie auf WhatsApp.",
+    disclaimer: "KI kann sich irren; verbindlich ist die Auskunft der Familie.",
+    privacy: "Datenschutz",
+    reset: "Neuer Chat",
   },
   reservation: {
     title: "Buchungsanfrage",

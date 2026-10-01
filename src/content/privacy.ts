@@ -32,13 +32,14 @@ export const privacy: Record<Locale, Privacy> = {
           "Rezervasyon talebinizi yanıtlamak, müsaitliği teyit etmek ve sizinle iletişim kurmak için. Hukuki sebep: bir sözleşmenin kurulmasıyla doğrudan ilgili olması (KVKK m.5/2-c; GDPR m.6/1-b) ve formda verdiğiniz açık onay.",
           "E-posta adresinizi verdiyseniz, konaklamanızla ilgili bilgilendirme e-postaları: talebinizin alındığı, rezervasyonunuzun onaylandığı ve varışınızdan bir gün önce yol tarifi ile giriş bilgileri. Hukuki sebep: sözleşmenin ifası (KVKK m.5/2-c; GDPR m.6/1-b).",
           "Konaklamanızdan sonra deneyiminizi soran tek bir e-posta: yalnızca formda bu kutuyu ayrıca işaretlediyseniz gönderilir. Hukuki sebep: açık rızanız (KVKK m.5/1; GDPR m.6/1-a); rızanızı istediğiniz zaman geri alabilirsiniz.",
+          "Sitedeki yapay zekâ asistanını kullanırsanız: sorularınızı yanıtlamak ve müsaitliğe bakmak için yazdıklarınız Anthropic'in Claude modeline iletilir. Asistanı iyileştirmek için konuşmalar, içindeki e-posta adresleri ve telefon numaraları maskelenerek 30 gün saklanır ve sonra silinir; bir rezervasyonla ya da IP adresinizle ilişkilendirilmez. Hukuki sebep: talebiniz üzerine işlem (KVKK m.5/2-c; GDPR m.6/1-b) ve hizmeti iyileştirmede meşru menfaat (KVKK m.5/2-f; GDPR m.6/1-f). Asistana hassas kişisel bilgi yazmamanızı rica ederiz.",
           "Sitenin işleyişini iyileştirmek için anonim istatistikler: meşru menfaat (KVKK m.5/2-f; GDPR m.6/1-f).",
         ],
       },
       {
         h: "Verileriniz kimlerle paylaşılır?",
         p: [
-          "Verileriniz satılmaz ve reklam amacıyla kullanılmaz. Sadece hizmeti sunabilmemiz için gerekli teknik hizmet sağlayıcılarla paylaşılır: Vercel (site barındırma), Neon (veritabanı — sunucular Frankfurt, Almanya), Resend (işletmeye bildirim ve size gönderilen rezervasyon e-postaları) ve Google (harita, yorumlar). Bu sağlayıcıların bazıları yurt dışında (AB ve ABD) bulunduğundan verileriniz yurt dışına aktarılabilir; bu aktarım yalnızca yukarıdaki amaçlarla ve formda verdiğiniz onaya dayanarak yapılır.",
+          "Verileriniz satılmaz ve reklam amacıyla kullanılmaz. Sadece hizmeti sunabilmemiz için gerekli teknik hizmet sağlayıcılarla paylaşılır: Vercel (site barındırma), Neon (veritabanı — sunucular Frankfurt, Almanya), Resend (işletmeye bildirim ve size gönderilen rezervasyon e-postaları) Anthropic (yapay zekâ asistanı, ABD) ve Google (harita, yorumlar). Bu sağlayıcıların bazıları yurt dışında (AB ve ABD) bulunduğundan verileriniz yurt dışına aktarılabilir; bu aktarım yalnızca yukarıdaki amaçlarla ve formda verdiğiniz onaya dayanarak yapılır.",
           "WhatsApp'tan yazmayı seçerseniz o iletişim WhatsApp'ın kendi gizlilik koşullarına tabidir.",
         ],
       },
@@ -46,6 +47,7 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Ne kadar süre saklıyoruz?",
         p: [
           "Rezervasyon talepleri, konaklama tarihinden sonra en fazla 2 yıl saklanır ve ardından silinir ya da anonim hâle getirilir. Yasal saklama yükümlülüğü olan kayıtlar (ör. fatura) ilgili mevzuatta belirtilen süre boyunca tutulur.",
+          "Yapay zekâ asistanıyla yapılan konuşmalar, son mesajdan 30 gün sonra silinir.",
         ],
       },
       {
@@ -82,13 +84,14 @@ export const privacy: Record<Locale, Privacy> = {
           "To answer your booking request, confirm availability and contact you — legal basis: steps prior to entering a contract (GDPR Art. 6(1)(b)) and the consent you give in the form.",
           "If you give an email address, emails about your stay: that we received your request, that your booking is confirmed, and directions with arrival details the day before you arrive — legal basis: performance of a contract (GDPR Art. 6(1)(b)).",
           "One email after your stay asking about your experience, only if you ticked that separate box in the form — legal basis: your consent (GDPR Art. 6(1)(a)), which you can withdraw at any time.",
+          "If you use the AI assistant on the site: what you write is sent to Anthropic's Claude model to answer your questions and check availability. To improve the assistant, conversations are kept for 30 days with email addresses and phone numbers masked, then deleted; they are not linked to a booking or to your IP address. Legal basis: steps taken at your request (GDPR Art. 6(1)(b)) and our legitimate interest in improving the service (GDPR Art. 6(1)(f)). Please don't share sensitive personal information with the assistant.",
           "Anonymous statistics to improve the site — legitimate interest (GDPR Art. 6(1)(f)).",
         ],
       },
       {
         h: "Who we share it with",
         p: [
-          "We never sell your data or use it for advertising. It is shared only with the technical providers we need to run the service: Vercel (hosting), Neon (database — servers in Frankfurt, Germany), Resend (notifications to the business and booking emails to you) and Google (maps, reviews). Some providers are located outside Türkiye (EU and USA), so your data may be transferred abroad for these purposes only.",
+          "We never sell your data or use it for advertising. It is shared only with the technical providers we need to run the service: Vercel (hosting), Neon (database — servers in Frankfurt, Germany), Resend (notifications to the business and booking emails to you) Anthropic (AI assistant, USA) and Google (maps, reviews). Some providers are located outside Türkiye (EU and USA), so your data may be transferred abroad for these purposes only.",
           "If you choose to message us on WhatsApp, that conversation is subject to WhatsApp's own privacy terms.",
         ],
       },
@@ -96,6 +99,7 @@ export const privacy: Record<Locale, Privacy> = {
         h: "How long we keep it",
         p: [
           "Booking requests are kept for at most 2 years after the stay and then deleted or anonymised. Records we are legally required to keep (e.g. invoices) are retained for the period required by law.",
+          "Conversations with the AI assistant are deleted 30 days after the last message.",
         ],
       },
       {
@@ -132,13 +136,14 @@ export const privacy: Record<Locale, Privacy> = {
           "Beantwortung deiner Buchungsanfrage, Prüfung der Verfügbarkeit und Kontaktaufnahme — Rechtsgrundlage: vorvertragliche Maßnahmen (Art. 6 Abs. 1 lit. b DSGVO) und deine Einwilligung im Formular.",
           "Wenn du eine E-Mail-Adresse angibst, E-Mails zu deinem Aufenthalt: dass deine Anfrage eingegangen ist, dass deine Buchung bestätigt ist, und am Tag vor der Anreise Anfahrt und Anreiseinfos — Rechtsgrundlage: Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO).",
           "Eine E-Mail nach deinem Aufenthalt mit der Frage nach deinen Eindrücken, nur wenn du das eigene Kästchen im Formular angekreuzt hast — Rechtsgrundlage: deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit widerrufen kannst.",
+          "Wenn du den KI-Assistenten auf der Website nutzt: Was du schreibst, wird an das Claude-Modell von Anthropic übermittelt, um deine Fragen zu beantworten und die Verfügbarkeit zu prüfen. Zur Verbesserung des Assistenten speichern wir Unterhaltungen 30 Tage lang, mit unkenntlich gemachten E-Mail-Adressen und Telefonnummern, und löschen sie dann; sie werden weder mit einer Buchung noch mit deiner IP-Adresse verknüpft. Rechtsgrundlage: Maßnahmen auf deine Anfrage (Art. 6 Abs. 1 lit. b DSGVO) und unser berechtigtes Interesse an der Verbesserung des Angebots (Art. 6 Abs. 1 lit. f DSGVO). Bitte teile dem Assistenten keine sensiblen persönlichen Daten mit.",
           "Anonyme Statistiken zur Verbesserung der Website — berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO).",
         ],
       },
       {
         h: "Weitergabe",
         p: [
-          "Wir verkaufen deine Daten nicht und nutzen sie nicht für Werbung. Sie gehen nur an technische Dienstleister, die wir für den Betrieb benötigen: Vercel (Hosting), Neon (Datenbank — Server in Frankfurt), Resend (Benachrichtigungen an den Betrieb und Buchungs-E-Mails an dich) und Google (Karten, Bewertungen). Einige Anbieter sitzen außerhalb der Türkei (EU und USA); eine Übermittlung erfolgt nur zu diesen Zwecken.",
+          "Wir verkaufen deine Daten nicht und nutzen sie nicht für Werbung. Sie gehen nur an technische Dienstleister, die wir für den Betrieb benötigen: Vercel (Hosting), Neon (Datenbank — Server in Frankfurt), Resend (Benachrichtigungen an den Betrieb und Buchungs-E-Mails an dich) Anthropic (KI-Assistent, USA) und Google (Karten, Bewertungen). Einige Anbieter sitzen außerhalb der Türkei (EU und USA); eine Übermittlung erfolgt nur zu diesen Zwecken.",
           "Wenn du uns per WhatsApp schreibst, gelten dafür die Datenschutzbestimmungen von WhatsApp.",
         ],
       },
@@ -146,6 +151,7 @@ export const privacy: Record<Locale, Privacy> = {
         h: "Speicherdauer",
         p: [
           "Buchungsanfragen werden höchstens 2 Jahre nach dem Aufenthalt gespeichert und dann gelöscht oder anonymisiert. Gesetzlich aufbewahrungspflichtige Unterlagen (z. B. Rechnungen) bewahren wir für die gesetzliche Frist auf.",
+          "Unterhaltungen mit dem KI-Assistenten werden 30 Tage nach der letzten Nachricht gelöscht.",
         ],
       },
       {

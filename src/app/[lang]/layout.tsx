@@ -1,8 +1,9 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
-import { locales, isLocale, defaultLocale } from "@/content/dictionaries";
+import { locales, isLocale, defaultLocale, getDictionary } from "@/content/dictionaries";
 import ClickTracker from "@/features/analytics/components/ClickTracker";
+import ConciergeLauncher from "@/features/concierge/components/ConciergeLauncher";
 import {
   HOME_DESCRIPTION,
   HOME_TITLE,
@@ -76,6 +77,10 @@ export default async function RootLayout({
         <Analytics />
         {/* Conversion tracking: WhatsApp / phone clicks → our own database */}
         <ClickTracker />
+        {/* AI concierge: only when an Anthropic API key is configured */}
+        {process.env.ANTHROPIC_API_KEY && (
+          <ConciergeLauncher labels={getDictionary(htmlLang).concierge} lang={htmlLang} />
+        )}
       </body>
     </html>
   );
