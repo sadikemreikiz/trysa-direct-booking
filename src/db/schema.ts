@@ -19,6 +19,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  serial,
   smallint,
   text,
   timestamp,
@@ -164,6 +165,37 @@ export const analyticsEvents = pgTable(
       sql`${t.name} in ('reservation_submitted', 'whatsapp_click', 'phone_click')`,
     ),
     index("analytics_events_name_created_idx").on(t.name, t.createdAt),
+  ],
+);
+
+/**
+ * The restaurant menu. Staff edit prices and availability in the panel; the public menu
+ * page and the AI concierge read from here. Categories are fixed keys (Turkish names, as on
+ * the printed menu) whose order and translations live in the site content.
+ */
+export const menuItems = pgTable(
+  "menu_items",
+  {
+    id: serial("id").primaryKey(),
+    category: text("category").notNull(),
+    position: smallint("position").notNull().default(0),
+    nameTr: text("name_tr").notNull(),
+    nameEn: text("name_en"),
+    nameDe: text("name_de"),
+    descTr: text("desc_tr"),
+    descEn: text("desc_en"),
+    descDe: text("desc_de"),
+    /** Whole Turkish lira */
+    price: integer("price").notNull(),
+    /** false = "not available today", still listed */
+    available: boolean("available").notNull().default(true),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    /** "user:<id>" of the last panel edit, null for the original menu */
+    updatedBy: text("updated_by"),
+  },
+  (t) => [
+    check("menu_items_price", sql`${t.price} > 0 and ${t.price} < 100000`),
+    index("menu_items_category_idx").on(t.category, t.position),
   ],
 );
 

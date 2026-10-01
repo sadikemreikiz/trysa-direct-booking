@@ -50,6 +50,13 @@
       "when": 1790866070981,
       "tag": "0006_concierge_conversations",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790867687101,
+      "tag": "0007_restaurant_menu",
+      "breakpoints": true
     }
   ]
 }

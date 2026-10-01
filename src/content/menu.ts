@@ -1,12 +1,23 @@
-// Prices match the printed menu in the restaurant (checked 2026-09-30).
-// To update: just change the p (price) values below.
+// The printed menu as checked on 2026-09-30. Since migration 0007 the live menu lives in the
+// database and staff edit it in the panel (/panel/menu); this copy seeded that table and is
+// shown only when the database can't be reached.
 // n = Turkish name (as on the printed menu); en/de = translation; d = short description per language.
 // On the English/German pages the translation is large and the Turkish name small, so guests
 // can point to the name on the printed menu in the restaurant.
 import type { Locale } from "@/lib/i18n";
 
 type Text = Record<Locale, string>;
-export type MenuItem = { n: string; en: string; de: string; p: string; d?: Text };
+export type MenuItem = {
+  n: string;
+  en: string;
+  de: string;
+  p: string;
+  d?: Text;
+  /** Set when the menu comes from the database */
+  id?: number;
+  /** false = not available today (still listed) */
+  available?: boolean;
+};
 export type MenuCategory = { cat: string; items: MenuItem[] };
 
 /** Menu item name in the page's language. */

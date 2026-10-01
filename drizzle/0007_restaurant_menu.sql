@@ -1,0 +1,53 @@
+-- Restaurant menu in the database, so staff can edit prices and availability in the panel.
+-- Seeded with the printed menu as it was on 2026-09-30 (src/content/menu.ts).
+CREATE TABLE "menu_items" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"category" text NOT NULL,
+	"position" smallint DEFAULT 0 NOT NULL,
+	"name_tr" text NOT NULL,
+	"name_en" text,
+	"name_de" text,
+	"desc_tr" text,
+	"desc_en" text,
+	"desc_de" text,
+	"price" integer NOT NULL,
+	"available" boolean DEFAULT true NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_by" text,
+	CONSTRAINT "menu_items_price" CHECK ("menu_items"."price" > 0 and "menu_items"."price" < 100000)
+);
+--> statement-breakpoint
+CREATE INDEX "menu_items_category_idx" ON "menu_items" USING btree ("category","position");--> statement-breakpoint
+INSERT INTO "menu_items" ("category", "position", "name_tr", "name_en", "name_de", "desc_tr", "desc_en", "desc_de", "price") VALUES
+  ('Izgaralar', 0, 'Kuzu Şiş', 'Lamb skewer', 'Lammspieß', NULL, NULL, NULL, 650),
+  ('Izgaralar', 1, 'Köfte', 'Grilled meatballs', 'Gegrillte Hackfleischbällchen', NULL, NULL, NULL, 500),
+  ('Izgaralar', 2, 'Tavuk Kanat', 'Chicken wings', 'Hähnchenflügel', NULL, NULL, NULL, 480),
+  ('Izgaralar', 3, 'Tavuk Şiş', 'Chicken skewer', 'Hähnchenspieß', NULL, NULL, NULL, 450),
+  ('Izgaralar', 4, 'Karışık Izgara', 'Mixed grill', 'Gemischte Grillplatte', NULL, NULL, NULL, 970),
+  ('Kahvaltı', 0, 'Lüx Serpme Kahvaltı', 'Deluxe Turkish breakfast spread', 'Großes türkisches Frühstück', NULL, NULL, NULL, 700),
+  ('Kahvaltı', 1, 'Tabak Kahvaltı', 'Breakfast plate', 'Frühstücksteller', NULL, NULL, NULL, 450),
+  ('Kahvaltı', 2, 'Köy Tavuğu Çorbası', 'Free-range chicken soup', 'Landhuhn-Suppe', NULL, NULL, NULL, 190),
+  ('Kahvaltı', 3, 'Pişi Tabağı', 'Pişi plate', 'Pişi-Teller', 'Pişi, domates, salatalık, peynir, reçel', 'Fried dough bites, tomato, cucumber, cheese, jam', 'Frittiertes Teiggebäck, Tomate, Gurke, Käse, Marmelade', 400),
+  ('Tavadan', 0, 'Kremalı Mantar Soslu Tavuk', 'Chicken in creamy mushroom sauce', 'Hähnchen in Champignon-Rahmsauce', NULL, NULL, NULL, 460),
+  ('Tavadan', 1, 'Köri Soslu Tavuk', 'Chicken in curry sauce', 'Hähnchen in Currysauce', NULL, NULL, NULL, 440),
+  ('Tavadan', 2, 'Kekik Soslu Tavuk', 'Chicken in thyme sauce', 'Hähnchen in Thymiansauce', NULL, NULL, NULL, 440),
+  ('Denizden Gelenler', 0, 'Çupra', 'Sea bream', 'Dorade', NULL, NULL, NULL, 580),
+  ('Gözleme & Tost', 0, 'Otlu Gözleme', 'Gözleme with herbs', 'Gözleme mit Kräutern', NULL, NULL, NULL, 200),
+  ('Gözleme & Tost', 1, 'Patatesli Gözleme', 'Gözleme with potato', 'Gözleme mit Kartoffeln', NULL, NULL, NULL, 230),
+  ('Gözleme & Tost', 2, 'Kaşarlı Gözleme', 'Gözleme with cheese', 'Gözleme mit Käse', NULL, NULL, NULL, 250),
+  ('Gözleme & Tost', 3, 'Karışık Gözleme', 'Mixed gözleme', 'Gemischte Gözleme', NULL, NULL, NULL, 290),
+  ('Gözleme & Tost', 4, 'Tost', 'Toasted sandwich', 'Toast', NULL, NULL, NULL, 170),
+  ('Salatalar', 0, 'Ton Balıklı Salata', 'Tuna salad', 'Thunfischsalat', NULL, NULL, NULL, 360),
+  ('Salatalar', 1, 'Greek Salata', 'Greek salad', 'Griechischer Salat', NULL, NULL, NULL, 330),
+  ('Kavurmalar', 0, 'Çoban Kavurma', 'Shepherd''s sauté', 'Hirtenpfanne', NULL, 'Pan-fried diced meat with vegetables', 'Gebratene Fleischwürfel mit Gemüse', 720),
+  ('Çıtırlar', 0, 'Patates Cips', 'French fries', 'Pommes frites', NULL, NULL, NULL, 220),
+  ('Sıcak İçecekler', 0, 'Çay', 'Turkish tea', 'Türkischer Tee', NULL, NULL, NULL, 25),
+  ('Sıcak İçecekler', 1, 'Bitki Çayları', 'Herbal teas', 'Kräutertees', NULL, NULL, NULL, 20),
+  ('Sıcak İçecekler', 2, 'Türk Kahvesi', 'Turkish coffee', 'Türkischer Kaffee', NULL, NULL, NULL, 90),
+  ('Sıcak İçecekler', 3, 'Nescafe', 'Instant coffee (Nescafé)', 'Instantkaffee (Nescafé)', NULL, NULL, NULL, 110),
+  ('Soğuk İçecekler', 0, 'Kutu Kola / Fanta / Sprite', 'Coke / Fanta / Sprite (can)', 'Cola / Fanta / Sprite (Dose)', NULL, NULL, NULL, 90),
+  ('Soğuk İçecekler', 1, 'Meyve Suları', 'Fruit juices', 'Fruchtsäfte', NULL, NULL, NULL, 90),
+  ('Soğuk İçecekler', 2, 'Meyveli Soda', 'Fruit-flavoured mineral water', 'Mineralwasser mit Fruchtgeschmack', NULL, NULL, NULL, 50),
+  ('Soğuk İçecekler', 3, 'Sade Soda', 'Sparkling mineral water', 'Mineralwasser mit Kohlensäure', NULL, NULL, NULL, 35),
+  ('Soğuk İçecekler', 4, 'Şalgam', 'Şalgam (fermented black carrot juice)', 'Şalgam (fermentierter Schwarzkarottensaft)', NULL, NULL, NULL, 50),
+  ('Soğuk İçecekler', 5, 'Ayran', 'Ayran (salted yoghurt drink)', 'Ayran (salziges Joghurtgetränk)', NULL, NULL, NULL, 100);
