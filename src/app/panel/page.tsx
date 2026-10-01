@@ -39,9 +39,15 @@ export default async function PanelHome() {
         </Link>
         <Link
           href="/panel/menu"
-          className="col-span-2 flex items-center justify-center rounded-2xl border-2 border-pine bg-white px-3 py-3.5 text-base font-bold text-pine"
+          className="flex items-center justify-center rounded-2xl border-2 border-pine bg-white px-3 py-3.5 text-base font-bold text-pine"
         >
-          🍽 Restoran menüsü ve fiyatlar
+          🍽 Menü
+        </Link>
+        <Link
+          href="/panel/kartlar"
+          className="flex items-center justify-center rounded-2xl border-2 border-pine bg-white px-3 py-3.5 text-base font-bold text-pine"
+        >
+          🖨 QR kartları
         </Link>
       </div>
 

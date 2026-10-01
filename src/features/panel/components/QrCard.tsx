@@ -1,11 +1,20 @@
 import QRCode from "qrcode";
 import LogoMark from "@/components/LogoMark";
+import type { QrCardKind } from "@/features/panel/qr-cards";
 
 /**
- * A printable table card (A6, a quarter of A4) with a QR code to the online menu. The link
- * has no language: /menu sends each guest to the menu in their phone's language.
+ * A printable card (A6, a quarter of A4) with a QR code to one of the site's short links,
+ * e.g. the menu on the restaurant tables or Google's review screen in the rooms.
  */
-export default async function TableCard({ url, id }: { url: string; id: string }) {
+export default async function QrCard({
+  card,
+  url,
+  id,
+}: {
+  card: QrCardKind;
+  url: string;
+  id: string;
+}) {
   const qr = await QRCode.toString(url, {
     type: "svg",
     // The quiet zone around the code comes from the card's white space
@@ -31,7 +40,11 @@ export default async function TableCard({ url, id }: { url: string; id: string }
       </div>
 
       <div className="font-display text-[6mm] leading-tight font-semibold text-clay">
-        Menü · Menu · Speisekarte
+        {card.title.map((line) => (
+          <span key={line} className="block">
+            {line}
+          </span>
+        ))}
       </div>
 
       <div
@@ -43,9 +56,11 @@ export default async function TableCard({ url, id }: { url: string; id: string }
 
       <div>
         <p className="text-[3mm] leading-snug text-muted">
-          Kamerayla okut · Scan with your camera
-          <br />
-          Mit der Kamera scannen
+          {card.hint.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
         </p>
         <p className="mt-[1.5mm] text-[3.6mm] font-bold text-ink">
           {url.replace(/^https?:\/\//, "")}

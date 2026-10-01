@@ -42,7 +42,8 @@ I built and run this on my own: gathered requirements with the family, chose the
 - A monthly occupancy calendar across all rooms and Airbnb
 - Statistics from measured data only: requests, confirmation rate, median first-response time, clicks, nights sold
 - An iCal feed per room, so Airbnb blocks dates sold directly
-- The restaurant menu edited from the phone: prices, "not available today", new dishes and translations reach the public menu and the AI concierge at once; printable QR table cards that never need reprinting
+- The restaurant menu edited from the phone: prices, "not available today", new dishes and translations reach the public menu and the AI concierge at once
+- Printable QR cards: the menu for the restaurant tables, Google's review screen for the rooms. They point to short links, so they never need reprinting
 
 <table>
   <tr>
@@ -149,12 +150,12 @@ src/
     booking/              request validation and storage, form action, spam limits, guest form
     airbnb-sync/          Airbnb calendar import and the iCal feed Airbnb imports
     notifications/        transactional outbox delivery, email, guest receipts, Web Push
-    panel/                status changes, access control, calendar, statistics, panel UI
+    panel/                status changes, access control, calendar, statistics, QR cards, panel UI
     maintenance/          scheduled jobs: reminders and data retention
     analytics/            cookie-free conversion events
     reviews/              live Google rating and reviews
     concierge/            AI assistant: knowledge, tools, streaming loop, chat UI, stored chats
-    restaurant/           menu in the database, staff menu editor, QR table cards
+    restaurant/           menu in the database and the staff menu editor
   content/                site facts, printed menu (seed and fallback), privacy policy, TR/EN/DE dictionaries
   components/             shared UI (header, footer, logo) and the home page sections
   db/                     Drizzle schema, connection and the PGlite test database

@@ -26,7 +26,7 @@ export default async function MenuPanelPage() {
           Sitede gör ↗
         </Link>
         <Link
-          href="/panel/menu/kart"
+          href="/panel/kartlar?tur=menu"
           className="rounded-xl border border-line bg-white px-3 py-2 text-sm font-semibold text-pine"
         >
           🖨 Masa için QR kartı
