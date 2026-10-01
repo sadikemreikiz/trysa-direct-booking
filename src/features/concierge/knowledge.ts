@@ -29,7 +29,10 @@ function rooms(): string {
     .map((s) => {
       const desc = en.room.descs[s.slug as keyof typeof en.room.descs] ?? s.desc;
       const price = s.slug === "kamp" ? "price on request" : `${s.price} per night`;
-      return `- ${s.title} (id: ${s.slug}): ${desc}. ${price}.`;
+      const extras = s.extras?.length
+        ? ` Has: ${s.extras.map((x) => en.amenities.extras[x].toLowerCase()).join(", ")}.`
+        : "";
+      return `- ${s.title} (id: ${s.slug}): ${desc}. ${price}.${extras}`;
     })
     .join("\n");
 }
@@ -72,7 +75,7 @@ ${rooms()}
 ${en.stay.sub}
 
 ## Amenities
-${en.amenities.list.join(", ")}. The family is still finalising this list, so for any amenity not listed here, offer WhatsApp instead of guessing.
+For every guest: ${en.amenities.list.join(", ")}. Air conditioning only in the rooms listed with it above. For any amenity not listed here, offer WhatsApp instead of guessing.
 
 ## Restaurant
 ${en.restaurant.desc} The restaurant is open to guests and to visitors who aren't staying.

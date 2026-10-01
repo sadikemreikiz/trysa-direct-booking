@@ -1,6 +1,6 @@
 import { stays } from "@/content/site";
 import { responsiveImage } from "@/lib/images";
-import { container, Photo, type TL } from "./shared";
+import { container, type TL } from "./shared";
 
 export function Accommodation({ t, lang }: TL) {
   return (
@@ -23,7 +23,7 @@ export function Accommodation({ t, lang }: TL) {
                 className="h-44 w-full object-cover"
               />
             ) : (
-              <Photo tone={s.tone} className="h-44" />
+              <CampScene />
             )}
             <div className="p-5">
               <div className="font-display text-lg font-semibold md:text-xl">
@@ -41,5 +41,41 @@ export function Accommodation({ t, lang }: TL) {
         ))}
       </div>
     </section>
+  );
+}
+
+/** The camping area has no photo yet: a small drawn scene instead of an empty photo slot. */
+function CampScene() {
+  return (
+    <svg
+      viewBox="0 0 320 176"
+      preserveAspectRatio="xMidYMax slice"
+      className="h-44 w-full"
+      aria-hidden="true"
+    >
+      <rect width="320" height="176" fill="#efe8d8" />
+      <circle cx="232" cy="58" r="20" fill="#c1622f" />
+      <path d="M-20 146 L84 64 Q92 58 100 64 L214 146 Z" fill="#9aa68c" />
+      <path d="M118 150 L222 84 Q230 79 238 84 L350 150 Z" fill="#2c3a2e" />
+      <rect y="142" width="320" height="34" fill="#c7b79a" />
+      {/* Tent */}
+      <path d="M58 152 L94 100 L130 152 Z" fill="#ad5426" />
+      <path d="M86 152 L94 126 L102 152 Z" fill="#f6f1e7" />
+      {/* Caravan */}
+      <rect
+        x="164"
+        y="118"
+        width="74"
+        height="30"
+        rx="9"
+        fill="#f6f1e7"
+        stroke="#2c3a2e"
+        strokeWidth="3"
+      />
+      <rect x="176" y="125" width="18" height="11" rx="2" fill="#9aa68c" />
+      <rect x="204" y="125" width="14" height="23" rx="2" fill="#c7b79a" />
+      <circle cx="184" cy="150" r="6" fill="#2c3a2e" />
+      <circle cx="222" cy="150" r="6" fill="#2c3a2e" />
+    </svg>
   );
 }

@@ -98,11 +98,14 @@ export default async function RoomPage({ params }: Params) {
             {t.room.amenitiesTitle}
           </h2>
           <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 rounded-2xl border border-line bg-white p-5 md:grid-cols-4 md:p-6">
-            {t.amenities.list.map((a) => (
-              <div key={a} className="flex items-center gap-2 text-sm text-pine/90">
-                <span className="text-clay">•</span> {a}
-              </div>
-            ))}
+            {/* Room-only features (air conditioning…) first, then what every guest gets */}
+            {[...(room.extras ?? []).map((x) => t.amenities.extras[x]), ...t.amenities.list].map(
+              (a) => (
+                <div key={a} className="flex items-center gap-2 text-sm text-pine/90">
+                  <span className="text-clay">•</span> {a}
+                </div>
+              ),
+            )}
           </div>
 
           <div className="mt-8 rounded-2xl bg-clay p-6 text-center md:p-8">

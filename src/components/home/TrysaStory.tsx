@@ -1,10 +1,10 @@
-import { container, Photo, type T } from "./shared";
+import { container, type T } from "./shared";
 
 export function TrysaStory({ t }: T) {
   return (
     <section id="trysa" className={`${container} scroll-mt-20 pt-10`}>
-      <div className="overflow-hidden rounded-2xl bg-stone md:flex">
-        <div className="p-6 md:flex-1 md:p-12">
+      <div className="overflow-hidden rounded-2xl bg-stone">
+        <div className="p-6 md:p-12">
           <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">
             {t.trysaStory.kicker}
           </div>
@@ -23,7 +23,6 @@ export function TrysaStory({ t }: T) {
             {t.trysaStory.cta}
           </a>
         </div>
-        <Photo tone="#4a4335" className="h-40 md:h-auto md:w-[420px]" labelDark />
       </div>
     </section>
   );

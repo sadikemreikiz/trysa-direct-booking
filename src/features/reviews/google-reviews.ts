@@ -1,7 +1,8 @@
 /**
  * Fetches real Google reviews via the Google Places API (New).
  * Env: GOOGLE_PLACES_API_KEY (required), GOOGLE_PLACE_ID (optional; otherwise found by name).
- * Without a key it returns null → the site falls back to static sample reviews.
+ * Without a key it returns null → the reviews section is hidden and the rating shows the
+ * last known value.
  * The Google API returns at most ~5 featured reviews; refreshed once a day.
  * Requested per language: Google returns reviews written in that language first (English
  * reviews on the EN page); translated ones are flagged with `translated`.

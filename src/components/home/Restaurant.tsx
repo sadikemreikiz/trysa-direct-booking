@@ -1,5 +1,6 @@
 import { fillRating } from "@/features/reviews/google-reviews";
-import { container, Photo, type TLR } from "./shared";
+import { responsiveImage } from "@/lib/images";
+import { container, type TLR } from "./shared";
 
 export function Restaurant({ t, lang, rating }: TLR) {
   return (
@@ -26,7 +27,16 @@ export function Restaurant({ t, lang, rating }: TLR) {
             {t.restaurant.cta}
           </a>
         </div>
-        <Photo tone="#4a5a45" className="h-48 md:h-auto md:w-[420px]" labelDark />
+        <div className="relative h-56 md:h-auto md:w-[420px]">
+          {/* The open-air section under the reed roof (lower part of the hero photo) */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            {...responsiveImage("/img/hero.jpg", "(min-width: 768px) 420px, 100vw")}
+            alt={t.restaurant.h}
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover object-[center_70%]"
+          />
+        </div>
       </div>
     </section>
   );

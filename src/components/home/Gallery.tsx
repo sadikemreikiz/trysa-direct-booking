@@ -16,7 +16,7 @@ export function Gallery({ t }: T) {
           <img
             key={i}
             {...responsiveImage(g.src, "(min-width: 768px) 25vw, 50vw")}
-            alt={g.label === "Doğa" ? t.gallery.nature : g.label}
+            alt={typeof g.alt === "string" ? g.alt : t.gallery[g.alt.label]}
             loading="lazy"
             className="h-28 w-full rounded-xl object-cover md:h-36"
           />
