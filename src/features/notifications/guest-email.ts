@@ -119,11 +119,11 @@ function toText(c: Content, directionsLink: string): string {
 /** Safe for email clients: table layout, inline styles, no external CSS. */
 function toHtml(c: Content, directionsLink: string, lang: Locale): string {
   const pine = "#2c3a2e";
-  const clay = "#c1622f";
+  const clay = "#ad5426";
   const rows = c.details
     .map(
       ([k, v]) =>
-        `<tr><td style="padding:6px 0;color:#6b6f63;font-size:14px">${esc(k)}</td><td style="padding:6px 0;color:${pine};font-size:14px;font-weight:700;text-align:right">${esc(v)}</td></tr>`,
+        `<tr><td style="padding:6px 0;color:#5f6358;font-size:14px">${esc(k)}</td><td style="padding:6px 0;color:${pine};font-size:14px;font-weight:700;text-align:right">${esc(v)}</td></tr>`,
     )
     .join("");
   const button = (href: string, label: string, bg: string) =>
@@ -138,10 +138,10 @@ function toHtml(c: Content, directionsLink: string, lang: Locale): string {
 <p style="margin:0 0 16px;font-size:15px;line-height:1.5">${esc(c.intro)}</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #e9e1cf;border-bottom:1px solid #e9e1cf;margin-bottom:16px">${rows}</table>
 <p style="margin:0 0 18px;font-size:14px;line-height:1.55;color:#22271f">${esc(c.notYet)}</p>
-${button(site.whatsapp, c.whatsapp, "#25d366")}${button(directionsLink, c.directions, clay)}
-<p style="margin:20px 0 0;font-size:14px;color:#6b6f63">${esc(c.bye)}<br><b style="color:${pine}">${esc(c.signature)}</b></p>
+${button(site.whatsapp, c.whatsapp, "#0f8040")}${button(directionsLink, c.directions, clay)}
+<p style="margin:20px 0 0;font-size:14px;color:#5f6358">${esc(c.bye)}<br><b style="color:${pine}">${esc(c.signature)}</b></p>
 </td></tr>
-<tr><td style="padding:14px 4px;font-size:12px;color:#6b6f63;text-align:center"><a href="${SITE_URL}" style="color:#6b6f63">trysacamping.com</a> · ${esc(site.phoneLabel)}</td></tr>
+<tr><td style="padding:14px 4px;font-size:12px;color:#5f6358;text-align:center"><a href="${SITE_URL}" style="color:#5f6358">trysacamping.com</a> · ${esc(site.phoneLabel)}</td></tr>
 </table></td></tr></table></body></html>`;
 }
 

@@ -259,7 +259,7 @@ export default function ReservationForm({
         </div>
 
         {dateBlocked && (
-          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-[#a9501f]">
+          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-clay-dark">
             {t.reservation.blockedMsg}
           </p>
         )}
@@ -312,7 +312,7 @@ export default function ReservationForm({
         <label className="block">
           <span className={lbl}>
             {t.reservation.email}{" "}
-            <span className="font-normal text-muted/70">{t.reservation.optional}</span>
+            <span className="font-normal text-muted">{t.reservation.optional}</span>
           </span>
           <input
             type="email"
@@ -325,7 +325,7 @@ export default function ReservationForm({
         <label className="block">
           <span className={lbl}>
             {t.reservation.note}{" "}
-            <span className="font-normal text-muted/70">{t.reservation.optional}</span>
+            <span className="font-normal text-muted">{t.reservation.optional}</span>
           </span>
           <textarea
             className={fld}
@@ -352,7 +352,7 @@ export default function ReservationForm({
         </label>
 
         {error && (
-          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-[#a9501f]">
+          <p className="rounded-lg bg-[#fbe4dc] px-3 py-2 text-sm font-semibold text-clay-dark">
             {error}
           </p>
         )}

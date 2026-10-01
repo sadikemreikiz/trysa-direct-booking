@@ -30,9 +30,7 @@ export function Reviews({ t, lang, google }: TL & { google?: GoogleReviewsData |
               “{r.text}”
             </p>
             <div className="mt-3 text-sm font-semibold text-muted">— {r.author}</div>
-            {r.translated && (
-              <div className="mt-1 text-xs text-muted/80">{t.reviews.translated}</div>
-            )}
+            {r.translated && <div className="mt-1 text-xs text-muted">{t.reviews.translated}</div>}
           </div>
         ))}
       </div>

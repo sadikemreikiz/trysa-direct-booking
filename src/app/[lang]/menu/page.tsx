@@ -50,7 +50,7 @@ export default async function MenuPage({ params }: { params: Promise<{ lang: str
                         )}
                         {/* In translations also show the Turkish name (italic) so guests can find it on the printed menu */}
                         {lang !== "tr" && (
-                          <span className="mt-0.5 block text-xs italic text-muted/80" lang="tr">
+                          <span className="mt-0.5 block text-xs italic text-muted" lang="tr">
                             {it.n}
                           </span>
                         )}
@@ -63,7 +63,7 @@ export default async function MenuPage({ params }: { params: Promise<{ lang: str
             ))}
           </div>
 
-          <p className="mt-6 text-xs text-muted/70">{t.menu.note}</p>
+          <p className="mt-6 text-xs text-muted">{t.menu.note}</p>
         </div>
       </main>
       <Footer t={t} lang={lang} />

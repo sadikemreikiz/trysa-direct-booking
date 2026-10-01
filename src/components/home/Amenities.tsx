@@ -13,7 +13,7 @@ export function Amenities({ t }: T) {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-xs text-muted/70">{t.amenities.note}</p>
+      <p className="mt-2 text-xs text-muted">{t.amenities.note}</p>
     </section>
   );
 }

@@ -9,7 +9,7 @@ export function CtaBand({ t, lang }: TL) {
         <h2 className="font-display text-2xl font-semibold text-white md:text-3xl">
           {t.cta.title}
         </h2>
-        <p className="mt-1.5 text-sm text-[#fbe6d8] md:text-base">{t.cta.sub}</p>
+        <p className="mt-1.5 text-sm text-[#fdf1e8] md:text-base">{t.cta.sub}</p>
         <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
           <a
             href={`/${lang}/rezervasyon`}
