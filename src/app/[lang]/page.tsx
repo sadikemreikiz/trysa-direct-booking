@@ -3,22 +3,20 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
 import JsonLd from "@/components/JsonLd";
-import {
-  Hero,
-  BookingBar,
-  TwoPath,
-  WhyDirect,
-  Accommodation,
-  Amenities,
-  Restaurant,
-  Gallery,
-  TrysaStory,
-  Experiences,
-  Distances,
-  Reviews,
-  Faq,
-  CtaBand,
-} from "@/components/sections";
+import { Hero } from "@/components/home/Hero";
+import { BookingBar } from "@/components/home/BookingBar";
+import { TwoPath } from "@/components/home/TwoPath";
+import { WhyDirect } from "@/components/home/WhyDirect";
+import { Accommodation } from "@/components/home/Accommodation";
+import { Amenities } from "@/components/home/Amenities";
+import { Restaurant } from "@/components/home/Restaurant";
+import { Gallery } from "@/components/home/Gallery";
+import { TrysaStory } from "@/components/home/TrysaStory";
+import { Experiences } from "@/components/home/Experiences";
+import { Distances } from "@/components/home/Distances";
+import { Reviews } from "@/components/home/Reviews";
+import { Faq } from "@/components/home/Faq";
+import { CtaBand } from "@/components/home/CtaBand";
 import { getGoogleReviews, getRatingSummary } from "@/features/reviews/google-reviews";
 import { getDictionary, isLocale } from "@/content/dictionaries";
 
