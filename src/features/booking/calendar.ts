@@ -7,6 +7,8 @@
  * check out on a booked day (they leave that morning) but cannot check in on it.
  */
 
+import { addDays } from "@/lib/dates";
+
 export const MAX_NIGHTS = 60;
 /** How far ahead guests can browse; Airbnb exports about a year of calendar. */
 export const MONTHS_AHEAD = 12;
@@ -16,11 +18,7 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 export type Range = { checkin: string; checkout: string };
 export type YearMonth = { year: number; month: number }; // month: 0–11
 
-export function addDays(iso: string, days: number): string {
-  const d = new Date(`${iso}T00:00:00Z`);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
+export { addDays };
 
 export function nightsBetween(checkin: string, checkout: string): number {
   return Math.round(
