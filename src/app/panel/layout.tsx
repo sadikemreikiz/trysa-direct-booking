@@ -24,7 +24,9 @@ export default function PanelLayout({ children }: { children: React.ReactNode })
   return (
     <html lang="tr" className={`${fraunces.variable} ${manrope.variable} h-full antialiased`}>
       <body className="min-h-full bg-ivory text-ink">
-        <main className="mx-auto max-w-xl px-4 pb-16 pt-4">{children}</main>
+        <main className="mx-auto max-w-xl px-4 pb-16 pt-4 print:max-w-none print:p-0">
+          {children}
+        </main>
       </body>
     </html>
   );
