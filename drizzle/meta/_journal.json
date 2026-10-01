@@ -43,6 +43,13 @@
       "when": 1790864251072,
       "tag": "0005_guest_journey",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790866070981,
+      "tag": "0006_concierge_conversations",
+      "breakpoints": true
     }
   ]
 }

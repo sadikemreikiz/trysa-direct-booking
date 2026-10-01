@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { getDb } from "@/db";
 import { pruneRateLimits } from "@/features/booking/rate-limit";
+import { deleteExpiredConversations } from "@/features/concierge/conversations";
 import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
 import { guestEmailEnabled } from "@/features/notifications/email";
 import { queueGuestJourneyEmails } from "@/features/notifications/guest-journey";
@@ -10,8 +11,8 @@ import { sendPushToStaff } from "@/features/notifications/push";
 
 /**
  * Scheduled maintenance: queues pre-arrival and review emails, retries failed notifications,
- * reminds the admin about unanswered requests, deletes expired personal data and cleans up
- * old spam counters.
+ * reminds the admin about unanswered requests, deletes expired personal data and assistant
+ * conversations, and cleans up old spam counters.
  *
  * Callers (Authorization: Bearer $CRON_SECRET):
  *   - Vercel Cron (vercel.json): once a day on the Hobby plan; Vercel adds the header itself.
@@ -32,9 +33,10 @@ export async function GET(request: Request) {
     sendPushToStaff(db, m, { roles: ["admin"] }),
   );
   const anonymized = await anonymizeExpiredReservations(db);
+  const conversations = await deleteExpiredConversations(db);
   await pruneRateLimits(db);
 
-  return Response.json({ journey, outbox, escalated, anonymized });
+  return Response.json({ journey, outbox, escalated, anonymized, conversations });
 }
 
 function authorized(header: string | null): boolean {

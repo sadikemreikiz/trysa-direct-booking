@@ -168,6 +168,34 @@ export const analyticsEvents = pgTable(
 );
 
 /**
+ * AI concierge conversations, kept 30 days to review and improve the assistant, then deleted
+ * by the maintenance job. Contact details are masked before storing; nothing links a
+ * conversation to a booking or an IP address.
+ */
+export const conciergeConversations = pgTable(
+  "concierge_conversations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    locale: text("locale").notNull(),
+    /** [{ role, text, at, actions? }] with emails and phone numbers masked */
+    messages: jsonb("messages").notNull().default([]),
+    /** Names of the tools the assistant called, in order */
+    toolCalls: jsonb("tool_calls").notNull().default([]),
+    turns: integer("turns").notNull().default(0),
+    inputTokens: integer("input_tokens").notNull().default(0),
+    outputTokens: integer("output_tokens").notNull().default(0),
+    cacheReadTokens: integer("cache_read_tokens").notNull().default(0),
+    cacheWriteTokens: integer("cache_write_tokens").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check("concierge_conversations_locale", sql`${t.locale} in ('tr', 'en', 'de')`),
+    index("concierge_conversations_updated_idx").on(t.updatedAt),
+  ],
+);
+
+/**
  * Abuse limit (spam protection): a fixed-window counter per key.
  * The key is not the IP itself but its keyed digest (HMAC); rows are deleted after 2 days.
  */
