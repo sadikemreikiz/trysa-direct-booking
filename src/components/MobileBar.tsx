@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
+import { site } from "@/content/site";
 import { WhatsAppIcon } from "./icons";
-import type { Dict, Locale } from "@/dictionaries";
+import type { Dict, Locale } from "@/content/dictionaries";
 
 export default function MobileBar({ t, lang }: { t: Dict; lang: Locale }) {
   return (

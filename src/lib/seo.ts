@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { locales, type Locale } from "@/i18n-config";
+import { locales, type Locale } from "./i18n";
 
 // Site URL (also set via NEXT_PUBLIC_SITE_URL in production).
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trysacamping.com";

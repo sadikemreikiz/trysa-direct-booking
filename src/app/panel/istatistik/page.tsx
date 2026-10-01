@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
-import PanelHeader from "@/components/panel/PanelHeader";
-import { sourceLabel } from "@/components/panel/format";
-import { getStats } from "@/db/stats";
-import { requireApprovedStaff } from "@/lib/panel-session";
+import PanelHeader from "@/features/panel/components/PanelHeader";
+import { sourceLabel } from "@/features/panel/format";
+import { getStats } from "@/features/panel/stats";
+import { requireApprovedStaff } from "@/features/panel/session";
 
 const monthName = new Intl.DateTimeFormat("tr-TR", { month: "short", year: "2-digit", timeZone: "UTC" });
 

@@ -1,13 +1,13 @@
 import { asc, ne } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { units } from "@/db/schema";
-import { listStaff } from "@/db/staff";
-import { AccessActions, CopyButton } from "@/components/panel/AccessActions";
-import PanelHeader from "@/components/panel/PanelHeader";
-import { icalToken } from "@/lib/ical";
-import { requireApprovedStaff } from "@/lib/panel-session";
+import { listStaff } from "@/features/panel/staff";
+import { AccessActions, CopyButton } from "@/features/panel/components/AccessActions";
+import PanelHeader from "@/features/panel/components/PanelHeader";
+import { icalToken } from "@/features/airbnb-sync/ical-feed";
+import { requireApprovedStaff } from "@/features/panel/session";
 import { SITE_URL } from "@/lib/seo";
-import { SHARED_UNIT_SLUG } from "@/db/panel";
+import { SHARED_UNIT_SLUG } from "@/features/panel/reservation-admin";
 
 const statusText = { pending: "⏳ Erişim istiyor", approved: "✅ Aktif", revoked: "🔒 Kapalı" } as const;
 const roleText = { admin: "Yönetici", staff: "İşletme" } as const;

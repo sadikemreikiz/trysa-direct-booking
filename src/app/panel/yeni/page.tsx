@@ -1,7 +1,7 @@
-import PanelHeader from "@/components/panel/PanelHeader";
-import ManualReservationForm from "@/components/panel/ManualReservationForm";
-import { todayInDemre } from "@/db/reservations";
-import { requireApprovedStaff } from "@/lib/panel-session";
+import PanelHeader from "@/features/panel/components/PanelHeader";
+import ManualReservationForm from "@/features/panel/components/ManualReservationForm";
+import { todayInDemre } from "@/features/booking/reservations";
+import { requireApprovedStaff } from "@/features/panel/session";
 
 /** Manually add a booking that came in by phone, WhatsApp or walk-in. */
 export default async function NewReservationPage() {

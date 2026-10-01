@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { confirmedStaysForUnit } from "@/db/panel";
-import { todayInDemre } from "@/db/reservations";
+import { confirmedStaysForUnit } from "@/features/panel/reservation-admin";
+import { todayInDemre } from "@/features/booking/reservations";
 import { units } from "@/db/schema";
-import { buildIcs, verifyIcalToken } from "@/lib/ical";
+import { buildIcs, verifyIcalToken } from "@/features/airbnb-sync/ical-feed";
 
 /** Airbnb polls this URL every few hours: /api/ical/ambar-1?token=... */
 export async function GET(request: Request, { params }: { params: Promise<{ unit: string }> }) {

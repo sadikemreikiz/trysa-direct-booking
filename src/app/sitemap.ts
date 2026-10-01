@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-import { stays } from "@/lib/site";
+import { stays } from "@/content/site";
 import { SITE_URL } from "@/lib/seo";
-import { locales } from "@/i18n-config";
+import { locales } from "@/lib/i18n";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

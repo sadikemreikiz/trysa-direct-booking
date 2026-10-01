@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site } from "@/lib/site";
+import { site } from "@/content/site";
 import { WhatsAppIcon } from "./icons";
 import LogoMark from "./LogoMark";
 

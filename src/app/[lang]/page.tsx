@@ -19,8 +19,8 @@ import {
   Faq,
   CtaBand,
 } from "@/components/sections";
-import { getGoogleReviews, getRatingSummary } from "@/lib/reviews";
-import { getDictionary, isLocale } from "@/dictionaries";
+import { getGoogleReviews, getRatingSummary } from "@/features/reviews/google-reviews";
+import { getDictionary, isLocale } from "@/content/dictionaries";
 
 export default async function Home({
   params,

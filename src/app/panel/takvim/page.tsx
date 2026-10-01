@@ -1,11 +1,11 @@
 import Link from "next/link";
-import PanelHeader from "@/components/panel/PanelHeader";
-import { buildCalendar, daysOfMonth, shiftMonth, type Cell } from "@/components/panel/calendar";
-import { formatDay } from "@/components/panel/format";
-import { calendarData, SHARED_UNIT_SLUG } from "@/db/panel";
-import { todayInDemre } from "@/db/reservations";
-import { AIRBNB_REFRESH_SECONDS, getLockedDatesByType } from "@/lib/availability";
-import { requireApprovedStaff } from "@/lib/panel-session";
+import PanelHeader from "@/features/panel/components/PanelHeader";
+import { buildCalendar, daysOfMonth, shiftMonth, type Cell } from "@/features/panel/calendar";
+import { formatDay } from "@/features/panel/format";
+import { calendarData, SHARED_UNIT_SLUG } from "@/features/panel/reservation-admin";
+import { todayInDemre } from "@/features/booking/reservations";
+import { AIRBNB_REFRESH_SECONDS, getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { requireApprovedStaff } from "@/features/panel/session";
 
 const monthTitle = new Intl.DateTimeFormat("tr-TR", { month: "long", year: "numeric", timeZone: "UTC" });
 const weekday = new Intl.DateTimeFormat("tr-TR", { weekday: "short", timeZone: "UTC" });

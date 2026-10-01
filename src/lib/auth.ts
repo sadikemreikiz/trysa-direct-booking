@@ -10,8 +10,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { getDb } from "@/db";
 import * as schema from "@/db/schema";
-import { createStaffForNewUser } from "@/db/staff";
-import { sendPushToStaff } from "./push";
+import { createStaffForNewUser } from "@/features/panel/staff";
+import { sendPushToStaff } from "@/features/notifications/push";
 
 function adminEmails(): string[] {
   return (process.env.ADMIN_EMAILS ?? "")

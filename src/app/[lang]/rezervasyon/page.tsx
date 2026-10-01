@@ -3,11 +3,11 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
-import ReservationForm from "@/components/ReservationForm";
-import { getGuestLockedDates } from "@/lib/guest-availability";
-import { fillRating, getRatingSummary } from "@/lib/reviews";
+import ReservationForm from "@/features/booking/components/ReservationForm";
+import { getGuestLockedDates } from "@/features/booking/guest-availability";
+import { fillRating, getRatingSummary } from "@/features/reviews/google-reviews";
 import { pageMetadata } from "@/lib/seo";
-import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
+import { getDictionary, isLocale, defaultLocale } from "@/content/dictionaries";
 
 export async function generateMetadata({
   params,

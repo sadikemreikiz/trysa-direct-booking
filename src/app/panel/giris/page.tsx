@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import LogoMark from "@/components/LogoMark";
-import { GoogleSignInButton } from "@/components/panel/AuthButtons";
-import { getPanelContext } from "@/lib/panel-session";
+import { GoogleSignInButton } from "@/features/panel/components/AuthButtons";
+import { getPanelContext } from "@/features/panel/session";
 
 export default async function SignInPage({
   searchParams,

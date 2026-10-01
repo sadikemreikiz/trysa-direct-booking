@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { SignOutButton } from "@/components/panel/AuthButtons";
-import { getPanelContext } from "@/lib/panel-session";
+import { SignOutButton } from "@/features/panel/components/AuthButtons";
+import { getPanelContext } from "@/features/panel/session";
 
 export default async function PendingAccessPage() {
   const ctx = await getPanelContext();

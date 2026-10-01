@@ -78,7 +78,7 @@ export const reservations = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
     /** Moment the admin was reminded because the request went unanswered for too long */
     escalatedAt: timestamp("escalated_at", { withTimezone: true }),
-    /** Moment personal data was deleted because the retention period expired (see db/maintenance) */
+    /** Moment personal data was deleted because the retention period expired (see features/maintenance) */
     anonymizedAt: timestamp("anonymized_at", { withTimezone: true }),
   },
   (t) => [

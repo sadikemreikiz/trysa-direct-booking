@@ -4,11 +4,11 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
-import { stays } from "@/lib/site";
-import { getRoomPhotos } from "@/lib/roomPhotos";
+import { stays } from "@/content/site";
+import { getRoomPhotos } from "@/lib/room-photos";
 import { responsiveImage } from "@/lib/images";
 import { pageMetadata } from "@/lib/seo";
-import { getDictionary, isLocale, defaultLocale, locales } from "@/dictionaries";
+import { getDictionary, isLocale, defaultLocale, locales } from "@/content/dictionaries";
 
 type Params = { params: Promise<{ lang: string; slug: string }> };
 

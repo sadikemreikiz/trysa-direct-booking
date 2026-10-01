@@ -1,10 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 import { getDb } from "@/db";
-import { anonymizeExpiredReservations, escalateStalePending } from "@/db/maintenance";
-import { pruneRateLimits } from "@/db/rate-limit";
-import { deliverDueOutbox } from "@/db/reservations";
-import { sendGuestEmail, sendNotificationEmail } from "@/lib/email";
-import { sendPushToStaff } from "@/lib/push";
+import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
+import { pruneRateLimits } from "@/features/booking/rate-limit";
+import { deliverDueOutbox } from "@/features/booking/reservations";
+import { sendGuestEmail, sendNotificationEmail } from "@/features/notifications/email";
+import { sendPushToStaff } from "@/features/notifications/push";
 
 /**
  * Scheduled maintenance: retries failed notifications, reminds the admin about unanswered

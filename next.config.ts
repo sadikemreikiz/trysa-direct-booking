@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { place } from "./src/lib/site";
+import { place } from "./src/content/site";
 
 const isDev = process.env.NODE_ENV === "development";
 // Vercel preview deployments load the comments toolbar (vercel.live); production does not.

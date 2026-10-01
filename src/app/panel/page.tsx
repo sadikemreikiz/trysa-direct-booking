@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { listPanelReservations } from "@/db/panel";
-import { todayInDemre } from "@/db/reservations";
-import PanelHeader from "@/components/panel/PanelHeader";
-import PushToggle from "@/components/panel/PushToggle";
-import { formatDay, localeFlag, nights, SLOW_RESPONSE_MS, sourceLabel, timeAgo } from "@/components/panel/format";
-import { requireApprovedStaff } from "@/lib/panel-session";
-import { vapidPublicKey } from "@/lib/push";
+import { listPanelReservations } from "@/features/panel/reservation-admin";
+import { todayInDemre } from "@/features/booking/reservations";
+import PanelHeader from "@/features/panel/components/PanelHeader";
+import PushToggle from "@/features/panel/components/PushToggle";
+import { formatDay, localeFlag, nights, SLOW_RESPONSE_MS, sourceLabel, timeAgo } from "@/features/panel/format";
+import { requireApprovedStaff } from "@/features/panel/session";
+import { vapidPublicKey } from "@/features/notifications/push";
 
 export default async function PanelHome() {
   const { db, staff } = await requireApprovedStaff();

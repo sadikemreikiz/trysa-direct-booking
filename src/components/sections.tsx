@@ -1,8 +1,8 @@
-import { place, site, stays, galleryImages } from "@/lib/site";
+import { place, site, stays, galleryImages } from "@/content/site";
 import { WhatsAppIcon } from "./icons";
-import type { Dict, Locale } from "@/dictionaries";
+import type { Dict, Locale } from "@/content/dictionaries";
 import { responsiveImage } from "@/lib/images";
-import { fillRating, formatRating, type GoogleReviewsData, type RatingSummary } from "@/lib/reviews";
+import { fillRating, formatRating, type GoogleReviewsData, type RatingSummary } from "@/features/reviews/google-reviews";
 
 const container = "mx-auto max-w-6xl px-5 md:px-8";
 

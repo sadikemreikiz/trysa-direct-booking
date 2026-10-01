@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import ClickTracker from "@/components/ClickTracker";
+import ClickTracker from "@/features/analytics/components/ClickTracker";
 import { HOME_DESCRIPTION, HOME_TITLE, openGraphBase, pageAlternates, SITE_URL, SITE_INDEXABLE } from "@/lib/seo";
-import { locales, isLocale, defaultLocale } from "@/dictionaries";
-import "../globals.css";
+import { locales, isLocale, defaultLocale } from "@/content/dictionaries";
+import "@/app/globals.css";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",

@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileBar from "@/components/MobileBar";
-import { itemName, menu } from "@/lib/menu";
+import { itemName, menu } from "@/content/menu";
 import { pageMetadata } from "@/lib/seo";
-import { getDictionary, isLocale, defaultLocale } from "@/dictionaries";
+import { getDictionary, isLocale, defaultLocale } from "@/content/dictionaries";
 
 export async function generateMetadata({
   params,

@@ -1,6 +1,6 @@
-import type { Locale } from "@/i18n-config";
+import type { Locale } from "@/lib/i18n";
 import { BUSINESS_NAME, GOOGLE_MAPS_URL, HOME_DESCRIPTION, SITE_URL } from "@/lib/seo";
-import { place, site } from "@/lib/site";
+import { place, site } from "@/content/site";
 
 const CUISINE: Record<Locale, string[]> = {
   tr: ["Türk mutfağı", "Izgara", "Balık", "Ev yemekleri"],

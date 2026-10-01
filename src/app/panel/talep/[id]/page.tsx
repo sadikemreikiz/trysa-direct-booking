@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { availabilityForRange, getReservationDetail } from "@/db/panel";
-import PanelHeader from "@/components/panel/PanelHeader";
-import ReservationActions from "@/components/panel/ReservationActions";
-import { formatDay, localeFlag, nights, sourceLabel } from "@/components/panel/format";
-import { getLockedDatesByType } from "@/lib/availability";
-import { requireApprovedStaff } from "@/lib/panel-session";
+import { availabilityForRange, getReservationDetail } from "@/features/panel/reservation-admin";
+import PanelHeader from "@/features/panel/components/PanelHeader";
+import ReservationActions from "@/features/panel/components/ReservationActions";
+import { formatDay, localeFlag, nights, sourceLabel } from "@/features/panel/format";
+import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { requireApprovedStaff } from "@/features/panel/session";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
