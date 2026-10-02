@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import MobileBar from "@/components/MobileBar";
 import { getDictionary, isLocale, defaultLocale } from "@/content/dictionaries";
 import { itemName } from "@/content/menu";
-import { foodPhotos } from "@/content/site";
+import { foodPhotos, site } from "@/content/site";
 import { getDb } from "@/db";
 import { getMenu } from "@/features/restaurant/menu-store";
 import { pageMetadata } from "@/lib/seo";
@@ -38,6 +38,9 @@ export default async function MenuPage({ params }: { params: Promise<{ lang: str
             {t.menu.title}
           </h1>
           <p className="mt-2 text-muted">{t.menu.sub}</p>
+          <p className="mt-1 text-sm font-semibold text-pine">
+            {t.footer.hours} {site.restaurantHours.opens}–{site.restaurantHours.closes}
+          </p>
 
           {/* A taste of the dishes; small 600 px versions, as guests often open this on mobile data */}
           <div className="mt-6 grid grid-cols-3 gap-2 md:gap-3">

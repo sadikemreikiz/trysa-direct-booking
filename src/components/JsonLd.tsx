@@ -63,6 +63,14 @@ export default function JsonLd({
     ],
     logo: `${SITE_URL}/logo.png`,
     hasMenu: `${SITE_URL}/${lang}/menu`,
+    // Same hours as the Google Business Profile; check-in is flexible, so only check-out is given
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      opens: site.restaurantHours.opens,
+      closes: site.restaurantHours.closes,
+    },
+    checkoutTime: site.checkoutTime,
     amenityFeature: AMENITIES[lang].map((name) => ({
       "@type": "LocationFeatureSpecification",
       name,

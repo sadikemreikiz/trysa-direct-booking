@@ -8,7 +8,7 @@ import { getDictionary, isLocale, defaultLocale, locales } from "@/content/dicti
 import { stays } from "@/content/site";
 import { responsiveImage } from "@/lib/images";
 import { getRoomPhotos } from "@/lib/room-photos";
-import { pageMetadata } from "@/lib/seo";
+import { BUSINESS_NAME, pageMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ lang: string; slug: string }> };
 
@@ -23,9 +23,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const t = getDictionary(loc);
   const room = stays.find((s) => s.slug === slug);
   if (!room) return { title: "404" };
+  const desc = t.room.descs[room.slug];
+  // The description goes into the title too: a bare room name read the same in all three
+  // languages ("Ambar-1 · Trysa") and said nothing in search results.
   const meta = pageMetadata(loc, `/oda/${room.slug}`, {
-    title: room.title,
-    description: t.room.descs[room.slug],
+    title: `${room.title} — ${desc}`,
+    description: `${desc} — ${BUSINESS_NAME}, Demre / Antalya`,
   });
   // Use the room's own cover photo in link previews
   if (room.img)
@@ -50,7 +53,7 @@ export default async function RoomPage({ params }: Params) {
         <div className="mx-auto max-w-5xl px-5 py-8 md:px-8">
           <Link
             href={`/${lang}#konaklama`}
-            className="text-sm font-semibold text-muted hover:text-clay"
+            className="inline-flex min-h-6 items-center text-sm font-semibold text-muted hover:text-clay"
           >
             {t.room.all}
           </Link>

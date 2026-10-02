@@ -11,6 +11,13 @@ export const site = {
   ratingFallback: { rating: 4.9, count: 292 },
   /** Airbnb Superhost badge (confirmed on the Airbnb listings, 2026-10-01) */
   superhost: true,
+  /**
+   * Restaurant hours, every day; must match the Google Business Profile (2026-10-02). Shown in
+   * the footer and on the menu page, and given to Google in the structured data.
+   */
+  restaurantHours: { opens: "09:00", closes: "23:00" },
+  /** Check-out time (check-in is flexible, see the FAQ) */
+  checkoutTime: "12:00",
 };
 
 /**

@@ -35,7 +35,7 @@ export function Distances({ t, lang }: TL) {
             href={place.directionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start text-sm font-bold text-clay"
+            className="inline-flex min-h-6 items-center self-start text-sm font-bold text-clay"
           >
             {t.distances.yolTarifi}
           </a>
