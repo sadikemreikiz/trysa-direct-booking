@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { WhatsAppIcon } from "@/components/icons";
 import type { Dict, Locale } from "@/content/dictionaries";
 import { rangeHasLockedDay } from "@/features/airbnb-sync/airbnb-calendar";
@@ -107,6 +107,12 @@ function BookingForm({
   // Bot traps: hidden field + how long the form took to fill
   const [hp, setHp] = useState("");
   const openedAt = useRef<number | null>(null);
+  // Fill time is counted from when the form appears, not from the first focus: iOS Safari doesn't
+  // focus buttons, so picking a room and dates there never started the clock, and a guest who then
+  // autofilled name and phone could submit "too fast" and be dropped as a bot.
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   const unitSlug = unitOptions.find(([label]) => label === data.unit)?.[1] ?? "";
   // Camping is shared, so it's never closed; "not sure" closes only days when every room is full.
@@ -263,20 +269,22 @@ function BookingForm({
 
       <form
         onSubmit={onSubmit}
-        onFocus={() => {
-          openedAt.current ??= Date.now();
-        }}
         className="mt-6 space-y-4 rounded-2xl border border-line bg-white p-5 md:p-7"
       >
-        {/* Hidden field: humans don't see it, bots fill it in. */}
+        {/* Hidden field: humans don't see it, bots fill it in. The name and label match nothing
+            browsers or password managers autofill (a "website" field once could), and the
+            data-*ignore attributes tell 1Password, LastPass and Bitwarden to leave it alone. */}
         <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
           <label>
-            Website
+            Leave this empty
             <input
               type="text"
-              name="website"
+              name="trysa_hp"
               tabIndex={-1}
               autoComplete="off"
+              data-1p-ignore
+              data-lpignore="true"
+              data-bwignore
               value={hp}
               onChange={(e) => setHp(e.target.value)}
             />

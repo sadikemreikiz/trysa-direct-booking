@@ -66,7 +66,7 @@ test("a bot that fills in the hidden field sees success, but nothing is stored",
     checkout: daysFromToday(21),
   });
   // Off-screen and hidden from screen readers: only a bot fills in every field
-  await page.locator('input[name="website"]').fill("https://spam.example");
+  await page.locator('input[name="trysa_hp"]').fill("https://spam.example");
   await page.getByRole("button", { name: "Send request" }).click();
 
   await expect(page.getByRole("heading", { name: "Your request is ready!" })).toBeVisible();
@@ -75,4 +75,9 @@ test("a bot that fills in the hidden field sees success, but nothing is stored",
   await signInAsStaff(context);
   await page.goto("/panel");
   await expect(page.getByText("Speedy Bot")).toHaveCount(0);
+
+  // The drop is counted (without the request itself), so a real guest caught by mistake would show
+  await page.goto("/panel/istatistik");
+  const filtered = page.locator("section", { hasText: "Bot filtresine takılan talep" });
+  await expect(filtered.getByText("1", { exact: true })).toBeVisible();
 });

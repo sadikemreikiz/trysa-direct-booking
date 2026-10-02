@@ -27,6 +27,8 @@ export type Stats = {
   respondedCount: number;
   /** Nights of confirmed stays checking in after today (all sources) */
   upcomingNights: number;
+  /** Booking requests the bot filter dropped in these months (a real guest may be among them) */
+  filteredRequests: number;
 };
 
 function lastMonths(count: number, now: Date): string[] {
@@ -79,6 +81,13 @@ export async function getStats(db: Db, now: Date = new Date(), monthCount = 6): 
     group by 1, 2`,
   );
 
+  const [filtered] = await query<{ n: number }>(
+    db,
+    sql`
+    select count(*)::int as n from analytics_events
+    where name = 'reservation_filtered' and ${monthOf(sql`created_at`)} >= ${from}`,
+  );
+
   const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Istanbul" }).format(now);
   const [upcoming] = await query<{ nights: number | null }>(
     db,
@@ -127,6 +136,7 @@ export async function getStats(db: Db, now: Date = new Date(), monthCount = 6): 
     medianResponseMinutes: response?.median == null ? null : Math.round(Number(response.median)),
     respondedCount: response?.n ?? 0,
     upcomingNights: upcoming?.nights ?? 0,
+    filteredRequests: filtered?.n ?? 0,
   };
 }
 

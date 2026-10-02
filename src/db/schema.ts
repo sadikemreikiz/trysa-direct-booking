@@ -162,7 +162,7 @@ export const analyticsEvents = pgTable(
   (t) => [
     check(
       "analytics_events_name",
-      sql`${t.name} in ('reservation_submitted', 'whatsapp_click', 'phone_click')`,
+      sql`${t.name} in ('reservation_submitted', 'reservation_filtered', 'whatsapp_click', 'phone_click')`,
     ),
     index("analytics_events_name_created_idx").on(t.name, t.createdAt),
   ],

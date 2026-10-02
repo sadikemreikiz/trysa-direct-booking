@@ -66,6 +66,15 @@ export default async function StatsPage() {
         <div className="text-sm text-muted">{stats.respondedCount} cevaplanmış talep üzerinden</div>
       </section>
 
+      <section className="mt-3 rounded-2xl bg-white p-4">
+        <div className="text-sm font-bold text-muted">Bot filtresine takılan talep</div>
+        <div className="mt-1 text-2xl font-bold text-pine">{stats.filteredRequests}</div>
+        <div className="text-sm text-muted">
+          Çok hızlı ya da gizli alan doldurularak gönderildiği için kaydedilmedi. Çoğu bottur; bir
+          misafir &quot;talep gönderdim&quot; der ama panelde yoksa, filtre onu elemiş olabilir.
+        </div>
+      </section>
+
       <h2 className="mb-3 mt-7 text-xs font-bold tracking-widest text-clay">AYLARA GÖRE</h2>
       <ul className="space-y-2">
         {[...stats.months].reverse().map((m) => (

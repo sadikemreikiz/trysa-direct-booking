@@ -113,6 +113,17 @@ describe("panel statistics", () => {
     expect((await getStats(db, new Date("2026-11-01T10:00:00Z"))).upcomingNights).toBe(5);
   });
 
+  it("counts requests the bot filter dropped in the last 6 months, apart from real requests", async () => {
+    await db.insert(analyticsEvents).values([
+      { name: "reservation_filtered", createdAt: new Date("2026-11-03T10:00:00Z") },
+      { name: "reservation_filtered", createdAt: new Date("2026-07-15T10:00:00Z") },
+      { name: "reservation_filtered", createdAt: new Date("2026-04-30T10:00:00Z") }, // too old
+    ]);
+    const stats = await getStats(db, NOW);
+    expect(stats.filteredRequests).toBe(2);
+    expect(stats.months.every((m) => m.requests === 0)).toBe(true);
+  });
+
   it("uses Istanbul time for month boundaries", async () => {
     // UTC 31 Oct 22:30 = Istanbul 1 Nov 01:30
     const r = await request("2026-10-31T22:30:00Z");

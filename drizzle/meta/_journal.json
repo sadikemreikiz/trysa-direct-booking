@@ -64,6 +64,13 @@
       "when": 1790885376127,
       "tag": "0008_health_checks",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1790956646850,
+      "tag": "0009_analytics_filtered_requests",
+      "breakpoints": true
     }
   ]
 }

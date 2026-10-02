@@ -3,7 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "@/db";
 import { analyticsEvents } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
-import { clientEventSchema, recordClientEvent } from "./events";
+import { clientEventSchema, recordClientEvent, recordFilteredRequest } from "./events";
 
 let db: Db;
 let client: PGlite;
@@ -39,10 +39,21 @@ describe("conversion events", () => {
   it.each([
     ["bilinmeyen olay adı", { name: "purchase", path: "/tr" }],
     ["istemcinin form gönderimi uydurması", { name: "reservation_submitted", path: "/tr" }],
+    ["istemcinin bot filtresi sayısını şişirmesi", { name: "reservation_filtered", path: "/tr" }],
     ["göreli olmayan yol", { name: "phone_click", path: "https://evil.example" }],
     ["desteklenmeyen dil", { name: "phone_click", path: "/fr", locale: "fr" }],
   ])("geçersiz olayı reddeder: %s", (_label, input) => {
     expect(clientEventSchema.safeParse(input).success).toBe(false);
+  });
+
+  it("counts a request dropped by the bot filter, without anything from the request", async () => {
+    await recordFilteredRequest(db, "de");
+    await recordFilteredRequest(db, "<script>");
+    const rows = await db.select().from(analyticsEvents);
+    expect(rows.map((r) => [r.name, r.path, r.locale])).toEqual([
+      ["reservation_filtered", "/de/rezervasyon", "de"],
+      ["reservation_filtered", null, null],
+    ]);
   });
 
   it("the database also rejects unknown event names (even if the app is bypassed)", async () => {

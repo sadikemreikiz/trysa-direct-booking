@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { Db } from "@/db";
 import { analyticsEvents } from "@/db/schema";
+import { isLocale } from "@/lib/i18n";
 
 /** Events the client may send. reservation_submitted is written only on the server. */
 export const clientEventSchema = z.object({
@@ -11,6 +12,19 @@ export const clientEventSchema = z.object({
 });
 
 export type ClientEvent = z.infer<typeof clientEventSchema>;
+
+/**
+ * A booking request the bot filter dropped (written on the server only). Counted so that a real
+ * guest caught by mistake shows up in the panel statistics; nothing about the request is kept.
+ */
+export async function recordFilteredRequest(db: Db, locale: string | null) {
+  const lang = locale && isLocale(locale) ? locale : null;
+  await db.insert(analyticsEvents).values({
+    name: "reservation_filtered",
+    path: lang ? `/${lang}/rezervasyon` : null,
+    locale: lang,
+  });
+}
 
 export async function recordClientEvent(db: Db, event: ClientEvent) {
   await db.insert(analyticsEvents).values({
