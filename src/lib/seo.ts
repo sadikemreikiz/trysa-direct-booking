@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { locales, type Locale } from "./i18n";
+import { fallbackLocale, locales, type Locale } from "./i18n";
 
 // Site URL (also set via NEXT_PUBLIC_SITE_URL in production).
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://trysacamping.com";
@@ -36,7 +36,7 @@ export function pageAlternates(lang: Locale, path: string) {
     canonical: `/${lang}${path}`,
     languages: {
       ...Object.fromEntries(locales.map((l) => [l, `/${l}${path}`])),
-      "x-default": `/en${path}`,
+      "x-default": `/${fallbackLocale}${path}`,
     },
   };
 }

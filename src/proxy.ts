@@ -1,19 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { locales, defaultLocale } from "@/lib/i18n";
-
-function detectLocale(req: NextRequest): string {
-  const accept = (req.headers.get("accept-language") || "").toLowerCase();
-  const preferred = accept.split(",").map((s) => s.split(";")[0].trim().slice(0, 2));
-  const found = preferred.find((p) => (locales as readonly string[]).includes(p));
-  return found || defaultLocale;
-}
+import { locales, negotiateLocale } from "@/lib/i18n";
 
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const hasLocale = locales.some((l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`));
   if (hasLocale) return;
 
-  const locale = detectLocale(req);
+  const locale = negotiateLocale(req.headers.get("accept-language"));
   req.nextUrl.pathname = `/${locale}${pathname === "/" ? "" : pathname}`;
   return NextResponse.redirect(req.nextUrl);
 }
