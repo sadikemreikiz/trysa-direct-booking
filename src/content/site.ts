@@ -114,39 +114,7 @@ export const stays: {
 ];
 
 /** Translated captions of the site's photos (keys of the dictionary's `gallery`). */
-export type PhotoLabel =
-  | "aerial"
-  | "restaurant"
-  | "table"
-  | "plates"
-  | "corner"
-  | "breakfast"
-  | "grill"
-  | "gozleme"
-  | "chicken";
-
-/**
- * Home page gallery: the place and its food, none of them repeated from the room cards or the
- * restaurant section above. The first photo is shown large. `alt` is a room name, or a
- * translated caption. `width`: large versions narrower than 1600 px. `focus`: object-position.
- */
-export const galleryImages: {
-  src: string;
-  alt: string | { label: PhotoLabel };
-  width?: number;
-  focus?: string;
-}[] = [
-  { src: "/img/gallery/trysa-aerial.jpg", alt: { label: "aerial" }, width: 1236 },
-  {
-    src: "/img/gallery/restaurant-evening.jpg",
-    alt: { label: "restaurant" },
-    width: 1200,
-    focus: "object-[50%_70%]",
-  },
-  { src: "/img/gallery/breakfast-table.jpg", alt: { label: "table" }, width: 1087 },
-  { src: "/img/gallery/grill-plates.jpg", alt: { label: "plates" }, width: 1018 },
-  { src: "/img/gallery/trysa-corner.jpg", alt: { label: "corner" }, width: 900 },
-];
+export type PhotoLabel = "breakfast" | "grill" | "gozleme" | "chicken";
 
 /**
  * Food photos for the restaurant section (large first) and the menu page. `focus` is the

@@ -10,7 +10,6 @@ export default function Header({ t, lang }: { t: Dict; lang: Locale }) {
     { label: t.nav.konaklama, href: `/${lang}#konaklama` },
     { label: t.nav.restoran, href: `/${lang}#restoran` },
     { label: t.nav.trysa, href: `/${lang}#trysa` },
-    { label: t.nav.galeri, href: `/${lang}#galeri` },
     { label: t.nav.sss, href: `/${lang}#sss` },
     { label: t.nav.iletisim, href: `/${lang}#iletisim` },
   ];

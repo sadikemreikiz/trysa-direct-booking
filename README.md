@@ -26,7 +26,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 
 **For guests** (Turkish, English, German)
 
-- Rooms, restaurant menu, gallery, FAQ and the live Google rating and reviews
+- Rooms, restaurant menu, FAQ and the live Google rating and reviews
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
 - A QR menu on the restaurant tables that opens in the language of the guest's phone, with dishes sold out today marked

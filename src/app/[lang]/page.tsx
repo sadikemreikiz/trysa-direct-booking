@@ -8,7 +8,6 @@ import { CtaBand } from "@/components/home/CtaBand";
 import { Distances } from "@/components/home/Distances";
 import { Experiences } from "@/components/home/Experiences";
 import { Faq } from "@/components/home/Faq";
-import { Gallery } from "@/components/home/Gallery";
 import { Hero } from "@/components/home/Hero";
 import { Restaurant } from "@/components/home/Restaurant";
 import { Reviews } from "@/components/home/Reviews";
@@ -38,7 +37,6 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
         <Accommodation t={t} lang={lang} />
         <Amenities t={t} />
         <Restaurant t={t} lang={lang} rating={rating} />
-        <Gallery t={t} />
         <TrysaStory t={t} />
         <Experiences t={t} />
         <Distances t={t} lang={lang} />
