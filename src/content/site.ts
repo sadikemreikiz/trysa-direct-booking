@@ -115,23 +115,38 @@ export const stays: {
 
 /** Translated captions of the site's photos (keys of the dictionary's `gallery`). */
 export type PhotoLabel =
-  "corner" | "view" | "breakfast" | "grill" | "gozleme" | "board" | "chicken";
+  | "aerial"
+  | "restaurant"
+  | "table"
+  | "plates"
+  | "corner"
+  | "breakfast"
+  | "grill"
+  | "gozleme"
+  | "chicken";
 
 /**
- * Home page gallery: food and the place, alternating (the rooms have their own cards above).
- * `alt` is a room name, or a translated caption. `width`: large versions narrower than 1600 px.
+ * Home page gallery: the place and its food, none of them repeated from the room cards or the
+ * restaurant section above. The first photo is shown large. `alt` is a room name, or a
+ * translated caption. `width`: large versions narrower than 1600 px. `focus`: object-position.
  */
-export const galleryImages: { src: string; alt: string | { label: PhotoLabel }; width?: number }[] =
-  [
-    { src: "/img/food/serpme-kahvalti.jpg", alt: { label: "breakfast" }, width: 1130 },
-    { src: "/img/rooms/ambar-1/kapak.jpg", alt: "Ambar-1" },
-    { src: "/img/food/karisik-izgara.jpg", alt: { label: "grill" }, width: 963 },
-    { src: "/img/rooms/ambar-1/5.jpg", alt: { label: "view" } },
-    { src: "/img/food/kahvalti-tahtasi.jpg", alt: { label: "board" }, width: 1002 },
-    { src: "/img/rooms/tiny-house/kapak.jpg", alt: "Tiny House" },
-    { src: "/img/food/gozleme.jpg", alt: { label: "gozleme" }, width: 1037 },
-    { src: "/img/gallery/trysa-corner.jpg", alt: { label: "corner" } },
-  ];
+export const galleryImages: {
+  src: string;
+  alt: string | { label: PhotoLabel };
+  width?: number;
+  focus?: string;
+}[] = [
+  { src: "/img/gallery/trysa-aerial.jpg", alt: { label: "aerial" }, width: 1236 },
+  {
+    src: "/img/gallery/restaurant-evening.jpg",
+    alt: { label: "restaurant" },
+    width: 1200,
+    focus: "object-[50%_70%]",
+  },
+  { src: "/img/gallery/breakfast-table.jpg", alt: { label: "table" }, width: 1087 },
+  { src: "/img/gallery/grill-plates.jpg", alt: { label: "plates" }, width: 1018 },
+  { src: "/img/gallery/trysa-corner.jpg", alt: { label: "corner" }, width: 900 },
+];
 
 /**
  * Food photos for the restaurant section (large first) and the menu page. `focus` is the

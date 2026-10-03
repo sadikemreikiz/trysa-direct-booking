@@ -10,15 +10,25 @@ export function Gallery({ t }: T) {
           {t.gallery.title}
         </h2>
       </div>
+      {/* The photos are portrait: tall tiles keep them whole. The first one is large (two
+          columns, and two rows on wide screens). */}
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         {galleryImages.map((g, i) => (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            key={i}
-            {...responsiveImage(g.src, "(min-width: 768px) 25vw, 50vw", g.width)}
+            key={g.src}
+            {...responsiveImage(
+              g.src,
+              i === 0 ? "(min-width: 768px) 50vw, 100vw" : "(min-width: 768px) 25vw, 50vw",
+              g.width,
+            )}
             alt={typeof g.alt === "string" ? g.alt : t.gallery[g.alt.label]}
             loading="lazy"
-            className="h-28 w-full rounded-xl object-cover md:h-36"
+            className={`w-full rounded-xl object-cover ${g.focus ?? ""} ${
+              i === 0
+                ? "col-span-2 aspect-square md:row-span-2 md:aspect-auto md:h-full"
+                : "aspect-[4/5]"
+            }`}
           />
         ))}
       </div>
