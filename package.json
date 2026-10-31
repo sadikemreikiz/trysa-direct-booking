@@ -2,7 +2,7 @@
   "name": "trysa-direct-booking",
   "version": "0.1.0",
   "private": true,
-  "description": "Direct booking site, staff panel and Airbnb sync for a family-run guesthouse (Next.js, PostgreSQL)",
+  "description": "Direct booking site, staff panel, Airbnb sync and an AI concierge for a family-run guesthouse (Next.js, PostgreSQL, Claude)",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=24"
