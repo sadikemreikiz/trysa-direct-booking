@@ -11,9 +11,14 @@ import { conciergeSystemPrompt, requestContext } from "./knowledge";
 import { CONCIERGE_TOOLS, runTool, type ToolContext, type UiAction } from "./tools";
 
 /** Chosen by the owner for speed and cost; the prompt and tools are kept simple for it. */
-export const CONCIERGE_MODEL = "claude-haiku-4-5";
-/** Chat replies are short; this leaves room for a reply plus tool calls. */
-const MAX_TOKENS = 2048;
+export const CONCIERGE_MODEL = "claude-haiku-5-5";
+/**
+ * Haiku 5.5 thinks adaptively; effort sets how much. "low" is the cheapest, but the rules
+ * (call the availability tool, never guess) matter more here than a fraction of a cent.
+ */
+export const CONCIERGE_EFFORT = "medium";
+/** Chat replies are short; this leaves room for thinking, a reply and tool calls. */
+const MAX_TOKENS = 4096;
 /** Rounds of tool use per guest message before the loop gives up. */
 export const MAX_TOOL_ROUNDS = 3;
 
@@ -70,9 +75,8 @@ export async function* runConcierge(
   usage: ConciergeUsage,
 ): AsyncGenerator<ConciergeEvent> {
   const system: Anthropic.TextBlockParam[] = [
-    // Rules and knowledge: identical on every request until the menu is edited, so they can be
-    // cached. Haiku 4.5 only caches prefixes from 4096 tokens; today's ~3K-token prompt is below
-    // that, so this marker takes effect once the knowledge grows (check usage.cacheReadTokens).
+    // Rules and knowledge: identical on every request until the menu is edited, so they are
+    // cached (Haiku 5.5 caches prefixes from 512 tokens; check usage.cacheReadTokens).
     {
       type: "text",
       text: conciergeSystemPrompt(ctx.menu),
@@ -93,6 +97,9 @@ export async function* runConcierge(
     const stream = client.messages.stream({
       model: CONCIERGE_MODEL,
       max_tokens: MAX_TOKENS,
+      // Thinking text isn't shown to guests: only text deltas are streamed below.
+      thinking: { type: "adaptive" },
+      output_config: { effort: CONCIERGE_EFFORT },
       system,
       tools: CONCIERGE_TOOLS,
       // Last round: no more tools, so the guest always gets a written answer.
@@ -137,6 +144,8 @@ export async function* runConcierge(
     if (toolUses.length === 0 || message.stop_reason === "max_tokens") return;
     if (round === MAX_TOOL_ROUNDS) return;
 
+    // The whole turn goes back unchanged, thinking blocks included: Haiku 5.5 needs them
+    // alongside its tool calls, and the history must stay append-only for them to stay valid.
     messages.push({ role: "assistant", content: message.content });
     const results: Anthropic.ToolResultBlockParam[] = [];
     for (const call of toolUses) {

@@ -4,6 +4,8 @@ import { menu as printedMenu } from "@/content/menu";
 import { conciergeSystemPrompt, requestContext } from "./knowledge";
 import { maskPersonalData } from "./mask";
 import {
+  CONCIERGE_EFFORT,
+  CONCIERGE_MODEL,
   emptyUsage,
   MAX_TOOL_ROUNDS,
   runConcierge,
@@ -142,7 +144,7 @@ function reply(content: Anthropic.ContentBlock[], stopReason: Anthropic.StopReas
     id: "msg",
     type: "message",
     role: "assistant",
-    model: "claude-haiku-4-5",
+    model: CONCIERGE_MODEL,
     content,
     stop_reason: stopReason,
     stop_sequence: null,
@@ -170,6 +172,9 @@ function reply(content: Anthropic.ContentBlock[], stopReason: Anthropic.StopReas
 }
 
 const text = (t: string) => ({ type: "text", text: t, citations: null }) as Anthropic.TextBlock;
+// Haiku 5.5 omits the thinking text by default and returns only the signature.
+const thinking = (signature: string) =>
+  ({ type: "thinking", thinking: "", signature }) as Anthropic.ThinkingBlock;
 const toolUse = (id: string, name: string, input: unknown) =>
   ({ type: "tool_use", id, name, input }) as Anthropic.ToolUseBlock;
 
@@ -202,6 +207,38 @@ describe("runConcierge", () => {
     expect(system[0].cache_control).toEqual({ type: "ephemeral" });
     expect(system[1].cache_control).toBeUndefined();
     expect(system[1].text).toContain("2026-10-01");
+  });
+
+  it("asks for adaptive thinking at the chosen effort, with no sampling parameters", async () => {
+    const { client, requests } = fakeClient([reply([text("Hi!")])]);
+    await collect(runConcierge(client, [{ role: "user", text: "Hello" }], ctx, emptyUsage()));
+    expect(requests[0]).toMatchObject({
+      model: "claude-haiku-5-5",
+      thinking: { type: "adaptive" },
+      output_config: { effort: CONCIERGE_EFFORT },
+    });
+    expect(requests[0]).not.toHaveProperty("temperature");
+    expect(requests[0]).not.toHaveProperty("top_p");
+    expect(requests[0]).not.toHaveProperty("top_k");
+  });
+
+  it("sends thinking blocks back unchanged with the tool results, and never streams them", async () => {
+    const firstTurn = [
+      thinking("sig-1"),
+      toolUse("t1", "check_availability", { checkin: "2026-10-09", checkout: "2026-10-12" }),
+    ];
+    const { client, requests } = fakeClient([
+      reply(firstTurn, "tool_use"),
+      reply([thinking("sig-2"), text("Ambar-2 is free.")]),
+    ]);
+    const events = await collect(
+      runConcierge(client, [{ role: "user", text: "Free 9-12 Oct?" }], ctx, emptyUsage()),
+    );
+
+    expect(events).toEqual([{ type: "text", text: "Ambar-2 is free." }]);
+    // Append-only: the first request's messages are a prefix of the second's.
+    expect(requests[1].messages.slice(0, 1)).toEqual(requests[0].messages);
+    expect(requests[1].messages[1]).toEqual({ role: "assistant", content: firstTurn });
   });
 
   it("runs the tool, returns its result and streams the final answer", async () => {

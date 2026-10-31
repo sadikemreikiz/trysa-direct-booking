@@ -5,7 +5,7 @@
 
 Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: six wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
 
-**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel. Live since September 2026, in three languages, with 162 unit and integration tests plus end-to-end tests in CI.
+**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel. Live since September 2026, in three languages, with 164 unit and integration tests plus end-to-end tests in CI.
 
 ![The public site](docs/screenshots/site-desktop.jpg)
 
@@ -32,7 +32,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
 - A QR menu on the restaurant tables that opens in the language of the guest's phone, with dishes sold out today marked
-- An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself
+- An AI concierge (Claude Haiku 5.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself
 - Branded emails in their language along the stay: request received, booking confirmed (sent when the family confirms), directions and arrival times the day before arrival, and after check-out one review request for guests who opted in on the form
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
@@ -128,7 +128,7 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 
 ## Quality
 
-- **162 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **164 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
 - **End-to-end tests** (Playwright, on a phone-sized Chromium) run against a production build and a throwaway in-memory database: a guest sends a request, the family confirms it in the panel and the next guest finds those nights booked; a bot filling the hidden field is told "success" while nothing is stored, and the drop shows up in the panel statistics; the panel stays closed without signing in; a price changed in the panel reaches the German menu. The test server blanks every variable from local `.env` files, so a run can never email the family or reach a real database.
 - **CI** runs lint, type checks, tests, a production build and the end-to-end tests without any secrets on every push.
 - **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB. Measured on the live site with Lighthouse (mobile, median of two runs, 1 October 2026), a room page went from a performance score of 63 to 98 and from an 8.0 s to a 2.5 s Largest Contentful Paint, after the cover photo was given priority and the footer map was loaded on tap.
