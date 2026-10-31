@@ -1,0 +1,21 @@
+# Files the Vercel CLI (`vercel --prod`) should not upload. The CLI does not read .gitignore:
+# it always skips its own defaults (node_modules, .next, .vercel, .env.local, .env.*.local, ...)
+# and adds the rules below.
+
+# env files and keys (by default only .env.local and .env.*.local are skipped)
+.env*
+*.pem
+
+# local development database (PGlite)
+/.pglite/
+
+# personal editor and AI-assistant settings
+.claude/
+
+# test and build leftovers
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+*.tsbuildinfo
+npm-debug.log*
