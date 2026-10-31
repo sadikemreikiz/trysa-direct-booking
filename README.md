@@ -32,7 +32,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
 - A QR menu on the restaurant tables that opens in the language of the guest's phone, with dishes sold out today marked
-- An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself. It is built and tested end to end, but switched off in production until the business sets aside an API budget: it appears once an API key is configured
+- An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself
 - Branded emails in their language along the stay: request received, booking confirmed (sent when the family confirms), directions and arrival times the day before arrival, and after check-out one review request for guests who opted in on the form
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
