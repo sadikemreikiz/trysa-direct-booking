@@ -13,13 +13,16 @@ import { todayInDemre } from "@/lib/dates";
 
 export const maxDuration = 60;
 
-/** Per visitor (IP digest): 20 messages per 10 minutes, 80 per day. */
+/** Per visitor (IP digest): 20 messages per 10 minutes, 30 per day. */
 const VISITOR_LIMITS = {
   "10m": { limit: 20, windowMs: 10 * 60_000 },
-  "1d": { limit: 80, windowMs: 86_400_000 },
+  "1d": { limit: 30, windowMs: 86_400_000 },
 };
-/** Across the whole site: a ceiling on daily cost, whatever happens. */
-const SITE_DAILY_LIMIT = { limit: 1000, windowMs: 86_400_000 };
+/**
+ * Across the whole site: a ceiling on daily cost, whatever happens. The concierge runs on a
+ * small prepaid credit, so even a bot rotating IPs can spend only a few cents a day.
+ */
+const SITE_DAILY_LIMIT = { limit: 150, windowMs: 86_400_000 };
 /** How much of the conversation the model sees. */
 const HISTORY_TURNS = 12;
 
