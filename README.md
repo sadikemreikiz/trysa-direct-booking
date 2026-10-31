@@ -5,6 +5,8 @@
 
 Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: six wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
 
+**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel. Live since September 2026, in three languages, with 162 unit and integration tests plus end-to-end tests in CI.
+
 ![The public site](docs/screenshots/site-desktop.jpg)
 
 ## The problem
@@ -30,7 +32,7 @@ I built and run this on my own: gathered requirements with the family, chose the
 - A booking form with an availability calendar per room: nights taken on Airbnb or confirmed directly are shown as booked, the stay can only end on the morning of the next booking, and the server re-checks on submit. Keyboard and screen-reader accessible (WAI-ARIA date grid)
 - Dates chosen on the home page or a room page carry over into the form
 - A QR menu on the restaurant tables that opens in the language of the guest's phone, with dishes sold out today marked
-- An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself
+- An AI concierge (Claude Haiku 4.5) that answers questions in their language from the site's own content, checks real availability through a tool, and hands over to a prefilled booking form or to the family on WhatsApp; it never confirms bookings itself. It is built and tested end to end, but switched off in production until the business sets aside an API budget: it appears once an API key is configured
 - Branded emails in their language along the stay: request received, booking confirmed (sent when the family confirms), directions and arrival times the day before arrival, and after check-out one review request for guests who opted in on the form
 
 **For the family** (staff panel at `/panel`, mobile-first, installable as a PWA, in Turkish)
@@ -60,6 +62,21 @@ I built and run this on my own: gathered requirements with the family, chose the
     <td align="center"><sub>Occupancy calendar</sub></td>
     <td align="center"><sub>Statistics</sub></td>
     <td align="center"><sub>Availability calendar</sub></td>
+  </tr>
+</table>
+
+**The restaurant**
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/menu-mobile.png" width="200" alt="Public menu in English with food photos, category tabs and the Turkish dish names"></td>
+    <td><img src="docs/screenshots/panel-menu.png" width="200" alt="Menu editor in the panel: prices and a dish marked not available today"></td>
+    <td><img src="docs/screenshots/panel-cards.png" width="200" alt="Printable QR cards for the tables and the rooms"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>QR menu (guest)</sub></td>
+    <td align="center"><sub>Menu editor (family)</sub></td>
+    <td align="center"><sub>Printable QR cards</sub></td>
   </tr>
 </table>
 
@@ -111,10 +128,11 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 
 ## Quality
 
-- **153 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **162 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
 - **End-to-end tests** (Playwright, on a phone-sized Chromium) run against a production build and a throwaway in-memory database: a guest sends a request, the family confirms it in the panel and the next guest finds those nights booked; a bot filling the hidden field is told "success" while nothing is stored, and the drop shows up in the panel statistics; the panel stays closed without signing in; a price changed in the panel reaches the German menu. The test server blanks every variable from local `.env` files, so a run can never email the family or reach a real database.
 - **CI** runs lint, type checks, tests, a production build and the end-to-end tests without any secrets on every push.
-- **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB.
+- **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB. Measured on the live site with Lighthouse (mobile, median of two runs, 1 October 2026), a room page went from a performance score of 63 to 98 and from an 8.0 s to a 2.5 s Largest Contentful Paint, after the cover photo was given priority and the footer map was loaded on tap.
+- **Accessibility:** Lighthouse accessibility went from 95–96 to 100 on the home, booking, menu and room pages (colour contrast fixes); best practices and SEO score 100.
 - **SEO:** per-page canonical URLs and `hreflang`, localized JSON-LD (`LodgingBusiness` + `Restaurant`, FAQ), a sitemap with language alternates.
 
 ## Running locally
@@ -177,6 +195,7 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 
 ## What's next
 
+- Keep using a room's last known Airbnb calendar when Airbnb can't be reached: today that room looks free until the calendar is readable again; the family still confirms every request by hand, and the admins get an alert after 3 hours
 - An evaluation set of real guest questions for the AI concierge, run in CI on prompt changes
 - Ordering from the table, building on the QR menu
 
