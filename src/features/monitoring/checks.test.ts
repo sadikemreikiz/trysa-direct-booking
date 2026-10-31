@@ -83,9 +83,11 @@ describe("Airbnb calendars", () => {
 });
 
 describe("the 15-minute scheduler", () => {
-  it("Vercel's daily run alerts when the GitHub schedule has gone quiet", async () => {
+  it("Vercel's daily run alerts when cron-job.org has gone quiet", async () => {
     const c = channels();
-    await monitorScheduler(db, "github", { now: min(0), channels: c });
+    await monitorScheduler(db, "cron-job", { now: min(0), channels: c });
+    // GitHub's sparse backup runs don't count as the 15-minute scheduler.
+    await monitorScheduler(db, "github", { now: min(150), channels: c });
     expect(await monitorScheduler(db, "vercel", { now: min(60), channels: c })).toEqual({
       stale: false,
     });
@@ -96,9 +98,10 @@ describe("the 15-minute scheduler", () => {
     expect(c.push.mock.calls[0][1].body).toContain("3 saattir çalışmadı");
   });
 
-  it("stays quiet before the GitHub schedule has ever run", async () => {
+  it("stays quiet before cron-job.org has ever run, whatever GitHub does", async () => {
     const c = channels();
-    expect(await monitorScheduler(db, "vercel", { now: min(0), channels: c })).toEqual({
+    await monitorScheduler(db, "github", { now: min(0), channels: c });
+    expect(await monitorScheduler(db, "vercel", { now: min(600), channels: c })).toEqual({
       stale: false,
     });
     expect(c.push).not.toHaveBeenCalled();

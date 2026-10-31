@@ -56,28 +56,35 @@ export async function monitorAirbnbCalendars(db: Db, opts: Opts = {}) {
 }
 
 /**
- * Records that the scheduled job ran. The 15-minute scheduler lives on GitHub, which turns
- * scheduled workflows off after 60 days without repository activity; then guest emails stop
- * (they only go out 10:00–20:00 and Vercel's daily run is at 09:00). Vercel's daily run
- * notices and tells the admins.
+ * Who called the scheduled job: cron-job.org every 15 minutes, GitHub Actions as a backup
+ * (scheduled every 15 minutes, but in practice GitHub runs it only every 2–7 hours), and
+ * Vercel Cron once a day.
+ */
+export type CronSource = "cron-job" | "github" | "vercel";
+
+/**
+ * Records that the scheduled job ran. If cron-job.org stops (an account or job switched off),
+ * reminders and notification retries fall back to GitHub's sparse runs, and guest emails, which
+ * only go out 10:00–20:00, can be missed. Vercel's daily run (09:00 in Demre) notices and tells
+ * the admins. Until cron-job.org has run once there is nothing to compare with, so no alert.
  */
 export async function monitorScheduler(
   db: Db,
-  source: "github" | "vercel",
+  source: CronSource,
   opts: Pick<Opts, "now" | "channels"> = {},
 ) {
   const now = opts.now ?? new Date();
   await recordCheck(db, `cron:${source}`, { ok: true }, 0, now);
   if (source !== "vercel") return { stale: false };
-  const last = await lastOk(db, "cron:github");
+  const last = await lastOk(db, "cron:cron-job");
   const stale = last !== null && now.getTime() - last.getTime() > SCHEDULER_STALE_MS;
   if (stale) {
     await alertAdmins(
       db,
       {
-        key: "cron:github",
+        key: "cron:cron-job",
         title: "⚠️ 15 dakikalık zamanlayıcı durmuş",
-        body: `GitHub'daki zamanlayıcı ${hours(now.getTime() - last.getTime())} saattir çalışmadı: misafir e-postaları ve hatırlatmalar gitmiyor. Düzeltmek için GitHub'da repo → Actions → cron → "Enable workflow".`,
+        body: `cron-job.org'daki zamanlayıcı ${hours(now.getTime() - last.getTime())} saattir çalışmadı: hatırlatmalar ve tekrar denenen bildirimler gecikiyor. Düzeltmek için cron-job.org'a gir ve "trysa" işinin açık olduğuna bak.`,
       },
       { now, cooldownMs: 20 * HOUR_MS, channels: opts.channels },
     );

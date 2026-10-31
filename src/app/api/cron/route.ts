@@ -3,7 +3,11 @@ import { getDb } from "@/db";
 import { pruneRateLimits } from "@/features/booking/rate-limit";
 import { deleteExpiredConversations } from "@/features/concierge/conversations";
 import { anonymizeExpiredReservations, escalateStalePending } from "@/features/maintenance/jobs";
-import { monitorAirbnbCalendars, monitorScheduler } from "@/features/monitoring/checks";
+import {
+  monitorAirbnbCalendars,
+  monitorScheduler,
+  type CronSource,
+} from "@/features/monitoring/checks";
 import { guestEmailEnabled } from "@/features/notifications/email";
 import { queueGuestJourneyEmails } from "@/features/notifications/guest-journey";
 import { outboxHandlers } from "@/features/notifications/handlers";
@@ -17,8 +21,10 @@ import { sendPushToStaff } from "@/features/notifications/push";
  * calendars, the scheduler itself) to alert the admins.
  *
  * Callers (Authorization: Bearer $CRON_SECRET):
+ *   - cron-job.org: every 15 minutes, as /api/cron?from=cron-job.
+ *   - GitHub Actions (.github/workflows/cron.yml): a backup. It is scheduled every 15 minutes,
+ *     but GitHub runs scheduled workflows only every 2–7 hours in practice.
  *   - Vercel Cron (vercel.json): once a day on the Hobby plan; Vercel adds the header itself.
- *   - GitHub Actions (.github/workflows/cron.yml): every 15 minutes.
  * Every job is idempotent, so frequent or overlapping calls are safe.
  */
 export async function GET(request: Request) {
@@ -38,9 +44,7 @@ export async function GET(request: Request) {
   const conversations = await deleteExpiredConversations(db);
   await pruneRateLimits(db);
 
-  // Vercel's own cron identifies itself; every other authorised caller is the GitHub schedule.
-  const source = request.headers.get("user-agent")?.startsWith("vercel-cron") ? "vercel" : "github";
-  const scheduler = await monitorScheduler(db, source);
+  const scheduler = await monitorScheduler(db, callerOf(request));
   const airbnb = await monitorAirbnbCalendars(db);
 
   return Response.json({
@@ -52,6 +56,12 @@ export async function GET(request: Request) {
     scheduler,
     airbnb,
   });
+}
+
+/** Vercel's own cron identifies itself; cron-job.org says so in the URL; the rest is GitHub. */
+function callerOf(request: Request): CronSource {
+  if (request.headers.get("user-agent")?.startsWith("vercel-cron")) return "vercel";
+  return new URL(request.url).searchParams.get("from") === "cron-job" ? "cron-job" : "github";
 }
 
 function authorized(header: string | null): boolean {

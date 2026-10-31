@@ -1,5 +1,7 @@
-# Triggers maintenance jobs (notification retries, unanswered-request reminders, data retention)
-# every 15 minutes. Lives here because the Vercel Hobby plan limits cron jobs to once a day.
+# Backup trigger for the maintenance jobs (notification retries, unanswered-request reminders,
+# data retention). cron-job.org calls /api/cron every 15 minutes; this schedule asks for the
+# same, but GitHub runs scheduled workflows only every 2–7 hours in practice (measured in
+# October 2026), so it only covers for cron-job.org. Vercel Hobby allows one cron a day.
 # Required repository secrets: SITE_URL (e.g. https://trysacamping.com) and CRON_SECRET (same as on Vercel).
 name: cron
 

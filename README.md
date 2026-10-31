@@ -93,7 +93,7 @@ flowchart LR
   DB -->|outbox| Push[Web Push]
   Airbnb[(Airbnb iCal)] -->|every 15 min| Next
   Next -->|/api/ical| Airbnb
-  Cron[Vercel Cron / GitHub Actions] -->|/api/cron| Next
+  Cron[cron-job.org every 15 min · GitHub Actions backup · Vercel Cron daily] -->|/api/cron| Next
   Next -->|streaming, tool use| Claude[Claude API · Haiku 5.5]
 ```
 

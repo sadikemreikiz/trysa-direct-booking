@@ -242,7 +242,7 @@ export const rateLimits = pgTable("rate_limits", {
  * last worked, since when it has been failing, and whether the admins were told about it.
  */
 export const healthChecks = pgTable("health_checks", {
-  /** e.g. "airbnb:Ambar-1", "cron:github" */
+  /** e.g. "airbnb:Ambar-1", "cron:cron-job" */
   name: text("name").primaryKey(),
   okAt: timestamp("ok_at", { withTimezone: true }),
   /** Set on the first failure, cleared when it works again */
