@@ -5,7 +5,7 @@
 
 Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: six wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
 
-**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel. Live since September 2026, in three languages, with 164 unit and integration tests plus end-to-end tests in CI.
+**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel · an AI concierge on Claude Haiku 5.5 with tool use. Live since September 2026, in three languages, with 164 unit and integration tests plus end-to-end tests in CI.
 
 ![The public site](docs/screenshots/site-desktop.jpg)
 
@@ -94,6 +94,7 @@ flowchart LR
   Airbnb[(Airbnb iCal)] -->|every 15 min| Next
   Next -->|/api/ical| Airbnb
   Cron[Vercel Cron / GitHub Actions] -->|/api/cron| Next
+  Next -->|streaming, tool use| Claude[Claude API · Haiku 5.5]
 ```
 
 | Layer     | Choice                                                                                             |
@@ -102,6 +103,7 @@ flowchart LR
 | Data      | PostgreSQL on Neon (Frankfurt), Drizzle ORM, versioned SQL migrations applied on production builds |
 | Auth      | Better Auth with Google, sessions in the database                                                  |
 | Messaging | Resend (email), Web Push with VAPID                                                                |
+| AI        | Claude Haiku 5.5 through the Anthropic TypeScript SDK: streamed replies, tool use, prompt caching  |
 | Tests     | Vitest + PGlite (real Postgres in WebAssembly), GitHub Actions CI                                  |
 | Hosting   | Vercel (functions in `fra1`, next to the database)                                                 |
 
