@@ -33,3 +33,12 @@ The concierge went live on a small prepaid API credit with automatic top-up swit
 - **Lower ceilings:** 30 messages a day per visitor and 150 a day for the whole site, down from 80 and 1000. At roughly a tenth of a cent per message, a bot rotating IPs could otherwise have spent the credit in a few days; real guests send far fewer messages than that.
 - **Refusals:** the model can decline a request (`stop_reason: "refusal"`); the loop already reports that to the guest, and there is no server-side fallback model for Haiku 5.5.
 - **Prompt:** the rules now say explicitly that they hold for the whole conversation, whatever the guest argues, and that the booking button fills in the dates, room and guests while the guest adds their name and phone number (a live test showed the assistant implying the form was complete).
+
+## Update (November 2026): measured with an eval
+
+An eval of 31 scripted guest conversations ([`evals/concierge`](../../evals/concierge)) runs this loop with the production model, prompt and tools, and grades each reply with code checks and a judge model. It changed two things:
+
+- **The turn ends after a button.** When the model had written its reply and then called `offer_whatsapp` or `offer_booking`, the loop asked it for another round, and it wrote the reply again: guests got the same answer twice in 7 of 31 conversations. Buttons give the model nothing to read, so the loop now ends the turn when a round's tools are all buttons and the round already has text; it still continues after a lookup, after a tool error, or when nothing is written yet. This also removed about a quarter of the model calls.
+- **Informal address is its own rule.** Turkish replies sometimes slipped into the formal "siz"; the rule now names the forms to use and to avoid in Turkish and German.
+
+On the eval, the pass rate went from 71% to 94% (22 to 29 of 31, one run per case).

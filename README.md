@@ -5,7 +5,7 @@
 
 Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: five wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
 
-**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel · an AI concierge on Claude Haiku 5.5 with tool use. Live since September 2026, in three languages, with 164 unit and integration tests plus end-to-end tests in CI.
+**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel · an AI concierge on Claude Haiku 5.5 with tool use. Live since September 2026, in three languages, with 178 unit and integration tests plus end-to-end tests in CI, and an eval of the AI concierge.
 
 ![The public site](docs/screenshots/site-desktop.jpg)
 
@@ -130,9 +130,10 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 
 ## Quality
 
-- **164 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **178 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
 - **End-to-end tests** (Playwright, on a phone-sized Chromium) run against a production build and a throwaway in-memory database: a guest sends a request, the family confirms it in the panel and the next guest finds those nights booked; a bot filling the hidden field is told "success" while nothing is stored, and the drop shows up in the panel statistics; the panel stays closed without signing in; a price changed in the panel reaches the German menu. The test server blanks every variable from local `.env` files, so a run can never email the family or reach a real database.
 - **CI** runs lint, type checks, tests, a production build and the end-to-end tests without any secrets on every push.
+- **AI concierge eval:** 31 scripted guest conversations in three languages run through the real concierge loop and are graded by code checks and a judge model ([`evals/concierge`](evals/concierge)). It found the assistant writing the same answer twice around its buttons and slipping into formal Turkish; after two fixes the pass rate went from 71% to 94%, with a quarter fewer model calls. A full run costs about $0.20.
 - **Performance:** photos went from 26 MB to 11.6 MB with responsive sizes; on a phone the home page downloads about 0.9 MB of images instead of 8.5 MB. Measured on the live site with Lighthouse (mobile, median of two runs, 1 October 2026), a room page went from a performance score of 63 to 98 and from an 8.0 s to a 2.5 s Largest Contentful Paint, after the cover photo was given priority and the footer map was loaded on tap.
 - **Accessibility:** Lighthouse accessibility went from 95–96 to 100 on the home, booking, menu and room pages (colour contrast fixes); best practices and SEO score 100.
 - **SEO:** per-page canonical URLs and `hreflang`, localized JSON-LD (`LodgingBusiness` + `Restaurant`, FAQ), a sitemap with language alternates.
@@ -189,6 +190,7 @@ src/
   lib/                    cross-cutting helpers: auth, i18n, SEO, dates, images
 drizzle/                  versioned SQL migrations
 e2e/                      end-to-end tests (Playwright) of the guest and panel flows
+evals/concierge/          the AI concierge's eval: cases, runner, grader and results
 scripts/                  local database, demo data, dev sign-in, image optimisation, migrations
 docs/decisions/           architecture decision records
 ```
@@ -198,7 +200,7 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 ## What's next
 
 - Keep using a room's last known Airbnb calendar when Airbnb can't be reached: today that room looks free until the calendar is readable again; the family still confirms every request by hand, and the admins get an alert after 3 hours
-- An evaluation set of real guest questions for the AI concierge, run in CI on prompt changes
+- Real guest questions in the AI concierge's eval (its cases are written from the site's content today), and the restaurant's opening hours in its knowledge (it sends guests to WhatsApp for them now)
 - Ordering from the table, building on the QR menu
 
 ## License
