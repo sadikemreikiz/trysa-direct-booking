@@ -71,6 +71,13 @@
       "when": 1790956646850,
       "tag": "0009_analytics_filtered_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793630669902,
+      "tag": "0010_airbnb_calendars",
+      "breakpoints": true
     }
   ]
 }

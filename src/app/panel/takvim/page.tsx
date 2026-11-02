@@ -1,8 +1,6 @@
 import Link from "next/link";
-import {
-  AIRBNB_REFRESH_SECONDS,
-  getLockedDatesByType,
-} from "@/features/airbnb-sync/airbnb-calendar";
+import { AIRBNB_REFRESH_SECONDS } from "@/features/airbnb-sync/airbnb-calendar";
+import { readAirbnbAvailability } from "@/features/airbnb-sync/calendar-store";
 import { buildCalendar, daysOfMonth, shiftMonth, type Cell } from "@/features/panel/calendar";
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import { formatDay } from "@/features/panel/format";
@@ -16,6 +14,13 @@ const monthTitle = new Intl.DateTimeFormat("tr-TR", {
   timeZone: "UTC",
 });
 const weekday = new Intl.DateTimeFormat("tr-TR", { weekday: "short", timeZone: "UTC" });
+const readTime = new Intl.DateTimeFormat("tr-TR", {
+  day: "numeric",
+  month: "long",
+  hour: "2-digit",
+  minute: "2-digit",
+  timeZone: "Europe/Istanbul",
+});
 
 /** Shortened unit names so the column headers fit narrow screens */
 const SHORT: Record<string, string> = {
@@ -49,9 +54,9 @@ export default async function CalendarPage({
   const days = daysOfMonth(month);
   const [{ units, stays }, airbnb] = await Promise.all([
     calendarData(db, days[0], shiftMonth(month, 1) + "-01"),
-    getLockedDatesByType(),
+    readAirbnbAvailability(db),
   ]);
-  const calendar = buildCalendar(month, units, stays, airbnb, SHARED_UNIT_SLUG);
+  const calendar = buildCalendar(month, units, stays, airbnb.locked, SHARED_UNIT_SLUG);
   const unassigned = stays.filter((s) => s.unitId == null);
 
   return (
@@ -86,6 +91,25 @@ export default async function CalendarPage({
         Airbnb takvimi en geç {AIRBNB_REFRESH_SECONDS / 60} dakikada bir okunur. Airbnb geçmiş
         günleri paylaşmadığı için geçmiş günler soluk gösterilir.
       </p>
+      {airbnb.fallback.length > 0 && (
+        <div
+          role="status"
+          className="mb-3 rounded-2xl bg-[#ffd9d6] px-4 py-3 text-sm text-[#7a2420]"
+        >
+          <p className="font-semibold">Airbnb takvimi şu an okunamıyor</p>
+          <ul className="mt-1 list-disc pl-5">
+            {airbnb.fallback.map(({ room, readAt }) => (
+              <li key={room}>
+                {room}:{" "}
+                {readAt
+                  ? `${readTime.format(readAt)} itibarıyla son okunan takvim gösteriliyor`
+                  : "kayıtlı takvim yok, dolu günler görünmüyor"}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1">{"Onaylamadan önce Airbnb'ye bak."}</p>
+        </div>
+      )}
 
       <div className="overflow-hidden rounded-2xl bg-white">
         <div

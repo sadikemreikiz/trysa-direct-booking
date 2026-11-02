@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { getAirbnbLockedDates } from "@/features/airbnb-sync/calendar-store";
 import PanelHeader from "@/features/panel/components/PanelHeader";
 import ReservationActions from "@/features/panel/components/ReservationActions";
 import { formatDay, localeFlag, nights, sourceLabel } from "@/features/panel/format";
@@ -42,7 +42,7 @@ export default async function ReservationPage({ params }: { params: Promise<{ id
     db,
     r.checkIn,
     r.checkOut,
-    await getLockedDatesByType(),
+    await getAirbnbLockedDates(db),
     r.id,
   );
 

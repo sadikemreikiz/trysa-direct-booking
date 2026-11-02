@@ -252,6 +252,18 @@ export const healthChecks = pgTable("health_checks", {
   alertedAt: timestamp("alerted_at", { withTimezone: true }),
 });
 
+/**
+ * The last Airbnb calendar read successfully for each room. When Airbnb can't be read, the
+ * site, the assistant and the panel use these booked nights instead of showing the room free.
+ */
+export const airbnbCalendars = pgTable("airbnb_calendars", {
+  /** Room name as in the booking form, e.g. "Ambar-1" */
+  room: text("room").primaryKey(),
+  /** Booked nights (YYYY-MM-DD) */
+  bookedDays: text("booked_days").array().notNull(),
+  readAt: timestamp("read_at", { withTimezone: true }).notNull(),
+});
+
 /* ------------------------------------------------------------------------ */
 /* Panel sign-in: Better Auth core tables (names as the library expects)   */
 /* ------------------------------------------------------------------------ */

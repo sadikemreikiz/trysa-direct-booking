@@ -6,6 +6,9 @@
  * Env variables (comma-separated .ics links, SECRET, never committed):
  * Each room is separate: a single unit with its own env key.
  *   AIRBNB_ICAL_AMBAR1/2/3, AIRBNB_ICAL_KULUBE1/2, AIRBNB_ICAL_TINY
+ *
+ * A calendar that can't be read is reported as such (null), never as an empty one: the caller
+ * falls back to the last calendar read successfully (features/airbnb-sync/calendar-store).
  */
 
 import type { CheckResult } from "@/features/monitoring/health";
@@ -36,92 +39,110 @@ function toISO(yyyymmdd: string): string {
   return `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
 }
 
-/** Returns the taken days (YYYY-MM-DD) from a single .ics link. */
-async function bookedSet(url: string): Promise<Set<string>> {
+/**
+ * The taken days (YYYY-MM-DD) in an .ics file, or null when the text isn't a calendar
+ * (Airbnb sometimes answers with a web page, e.g. a sign-in page, and a 200 status).
+ */
+export function parseBookedDays(text: string): Set<string> | null {
+  if (!text.includes("BEGIN:VCALENDAR")) return null;
   const set = new Set<string>();
-  try {
-    // Airbnb updates its own export with a delay too; we read it at least every 15 minutes.
-    const res = await fetch(url, { next: { revalidate: AIRBNB_REFRESH_SECONDS } });
-    if (!res.ok) return set;
-    const text = await res.text();
-    let start: string | null = null;
-    let end: string | null = null;
-    for (const line of text.split(/\r?\n/)) {
-      if (line.startsWith("BEGIN:VEVENT")) {
-        start = null;
-        end = null;
-      } else if (line.startsWith("DTSTART")) {
-        const m = line.match(/(\d{8})/);
-        if (m) start = toISO(m[1]);
-      } else if (line.startsWith("DTEND")) {
-        const m = line.match(/(\d{8})/);
-        if (m) end = toISO(m[1]);
-      } else if (line.startsWith("END:VEVENT") && start && end) {
-        let d = new Date(`${start}T00:00:00Z`);
-        const last = new Date(`${end}T00:00:00Z`); // checkout day excluded
-        while (d < last) {
-          set.add(d.toISOString().slice(0, 10));
-          d = new Date(d.getTime() + 86_400_000);
-        }
+  let start: string | null = null;
+  let end: string | null = null;
+  for (const line of text.split(/\r?\n/)) {
+    if (line.startsWith("BEGIN:VEVENT")) {
+      start = null;
+      end = null;
+    } else if (line.startsWith("DTSTART")) {
+      const m = line.match(/(\d{8})/);
+      if (m) start = toISO(m[1]);
+    } else if (line.startsWith("DTEND")) {
+      const m = line.match(/(\d{8})/);
+      if (m) end = toISO(m[1]);
+    } else if (line.startsWith("END:VEVENT") && start && end) {
+      let d = new Date(`${start}T00:00:00Z`);
+      const last = new Date(`${end}T00:00:00Z`); // checkout day excluded
+      while (d < last) {
+        set.add(d.toISOString().slice(0, 10));
+        d = new Date(d.getTime() + 86_400_000);
       }
     }
-  } catch {
-    /* empty if it can't be fetched */
   }
   return set;
 }
 
+type Reading = { days: Set<string> } | { error: string };
+
+/** Reads one .ics link: its taken days, or why it couldn't be read. */
+async function readCalendar(
+  url: string,
+  fetchImpl: typeof fetch,
+  init: RequestInit & { next?: { revalidate: number } },
+): Promise<Reading> {
+  try {
+    const res = await fetchImpl(url, init);
+    if (!res.ok) return { error: `HTTP ${res.status}` };
+    const days = parseBookedDays(await res.text());
+    return days ? { days } : { error: "not a calendar" };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : String(e) };
+  }
+}
+
+/** Days taken in EVERY unit of a type (= the type is fully booked), or the first read error. */
+function lockedDays(readings: Reading[]): { days: string[] } | { error: string } {
+  const failed = readings.find((r): r is { error: string } => "error" in r);
+  if (failed) return failed;
+  const [first, ...rest] = readings.map((r) => (r as { days: Set<string> }).days);
+  return { days: [...first].filter((day) => rest.every((s) => s.has(day))).sort() };
+}
+
+/** Rooms whose units all have a calendar link (otherwise a room may be free: no blocking). */
+function connectedRooms(): [string, string[]][] {
+  return Object.entries(TYPE_CONFIG).flatMap(([room, cfg]) => {
+    const urls = urlsFor(cfg.envKey);
+    return urls.length > 0 && urls.length >= cfg.total ? [[room, urls] as [string, string[]]] : [];
+  });
+}
+
 /**
- * Returns the BLOCKED days for each accommodation type.
- * A date is blocked only if ALL units of the type are connected and all are taken that day.
- * If a unit is missing (e.g. 2 of 5 rooms connected) nothing is blocked, since a room may be free.
+ * The BLOCKED days of each accommodation type, read through the 15-minute cache: null for a
+ * room whose calendar couldn't be read just now. Rooms without a calendar link get [].
  */
-export async function getLockedDatesByType(): Promise<Record<string, string[]>> {
-  const out: Record<string, string[]> = {};
+export async function readLockedDatesByType(
+  fetchImpl: typeof fetch = fetch,
+): Promise<Record<string, string[] | null>> {
+  const out: Record<string, string[] | null> = Object.fromEntries(
+    Object.keys(TYPE_CONFIG).map((room) => [room, []]),
+  );
   await Promise.all(
-    Object.entries(TYPE_CONFIG).map(async ([type, cfg]) => {
-      const urls = urlsFor(cfg.envKey);
-      // If not all units are connected we can't decide occupancy → no blocking.
-      if (urls.length === 0 || urls.length < cfg.total) {
-        out[type] = [];
-        return;
-      }
-      const sets = await Promise.all(urls.map(bookedSet));
-      const [first, ...rest] = sets;
-      // Only days taken in EVERY unit = the type is fully booked
-      out[type] = [...first].filter((day) => rest.every((s) => s.has(day))).sort();
+    connectedRooms().map(async ([room, urls]) => {
+      // Airbnb updates its own export with a delay too; we read it at least every 15 minutes.
+      const init = { next: { revalidate: AIRBNB_REFRESH_SECONDS } };
+      const result = lockedDays(
+        await Promise.all(urls.map((u) => readCalendar(u, fetchImpl, init))),
+      );
+      out[room] = "days" in result ? result.days : null;
     }),
   );
   return out;
 }
 
 /**
- * Reads every connected Airbnb calendar fresh (bypassing the cache), for the health check.
- * A calendar that can't be read would quietly show the room as free on the site and in the
- * panel, so failures are reported per room.
+ * Reads every connected Airbnb calendar fresh (bypassing the cache), for the scheduled job:
+ * its health check, and the copy of each calendar kept for when Airbnb can't be read.
  */
 export async function checkAirbnbCalendars(
   fetchImpl: typeof fetch = fetch,
-): Promise<{ room: string; result: CheckResult }[]> {
-  const rooms = Object.entries(TYPE_CONFIG).filter(([, cfg]) => urlsFor(cfg.envKey).length > 0);
+): Promise<{ room: string; result: CheckResult; days?: string[] }[]> {
   return Promise.all(
-    rooms.map(async ([room, cfg]) => {
-      const errors = await Promise.all(
-        urlsFor(cfg.envKey).map(async (url) => {
-          try {
-            const res = await fetchImpl(url, {
-              cache: "no-store",
-              signal: AbortSignal.timeout(10_000),
-            });
-            if (!res.ok) return `HTTP ${res.status}`;
-            return (await res.text()).includes("BEGIN:VCALENDAR") ? null : "not a calendar";
-          } catch (e) {
-            return e instanceof Error ? e.message : String(e);
-          }
-        }),
+    connectedRooms().map(async ([room, urls]) => {
+      const init = { cache: "no-store" as const, signal: AbortSignal.timeout(10_000) };
+      const result = lockedDays(
+        await Promise.all(urls.map((u) => readCalendar(u, fetchImpl, init))),
       );
-      const error = errors.find((e) => e !== null);
-      return { room, result: error ? { ok: false as const, error } : { ok: true as const } };
+      return "days" in result
+        ? { room, result: { ok: true as const }, days: result.days }
+        : { room, result: { ok: false as const, error: result.error } };
     }),
   );
 }

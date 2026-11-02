@@ -4,6 +4,7 @@
  */
 import type { Db } from "@/db";
 import { checkAirbnbCalendars } from "@/features/airbnb-sync/airbnb-calendar";
+import { saveAirbnbCalendars } from "@/features/airbnb-sync/calendar-store";
 import { alertAdmins, HOUR_MS, type AlertChannels } from "./alerts";
 import { lastOk, recordCheck } from "./health";
 
@@ -24,7 +25,14 @@ export async function monitorAirbnbCalendars(db: Db, opts: Opts = {}) {
   const now = opts.now ?? new Date();
   const failing: string[] = [];
   const recovered: string[] = [];
-  for (const { room, result } of await checkAirbnbCalendars(opts.fetchImpl)) {
+  const readings = await checkAirbnbCalendars(opts.fetchImpl);
+  // Every calendar read now becomes the copy used while Airbnb can't be read.
+  await saveAirbnbCalendars(
+    db,
+    readings.flatMap(({ room, days }) => (days ? [{ room, days }] : [])),
+    now,
+  );
+  for (const { room, result } of readings) {
     const change = await recordCheck(db, `airbnb:${room}`, result, AIRBNB_GRACE_MS, now);
     if (change.kind === "failing") {
       failing.push(`${room} (${hours(now.getTime() - change.since.getTime())} saattir)`);
@@ -37,7 +45,7 @@ export async function monitorAirbnbCalendars(db: Db, opts: Opts = {}) {
       {
         key: "airbnb",
         title: "⚠️ Airbnb takvimi okunamıyor",
-        body: `${failing.join(", ")}. Bu sürede o odalar sitede ve panelde boş görünebilir: onaylamadan önce Airbnb'ye bak.`,
+        body: `${failing.join(", ")}. Sitede ve panelde bu odaların son okunabilen takvimi kullanılıyor; o zamandan sonra Airbnb'de yapılan rezervasyonlar görünmez: onaylamadan önce Airbnb'ye bak.`,
         url: "/panel/takvim",
       },
       { now, cooldownMs: 0, channels: opts.channels },

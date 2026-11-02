@@ -1,6 +1,7 @@
 import type { PGlite } from "@electric-sql/pglite";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Db } from "@/db";
+import { airbnbCalendars } from "@/db/schema";
 import { createTestDb, resetTestDb } from "@/db/test-db";
 import type { AlertChannels } from "./alerts";
 import { monitorAirbnbCalendars, monitorScheduler } from "./checks";
@@ -69,6 +70,27 @@ describe("Airbnb calendars", () => {
     await monitorAirbnbCalendars(db, { now: min(0), fetchImpl: html, channels: c });
     await monitorAirbnbCalendars(db, { now: min(181), fetchImpl: html, channels: c });
     expect(c.push).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps a copy of each calendar it reads, for when Airbnb can't be read", async () => {
+    const ics =
+      "BEGIN:VCALENDAR\nBEGIN:VEVENT\nDTSTART:20261114\nDTEND:20261116\nEND:VEVENT\nEND:VCALENDAR";
+    await monitorAirbnbCalendars(db, {
+      now: min(0),
+      fetchImpl: respond(200, ics),
+      channels: channels(),
+    });
+    // A failed reading later doesn't overwrite the good copy.
+    await monitorAirbnbCalendars(db, {
+      now: min(15),
+      fetchImpl: respond(503),
+      channels: channels(),
+    });
+    const saved = await db.select().from(airbnbCalendars).orderBy(airbnbCalendars.room);
+    expect(saved).toEqual([
+      { room: "Ambar-1", bookedDays: ["2026-11-14", "2026-11-15"], readAt: min(0) },
+      { room: "Tiny House", bookedDays: ["2026-11-14", "2026-11-15"], readAt: min(0) },
+    ]);
   });
 
   it("only reads the calendars that are connected, bypassing the cache", async () => {

@@ -5,7 +5,7 @@
 
 Website, booking system and staff panel for **Trysa Restaurant Camping**, my family's small guesthouse and restaurant in Demre, Antalya: five wooden rooms and cabins, a tiny house, a camping area and a grill restaurant. It is live at [trysacamping.com](https://trysacamping.com), and the family handles incoming requests from its staff panel.
 
-**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel · an AI concierge on Claude Haiku 5.5 with tool use. Live since September 2026, in three languages, with 178 unit and integration tests plus end-to-end tests in CI, and an eval of the AI concierge.
+**At a glance:** Next.js 16 · React 19 · TypeScript · PostgreSQL (Neon) with Drizzle · Vercel · an AI concierge on Claude Haiku 5.5 with tool use. Live since September 2026, in three languages, with 186 unit and integration tests plus end-to-end tests in CI, and an eval of the AI concierge.
 
 ![The public site](docs/screenshots/site-desktop.jpg)
 
@@ -120,7 +120,7 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 | Two people acting on one request           | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                                                                                         |
 | Lost notifications                         | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))                                                                                      |
 | Emails sent twice by a scheduled job       | Each outbox row can carry an idempotency key (`guest_prearrival:<booking id>`, unique in the database). The job runs every 15 minutes in the daytime, inserts with `ON CONFLICT DO NOTHING` and only between 10:00 and 20:00 in Demre                                                                   |
-| No Airbnb API for small hosts              | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                                                                                                |
+| No Airbnb API for small hosts              | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings; when Airbnb can't be read, the room's last known calendar is used, so it never looks free by mistake ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                          |
 | Spam without CAPTCHA friction              | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                                                                                                      |
 | Privacy (KVKK/GDPR)                        | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                                                                                           |
 | Failures nobody would notice               | Next.js `onRequestError` plus health checks in the scheduled job (Airbnb calendars, the scheduler's own heartbeat) push one alert per problem to the admins, with a cooldown, and an all-clear when it recovers; email when push or the database is down                                                |
@@ -130,7 +130,7 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 
 ## Quality
 
-- **178 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
+- **186 tests** (unit and integration) run against PGlite with the production migrations, so constraints, races between workers and retry timing are tested for real, with no mocks of the database and no Docker ([ADR 0005](docs/decisions/0005-real-postgres-in-tests-with-pglite.md)).
 - **End-to-end tests** (Playwright, on a phone-sized Chromium) run against a production build and a throwaway in-memory database: a guest sends a request, the family confirms it in the panel and the next guest finds those nights booked; a bot filling the hidden field is told "success" while nothing is stored, and the drop shows up in the panel statistics; the panel stays closed without signing in; a price changed in the panel reaches the German menu. The test server blanks every variable from local `.env` files, so a run can never email the family or reach a real database.
 - **CI** runs lint, type checks, tests, a production build and the end-to-end tests without any secrets on every push.
 - **AI concierge eval:** 31 scripted guest conversations in three languages run through the real concierge loop and are graded by code checks and a judge model ([`evals/concierge`](evals/concierge)). It found the assistant writing the same answer twice around its buttons and slipping into formal Turkish; after two fixes the pass rate went from 71% to 94%, with a quarter fewer model calls. A full run costs about $0.20.
@@ -199,7 +199,6 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 
 ## What's next
 
-- Keep using a room's last known Airbnb calendar when Airbnb can't be reached: today that room looks free until the calendar is readable again; the family still confirms every request by hand, and the admins get an alert after 3 hours
 - Real guest questions in the AI concierge's eval (its cases are written from the site's content today)
 - Ordering from the table, building on the QR menu
 

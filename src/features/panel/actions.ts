@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
-import { getLockedDatesByType } from "@/features/airbnb-sync/airbnb-calendar";
+import { getAirbnbLockedDates } from "@/features/airbnb-sync/calendar-store";
 import { guestEmailEnabled } from "@/features/notifications/email";
 import { outboxHandlers } from "@/features/notifications/handlers";
 import { deliverDueOutbox } from "@/features/notifications/outbox";
@@ -65,7 +65,7 @@ export async function confirmAction(
     db,
     detail.r.checkIn,
     detail.r.checkOut,
-    await getLockedDatesByType(),
+    await getAirbnbLockedDates(db),
     id,
   );
   const unit = availability.find((u) => u.id === unitId);
@@ -99,7 +99,7 @@ export async function availabilityAction(
   ) {
     return [];
   }
-  return availabilityForRange(db, checkIn, checkOut, await getLockedDatesByType());
+  return availabilityForRange(db, checkIn, checkOut, await getAirbnbLockedDates(db));
 }
 
 export async function createManualAction(
@@ -111,7 +111,7 @@ export async function createManualAction(
     db,
     input.checkIn,
     input.checkOut,
-    await getLockedDatesByType(),
+    await getAirbnbLockedDates(db),
   );
   const unit = availability.find((u) => u.id === input.unitId);
   if (!unit) return { ok: false, error: MESSAGES.unit_required };
