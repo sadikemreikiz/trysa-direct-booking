@@ -107,14 +107,14 @@ export async function* runConcierge(
       messages,
     });
 
-    let separated = false;
+    let roundHasText = false;
     for await (const event of stream) {
       if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
         // Text from a later round ("Let me check… / Good news…") starts a new paragraph.
-        if (wroteText && !separated) {
+        if (wroteText && !roundHasText) {
           yield { type: "text", text: "\n\n" };
         }
-        separated = true;
+        roundHasText = true;
         wroteText = true;
         yield { type: "text", text: event.delta.text };
       }
@@ -148,10 +148,13 @@ export async function* runConcierge(
     // alongside its tool calls, and the history must stay append-only for them to stay valid.
     messages.push({ role: "assistant", content: message.content });
     const results: Anthropic.ToolResultBlockParam[] = [];
+    let onlyButtons = true;
     for (const call of toolUses) {
       usage.toolCalls[call.name] = (usage.toolCalls[call.name] ?? 0) + 1;
       const outcome = runTool(call.name, call.input, ctx);
       if (outcome.action) yield { type: "action", action: outcome.action };
+      // A button gives the model nothing new to read; an error or a lookup does.
+      if (!outcome.action || outcome.isError) onlyButtons = false;
       results.push({
         type: "tool_result",
         tool_use_id: call.id,
@@ -159,6 +162,9 @@ export async function* runConcierge(
         ...(outcome.isError ? { is_error: true } : {}),
       });
     }
+    // The reply is written and its buttons are under it: another round would only say it
+    // again (the eval in evals/concierge caught guests getting the same answer twice).
+    if (onlyButtons && roundHasText) return;
     // All results of one turn go back in a single user message.
     messages.push({ role: "user", content: results });
   }

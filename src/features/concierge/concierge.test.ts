@@ -287,6 +287,57 @@ describe("runConcierge", () => {
     });
   });
 
+  it("ends the turn when the reply is written and only buttons follow, so nothing is said twice", async () => {
+    const { client, requests } = fakeClient([
+      reply(
+        [
+          text("I'm not sure; the family can tell you."),
+          toolUse("t1", "offer_whatsapp", { message: "Card payment?" }),
+        ],
+        "tool_use",
+      ),
+      reply([text("I'm not sure; tap the button to ask the family.")]),
+    ]);
+    const events = await collect(
+      runConcierge(client, [{ role: "user", text: "Card?" }], ctx, emptyUsage()),
+    );
+    expect(requests).toHaveLength(1);
+    expect(events.map((e) => e.type)).toEqual(["text", "action"]);
+  });
+
+  it("keeps going after a button when nothing is written yet or a lookup came back", async () => {
+    // A button with no reply yet: the model still has to write one.
+    const silent = fakeClient([
+      reply([toolUse("t1", "offer_whatsapp", { message: "Hi" })], "tool_use"),
+      reply([text("Tap the button to ask the family.")]),
+    ]);
+    await collect(runConcierge(silent.client, [{ role: "user", text: "?" }], ctx, emptyUsage()));
+    expect(silent.requests).toHaveLength(2);
+
+    // A button next to an availability check: the model has to read the result.
+    const lookup = fakeClient([
+      reply(
+        [
+          text("Let me check."),
+          toolUse("t1", "check_availability", { checkin: "2026-10-09", checkout: "2026-10-12" }),
+          toolUse("t2", "offer_booking", {}),
+        ],
+        "tool_use",
+      ),
+      reply([text("Ambar-2 is free.")]),
+    ]);
+    await collect(runConcierge(lookup.client, [{ role: "user", text: "?" }], ctx, emptyUsage()));
+    expect(lookup.requests).toHaveLength(2);
+
+    // A button whose input was invalid: the model gets the error and can fix it.
+    const invalid = fakeClient([
+      reply([text("Here you go."), toolUse("t1", "offer_whatsapp", {})], "tool_use"),
+      reply([text("Tap the button.")]),
+    ]);
+    await collect(runConcierge(invalid.client, [{ role: "user", text: "?" }], ctx, emptyUsage()));
+    expect(invalid.requests).toHaveLength(2);
+  });
+
   it("stops offering tools after the last round, so there is always an answer", async () => {
     const loop = Array.from({ length: MAX_TOOL_ROUNDS }, (_, i) =>
       reply(
