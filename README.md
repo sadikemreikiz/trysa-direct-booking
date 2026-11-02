@@ -204,4 +204,4 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 
 ## License
 
-The source code is published to show my work; it is not open source. Code © Sadik Emre Ikiz; photos, texts, the Trysa name and logo © Trysa Restaurant Camping. All rights reserved, see [LICENSE](LICENSE).
+The source code is published to show my work; it is not open source. Code © Sadik Emre Ikiz; photos, texts, the Trysa name and logo © Trysa Restaurant Camping. All rights reserved, see [LICENSE](LICENSE). The two photos of ancient Trysa on the home page are from Wikimedia Commons under CC BY-SA 4.0 and are credited on the page and in the licence file.
