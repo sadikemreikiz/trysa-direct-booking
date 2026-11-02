@@ -18,17 +18,22 @@ export function Accommodation({ t, lang }: TL) {
               s.img ? "" : "md:col-span-3 md:grid md:grid-cols-3 md:items-center md:gap-6"
             }`}
           >
-            {s.img ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                {...responsiveImage(s.img, "(min-width: 768px) 33vw, 100vw")}
-                alt={s.title}
-                loading="lazy"
-                className={`aspect-[3/2] w-full object-cover ${s.focus ?? ""}`}
-              />
-            ) : (
-              <CampScene />
-            )}
+            {/* The photo sits inside the card in a cream frame, like the restaurant and Trysa cards */}
+            <div className={s.img ? "p-3 pb-0" : "p-3 pb-0 md:pb-3"}>
+              <div className="rounded-lg bg-ivory p-1.5 shadow-[0_6px_16px_rgba(44,58,46,0.18)]">
+                {s.img ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    {...responsiveImage(s.img, "(min-width: 768px) 33vw, 100vw")}
+                    alt={s.title}
+                    loading="lazy"
+                    className={`block aspect-[3/2] w-full rounded object-cover ${s.focus ?? ""}`}
+                  />
+                ) : (
+                  <CampScene />
+                )}
+              </div>
+            </div>
             <div className={s.img ? "p-5" : "p-5 md:col-span-2 md:max-w-md md:pl-0"}>
               <div className="font-display text-lg font-semibold md:text-xl">
                 {s.slug === "kamp" ? t.stay.kampTitle : s.title}
@@ -54,7 +59,7 @@ function CampScene() {
     <svg
       viewBox="0 0 320 176"
       preserveAspectRatio="xMidYMax slice"
-      className="aspect-[3/2] w-full"
+      className="block aspect-[3/2] w-full rounded"
       aria-hidden="true"
     >
       <rect width="320" height="176" fill="#efe8d8" />
