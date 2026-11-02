@@ -5,10 +5,10 @@
 export function responsiveImage(
   src: string,
   sizes: string,
-  /** Width of the large version, if it isn't the usual 1600 px (1920 px for the hero image) */
+  /** Width of the large version, if it isn't the usual 1600 px */
   largeWidth?: number,
 ) {
-  const large = largeWidth ?? (src.endsWith("/hero.jpg") ? 1920 : 1600);
+  const large = largeWidth ?? 1600;
   return {
     src,
     srcSet: `${src.replace(/\.jpg$/, ".sm.jpg")} 800w, ${src} ${large}w`,

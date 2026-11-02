@@ -6,14 +6,17 @@ import { container, Stars, type TLR } from "./shared";
 export function Hero({ t, lang, rating }: TLR) {
   return (
     <section className="relative overflow-hidden bg-pine">
+      {/* Drone shot of the property at dusk (the Google Business Profile cover). Phones see the
+          sunset over the hills and the restaurant; wide screens the lit buildings in the trees. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        {...responsiveImage("/img/hero.jpg", "100vw")}
+        {...responsiveImage("/img/hero.jpg", "100vw", 1236)}
         alt=""
         fetchPriority="high"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-cover object-[40%_85%]"
       />
-      <div className="absolute inset-0 bg-pine/75" />
+      {/* Dark behind the text, lighter where the photo has nothing on top of it */}
+      <div className="absolute inset-0 bg-linear-to-b from-pine/70 via-pine/60 to-pine/80 md:bg-linear-to-r md:from-pine/90 md:from-30% md:via-pine/70 md:via-55% md:to-pine/10" />
       <div
         className={`relative ${container} flex min-h-[440px] flex-col justify-center py-16 md:min-h-[520px] md:py-24`}
       >
