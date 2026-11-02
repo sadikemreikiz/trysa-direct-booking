@@ -12,14 +12,14 @@ export function Accommodation({ t, lang }: TL) {
           <a
             key={s.slug}
             href={s.img ? `/${lang}/oda/${s.slug}` : `/${lang}/rezervasyon`}
-            // The camping area comes last, alone on its row: on wide screens it spans the row,
-            // its drawing as wide as one room photo above it.
+            // The camping area comes last, alone on its row: on wide screens it is a slim strip
+            // across the row (small drawing, text, then the price and link on the right).
             className={`overflow-hidden rounded-2xl border border-line bg-white ${
-              s.img ? "" : "md:col-span-3 md:grid md:grid-cols-3 md:items-center md:gap-6"
+              s.img ? "" : "md:col-span-3 md:flex md:items-center"
             }`}
           >
             {/* The photo sits inside the card in a cream frame, like the restaurant and Trysa cards */}
-            <div className={s.img ? "p-3 pb-0" : "p-3 pb-0 md:pb-3"}>
+            <div className={s.img ? "p-3 pb-0" : "p-3 pb-0 md:w-64 md:shrink-0 md:pb-3"}>
               <div className="rounded-lg bg-ivory p-1.5 shadow-[0_6px_16px_rgba(44,58,46,0.18)]">
                 {s.img ? (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -34,12 +34,22 @@ export function Accommodation({ t, lang }: TL) {
                 )}
               </div>
             </div>
-            <div className={s.img ? "p-5" : "p-5 md:col-span-2 md:max-w-md md:pl-0"}>
-              <div className="font-display text-lg font-semibold md:text-xl">
-                {s.slug === "kamp" ? t.stay.kampTitle : s.title}
+            <div
+              className={
+                s.img
+                  ? "p-5"
+                  : "p-5 md:flex-1 md:pl-3 md:pr-8 lg:flex lg:items-center lg:justify-between lg:gap-10"
+              }
+            >
+              <div>
+                <div className="font-display text-lg font-semibold md:text-xl">
+                  {s.slug === "kamp" ? t.stay.kampTitle : s.title}
+                </div>
+                <p className="mt-1.5 text-sm text-muted">{t.room.descs[s.slug] ?? s.desc}</p>
               </div>
-              <p className="mt-1.5 text-sm text-muted">{t.room.descs[s.slug] ?? s.desc}</p>
-              <div className="mt-3.5 flex items-center justify-between">
+              <div
+                className={`mt-3.5 flex items-center justify-between ${s.img ? "" : "lg:mt-0 lg:gap-10"}`}
+              >
                 <span className="text-lg font-bold text-pine">
                   {s.slug === "kamp" ? t.stay.fiyatSor : s.price}
                 </span>
