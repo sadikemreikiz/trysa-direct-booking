@@ -51,7 +51,7 @@ export const place = {
 export type RoomExtra = "ac" | "fridge";
 
 // Each room is separate. Prices from Airbnb; to be confirmed with the family.
-// `focus` is the object-position that keeps the cabin (or bed) in view when the portrait cover
+// `focus` is the object-position that keeps the cabin in view when the portrait cover
 // is cropped to the wide card and room page frames.
 export const stays: {
   slug: string;
@@ -92,7 +92,7 @@ export const stays: {
     desc: "Konforlu ahşap oda, doğa manzaralı",
     price: "1.500 ₺",
     img: "/img/rooms/kulube-1/kapak.jpg",
-    focus: "object-[50%_72%]",
+    focus: "object-[50%_45%]",
     extras: ["ac"],
   },
   {
