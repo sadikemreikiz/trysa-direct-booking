@@ -29,7 +29,7 @@ export function Restaurant({ t, lang, rating }: TLR) {
           </a>
         </div>
         {/* The breakfast spread large, a grill and gözleme below it */}
-        <div className="grid h-80 grid-cols-2 grid-rows-[minmax(0,3fr)_minmax(0,2fr)] gap-1 md:h-96 md:w-[460px]">
+        <div className="grid h-80 grid-cols-2 grid-rows-[minmax(0,3fr)_minmax(0,2fr)] gap-1 md:h-96 md:w-2/5 lg:w-[460px]">
           {foodPhotos.map((p, i) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img

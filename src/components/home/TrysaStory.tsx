@@ -1,14 +1,15 @@
+import { responsiveImage } from "@/lib/images";
 import { container, type T } from "./shared";
 
 export function TrysaStory({ t }: T) {
   return (
     <section id="trysa" className={`${container} scroll-mt-20 pt-10`}>
-      <div className="overflow-hidden rounded-2xl bg-stone">
-        <div className="p-6 md:p-12">
+      <div className="overflow-hidden rounded-2xl bg-stone md:flex">
+        <div className="p-6 md:flex-1 md:p-12">
           <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">
             {t.trysaStory.kicker}
           </div>
-          <h2 className="font-display text-2xl font-semibold leading-tight text-[#f1e9d8] md:text-3xl">
+          <h2 className="font-display text-2xl font-semibold leading-tight text-balance text-[#f1e9d8] md:text-3xl">
             {t.trysaStory.title}
           </h2>
           <p className="mt-3.5 max-w-md text-sm leading-relaxed text-[#d8cfb8] md:text-base">
@@ -22,6 +23,18 @@ export function TrysaStory({ t }: T) {
           >
             {t.trysaStory.cta}
           </a>
+        </div>
+        {/* Dusk over the Ambar cabins, as tall as the text next to it (laid out like the restaurant
+            card). Placeholder until there is a good photo of the ruins. */}
+        <div className="relative h-56 md:h-auto md:w-2/5 lg:w-[460px]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            {...responsiveImage("/img/home/trysa-dusk.jpg", "(min-width: 768px) 460px, 100vw")}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover object-[50%_60%]"
+          />
         </div>
       </div>
     </section>
