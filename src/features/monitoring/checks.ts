@@ -9,7 +9,10 @@ import { lastOk, recordCheck } from "./health";
 
 /** Airbnb has short outages; only a calendar unreadable for this long is worth an alert. */
 export const AIRBNB_GRACE_MS = 3 * HOUR_MS;
-/** The scheduler runs every 15 minutes; this much silence means it has stopped. */
+/**
+ * cron-job.org runs every 15 minutes from 08:00 Turkish time; at the 09:00 daily check this much
+ * silence means it has stopped. A window starting later than 07:00 would raise false alarms.
+ */
 export const SCHEDULER_STALE_MS = 2 * HOUR_MS;
 
 type Opts = { now?: Date; fetchImpl?: typeof fetch; channels?: AlertChannels };
@@ -56,9 +59,9 @@ export async function monitorAirbnbCalendars(db: Db, opts: Opts = {}) {
 }
 
 /**
- * Who called the scheduled job: cron-job.org every 15 minutes, GitHub Actions as a backup
- * (scheduled every 15 minutes, but in practice GitHub runs it only every 2–7 hours), and
- * Vercel Cron once a day.
+ * Who called the scheduled job: cron-job.org every 15 minutes in the daytime, GitHub Actions
+ * as a backup (scheduled every 15 minutes, but in practice GitHub runs it only every 2–7 hours),
+ * and Vercel Cron once a day.
  */
 export type CronSource = "cron-job" | "github" | "vercel";
 

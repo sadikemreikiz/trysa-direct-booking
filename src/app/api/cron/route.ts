@@ -21,7 +21,8 @@ import { sendPushToStaff } from "@/features/notifications/push";
  * calendars, the scheduler itself) to alert the admins.
  *
  * Callers (Authorization: Bearer $CRON_SECRET):
- *   - cron-job.org: every 15 minutes, as /api/cron?from=cron-job.
+ *   - cron-job.org: every 15 minutes from 08:00 to 23:00 Turkish time, as
+ *     /api/cron?from=cron-job (daytime only, to stay within Neon's free compute; see ADR 0003).
  *   - GitHub Actions (.github/workflows/cron.yml): a backup. It is scheduled every 15 minutes,
  *     but GitHub runs scheduled workflows only every 2–7 hours in practice.
  *   - Vercel Cron (vercel.json): once a day on the Hobby plan; Vercel adds the header itself.

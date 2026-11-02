@@ -93,7 +93,7 @@ flowchart LR
   DB -->|outbox| Push[Web Push]
   Airbnb[(Airbnb iCal)] -->|every 15 min| Next
   Next -->|/api/ical| Airbnb
-  Cron[cron-job.org every 15 min · GitHub Actions backup · Vercel Cron daily] -->|/api/cron| Next
+  Cron[cron-job.org every 15 min, 08–23 · GitHub Actions backup · Vercel Cron daily] -->|/api/cron| Next
   Next -->|streaming, tool use| Claude[Claude API · Haiku 5.5]
 ```
 
@@ -119,7 +119,7 @@ The full reasoning, alternatives and costs are in [`docs/decisions`](docs/decisi
 | Double bookings under concurrency          | An `EXCLUDE USING gist` constraint on `(unit_id, daterange)` for confirmed bookings; the database rejects overlaps even under concurrent writes ([ADR 0002](docs/decisions/0002-database-constraint-against-double-booking.md))                                                                         |
 | Two people acting on one request           | A small state machine applied with conditional `UPDATE … WHERE status = expected`; the second click gets "already handled". Every change goes into an audit log                                                                                                                                         |
 | Lost notifications                         | **Transactional outbox**: booking, audit event and notification rows in one transaction; delivery with a lease and exponential backoff ([ADR 0003](docs/decisions/0003-transactional-outbox-for-notifications.md))                                                                                      |
-| Emails sent twice by a scheduled job       | Each outbox row can carry an idempotency key (`guest_prearrival:<booking id>`, unique in the database). The job runs every 15 minutes, inserts with `ON CONFLICT DO NOTHING` and only between 10:00 and 20:00 in Demre                                                                                  |
+| Emails sent twice by a scheduled job       | Each outbox row can carry an idempotency key (`guest_prearrival:<booking id>`, unique in the database). The job runs every 15 minutes in the daytime, inserts with `ON CONFLICT DO NOTHING` and only between 10:00 and 20:00 in Demre                                                                   |
 | No Airbnb API for small hosts              | Two-way sync over iCal: read each room's Airbnb calendar, publish a tokenised feed of direct bookings ([ADR 0004](docs/decisions/0004-two-way-airbnb-sync-over-ical.md))                                                                                                                                |
 | Spam without CAPTCHA friction              | Honeypot, minimum fill time and a Postgres fixed-window rate limit keyed by an HMAC of the IP ([ADR 0006](docs/decisions/0006-spam-protection-without-captcha.md))                                                                                                                                      |
 | Privacy (KVKK/GDPR)                        | Cookie-free analytics, no IPs stored, and a scheduled job that anonymises booking data 2 years after the stay, as the privacy policy promises                                                                                                                                                           |
