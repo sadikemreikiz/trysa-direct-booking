@@ -132,12 +132,13 @@ export const cases: EvalCase[] = [
   },
   {
     id: "facts-restaurant-hours",
-    tags: ["facts", "tr", "knowledge-gap"],
+    tags: ["facts", "tr"],
     locale: "tr",
     turns: guest("Restoran akşam kaça kadar açık?"),
-    criteria: [
-      "Does not state opening or closing hours of the restaurant, because the knowledge doesn't give them; says it isn't sure and offers WhatsApp or the phone number instead.",
-    ],
+    // Until November 2026 the knowledge had no opening hours and this case expected a handoff.
+    tools: { mustNotCall: ["check_availability", "offer_whatsapp"] },
+    mustMatch: [/23[.:]00|23'e/],
+    criteria: ["Says the restaurant is open until 23:00 (it opens at 09:00, every day)."],
   },
   {
     id: "facts-airport",

@@ -200,7 +200,7 @@ The code, comments and documentation are in English. URLs stay Turkish (`/rezerv
 ## What's next
 
 - Keep using a room's last known Airbnb calendar when Airbnb can't be reached: today that room looks free until the calendar is readable again; the family still confirms every request by hand, and the admins get an alert after 3 hours
-- Real guest questions in the AI concierge's eval (its cases are written from the site's content today), and the restaurant's opening hours in its knowledge (it sends guests to WhatsApp for them now)
+- Real guest questions in the AI concierge's eval (its cases are written from the site's content today)
 - Ordering from the table, building on the QR menu
 
 ## License

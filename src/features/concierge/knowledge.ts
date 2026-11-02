@@ -79,7 +79,7 @@ ${en.stay.sub}
 For every guest: ${en.amenities.list.join(", ")}. Air conditioning only in the rooms listed with it above. For any amenity not listed here, offer WhatsApp instead of guessing.
 
 ## Restaurant
-${en.restaurant.desc} The restaurant is open to guests and to visitors who aren't staying.
+${en.restaurant.desc} The restaurant is open every day from ${site.restaurantHours.opens} to ${site.restaurantHours.closes}, to guests and to visitors who aren't staying.
 Menu (Turkish name, English name, price in Turkish lira). ${en.menu.note} Dishes marked [not available today] are on the menu but can't be ordered today.
 ${restaurantMenu(menu)}
 

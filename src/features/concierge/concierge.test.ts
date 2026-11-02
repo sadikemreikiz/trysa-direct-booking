@@ -31,6 +31,8 @@ describe("knowledge", () => {
     expect(prompt).toContain("1.750 ₺ per night");
     expect(prompt).toContain("Kuzu Şiş (Lamb skewer) 650 ₺");
     expect(prompt).toContain("Check-out is 12:00");
+    // Same hours as the footer, the menu page and the Google Business Profile.
+    expect(prompt).toContain("open every day from 09:00 to 23:00");
   });
 
   it("knows the menu as staff edited it: prices and dishes not available today", () => {
