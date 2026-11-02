@@ -65,7 +65,7 @@ export default async function RoomPage({ params }: Params) {
               </h1>
               <p className="mt-1 text-muted">{t.room.descs[room.slug] ?? room.desc}</p>
             </div>
-            <div className="text-right">
+            <div className="md:text-right">
               <div className="text-sm text-muted">{t.room.gecelik}</div>
               <div className="font-display text-2xl font-bold text-pine">{room.price}</div>
             </div>
@@ -77,7 +77,7 @@ export default async function RoomPage({ params }: Params) {
               {...responsiveImage(cover, "(min-width: 768px) 1100px, 100vw")}
               alt={room.title}
               fetchPriority="high"
-              className="mt-5 h-64 w-full rounded-2xl object-cover md:h-[420px]"
+              className={`mt-5 h-64 w-full rounded-2xl object-cover md:h-[420px] ${room.focus ?? ""}`}
             />
           )}
 

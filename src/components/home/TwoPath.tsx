@@ -13,7 +13,7 @@ export function TwoPath({ t, lang, rating }: TLR) {
               {...responsiveImage("/img/home/stay-in-nature.jpg", "(min-width: 768px) 50vw, 100vw")}
               alt={t.twoPath.stayTitle}
               loading="lazy"
-              className="h-full w-full object-cover object-[center_58%]"
+              className="h-full w-full object-cover object-[center_48%]"
             />
             <span className="absolute left-3.5 top-3.5 rounded-full bg-pine px-3 py-1.5 text-[11px] font-extrabold tracking-widest text-ivory">
               {t.twoPath.stayLabel}

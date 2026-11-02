@@ -12,7 +12,11 @@ export function Accommodation({ t, lang }: TL) {
           <a
             key={s.slug}
             href={s.img ? `/${lang}/oda/${s.slug}` : `/${lang}/rezervasyon`}
-            className="overflow-hidden rounded-2xl border border-line bg-white"
+            // The camping area comes last, alone on its row: on wide screens it spans the row,
+            // its drawing as wide as one room photo above it.
+            className={`overflow-hidden rounded-2xl border border-line bg-white ${
+              s.img ? "" : "md:col-span-3 md:grid md:grid-cols-3 md:items-center md:gap-6"
+            }`}
           >
             {s.img ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -20,12 +24,12 @@ export function Accommodation({ t, lang }: TL) {
                 {...responsiveImage(s.img, "(min-width: 768px) 33vw, 100vw")}
                 alt={s.title}
                 loading="lazy"
-                className="h-44 w-full object-cover"
+                className={`aspect-[3/2] w-full object-cover ${s.focus ?? ""}`}
               />
             ) : (
               <CampScene />
             )}
-            <div className="p-5">
+            <div className={s.img ? "p-5" : "p-5 md:col-span-2 md:max-w-md md:pl-0"}>
               <div className="font-display text-lg font-semibold md:text-xl">
                 {s.slug === "kamp" ? t.stay.kampTitle : s.title}
               </div>
@@ -50,7 +54,7 @@ function CampScene() {
     <svg
       viewBox="0 0 320 176"
       preserveAspectRatio="xMidYMax slice"
-      className="h-44 w-full"
+      className="aspect-[3/2] w-full"
       aria-hidden="true"
     >
       <rect width="320" height="176" fill="#efe8d8" />

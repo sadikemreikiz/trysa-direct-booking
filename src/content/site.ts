@@ -51,12 +51,15 @@ export const place = {
 export type RoomExtra = "ac" | "fridge";
 
 // Each room is separate. Prices from Airbnb; to be confirmed with the family.
+// `focus` is the object-position that keeps the cabin (or bed) in view when the portrait cover
+// is cropped to the wide card and room page frames.
 export const stays: {
   slug: string;
   title: string;
   desc: string;
   price: string;
   img: string;
+  focus?: string;
   extras?: RoomExtra[];
 }[] = [
   {
@@ -65,6 +68,7 @@ export const stays: {
     desc: "Doğa içinde 2 kişilik ahşap oda",
     price: "1.350 ₺",
     img: "/img/rooms/ambar-1/kapak.jpg",
+    focus: "object-[50%_60%]",
   },
   {
     slug: "ambar-2",
@@ -72,6 +76,7 @@ export const stays: {
     desc: "Doğa içinde 2 kişilik ahşap oda",
     price: "1.350 ₺",
     img: "/img/rooms/ambar-2/kapak.jpg",
+    focus: "object-center",
   },
   {
     slug: "ambar-3",
@@ -79,6 +84,7 @@ export const stays: {
     desc: "Doğa içinde 2 tek yataklı ahşap oda",
     price: "1.150 ₺",
     img: "/img/rooms/ambar-3/kapak.jpg",
+    focus: "object-[50%_48%]",
   },
   {
     slug: "kulube-1",
@@ -86,6 +92,7 @@ export const stays: {
     desc: "Konforlu ahşap oda, doğa manzaralı",
     price: "1.500 ₺",
     img: "/img/rooms/kulube-1/kapak.jpg",
+    focus: "object-[50%_72%]",
     extras: ["ac"],
   },
   {
@@ -94,6 +101,7 @@ export const stays: {
     desc: "Konforlu ahşap oda, doğa manzaralı",
     price: "1.500 ₺",
     img: "/img/rooms/kulube-2/kapak.jpg",
+    focus: "object-[50%_58%]",
     extras: ["ac"],
   },
   {
@@ -102,6 +110,7 @@ export const stays: {
     desc: "Konforlu, müstakil, doğa manzaralı",
     price: "1.750 ₺",
     img: "/img/rooms/tiny-house/kapak.jpg",
+    focus: "object-[50%_62%]",
     extras: ["ac", "fridge"],
   },
   {
