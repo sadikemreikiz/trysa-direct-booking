@@ -8,7 +8,11 @@ const footerLink = "inline-flex min-h-6 items-center underline underline-offset-
 
 export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
   return (
-    <footer id="iletisim" className="mt-auto bg-ink px-5 py-10 text-[#c9cdbf] md:px-8">
+    // On phones the bottom padding keeps the end of the footer clear of the fixed MobileBar
+    <footer
+      id="iletisim"
+      className="mt-auto bg-ink px-5 pt-10 pb-28 text-[#c9cdbf] md:px-8 md:pb-10"
+    >
       <div className="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div>
           <div className="mb-3 flex items-center gap-2 font-display text-xl font-bold tracking-wide text-ivory">
@@ -47,12 +51,22 @@ export default function Footer({ t, lang }: { t: Dict; lang: Locale }) {
             </Link>
           </div>
         </div>
-        <div className="w-full overflow-hidden rounded-xl md:w-72">
-          <MapEmbed
-            src={`https://maps.google.com/maps?q=${place.lat},${place.lng}&hl=${lang}&z=14&output=embed`}
-            label={t.footer.showMap}
-            className="h-32 w-full"
-          />
+        <div className="w-full md:w-80">
+          <div className="overflow-hidden rounded-xl">
+            <MapEmbed
+              src={`https://maps.google.com/maps?q=${place.lat},${place.lng}&hl=${lang}&z=14&output=embed`}
+              label={t.footer.showMap}
+              className="h-44 w-full"
+            />
+          </div>
+          <a
+            href={place.directionsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${footerLink} mt-2 text-sm font-bold text-ivory`}
+          >
+            {t.distances.yolTarifi}
+          </a>
         </div>
       </div>
     </footer>

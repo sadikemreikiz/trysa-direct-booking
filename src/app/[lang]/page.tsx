@@ -29,7 +29,7 @@ export default async function Home({ params }: { params: Promise<{ lang: string 
     <>
       <JsonLd rating={googleReviews?.rating} count={googleReviews?.count} lang={lang} />
       <Header t={t} lang={lang} />
-      <main className="flex-1 pb-20 md:pb-0">
+      <main className="flex-1">
         <Hero t={t} lang={lang} rating={rating} />
         <BookingBar t={t} lang={lang} />
         <TwoPath t={t} lang={lang} rating={rating} />

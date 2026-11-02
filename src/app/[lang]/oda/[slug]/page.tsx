@@ -49,7 +49,7 @@ export default async function RoomPage({ params }: Params) {
   return (
     <>
       <Header t={t} lang={lang} />
-      <main className="flex-1 pb-24 md:pb-0">
+      <main className="flex-1">
         <div className="mx-auto max-w-5xl px-5 py-8 md:px-8">
           <Link
             href={`/${lang}#konaklama`}

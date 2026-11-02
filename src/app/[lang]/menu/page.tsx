@@ -31,7 +31,7 @@ export default async function MenuPage({ params }: { params: Promise<{ lang: str
   return (
     <>
       <Header t={t} lang={lang} />
-      <main className="flex-1 pb-24 md:pb-0">
+      <main className="flex-1">
         <div className="mx-auto max-w-4xl px-5 py-10 md:px-8">
           <div className="mb-2 text-xs font-bold tracking-[0.2em] text-clay">{t.menu.kicker}</div>
           <h1 className="font-display text-4xl font-semibold text-pine md:text-5xl">
