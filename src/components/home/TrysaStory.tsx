@@ -5,7 +5,7 @@ import { container, type T } from "./shared";
 export function TrysaStory({ t }: T) {
   return (
     <section id="trysa" className={`${container} scroll-mt-20 pt-10`}>
-      <div className="overflow-hidden rounded-2xl bg-stone md:flex">
+      <div className="overflow-hidden rounded-2xl bg-stone md:flex md:items-center">
         <div className="p-6 md:flex-1 md:p-12">
           <div className="mb-3 text-xs font-bold tracking-[0.2em] text-[#d9a05b]">
             {t.trysaStory.kicker}
@@ -25,32 +25,36 @@ export function TrysaStory({ t }: T) {
             {t.trysaStory.cta}
           </a>
         </div>
-        {/* A frieze panel (now in Vienna) above the view from the ruins, together as tall as the
-            text next to them (laid out like the restaurant card) */}
-        <div className="grid h-80 grid-rows-2 gap-1 md:h-auto md:w-2/5 lg:w-[460px]">
+        {/* A frieze panel (now in Vienna) above the view from the ruins, each in a cream frame
+            like a mounted print, its credit underneath */}
+        <div className="flex flex-col gap-3 px-6 pb-6 md:w-2/5 md:py-10 md:pr-10 md:pl-0 lg:w-[420px]">
           {storyPhotos.map((p) => (
-            <div key={p.src} className="relative overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                {...responsiveImage(
-                  p.src,
-                  "(min-width: 1024px) 460px, (min-width: 768px) 40vw, 100vw",
-                  1200,
-                )}
-                alt={t.trysaStory.photos[p.label]}
-                loading="lazy"
-                decoding="async"
-                className={`absolute inset-0 h-full w-full object-cover ${p.focus}`}
-              />
-              <a
-                href={p.source}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute right-0 bottom-0 inline-flex min-h-6 items-center rounded-tl-lg bg-black/60 px-2 text-[10px] text-white hover:underline"
-              >
-                © {p.credit} · CC BY-SA 4.0 · {t.trysaStory.edited}
-              </a>
-            </div>
+            <figure key={p.src}>
+              <div className="rounded-lg bg-[#f1e9d8] p-1.5 shadow-[0_10px_24px_rgba(0,0,0,0.35)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  {...responsiveImage(
+                    p.src,
+                    "(min-width: 1024px) 380px, (min-width: 768px) 35vw, 100vw",
+                    1200,
+                  )}
+                  alt={t.trysaStory.photos[p.label]}
+                  loading="lazy"
+                  decoding="async"
+                  className={`aspect-[5/2] w-full rounded object-cover ${p.focus}`}
+                />
+              </div>
+              <figcaption className="text-right text-[11px] text-[#bfb49c]">
+                <a
+                  href={p.source}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-6 items-center hover:underline"
+                >
+                  © {p.credit} · CC BY-SA 4.0 · {t.trysaStory.edited}
+                </a>
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>
