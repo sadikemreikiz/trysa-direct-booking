@@ -10,7 +10,7 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["src/**/*.test.ts"],
+    include: ["src/**/*.test.ts", "evals/**/*.test.ts"],
     // Each test file starts its own in-memory PostgreSQL (PGlite).
     testTimeout: 30_000,
     hookTimeout: 60_000,

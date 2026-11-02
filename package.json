@@ -21,7 +21,8 @@
     "db:migrate": "node scripts/migrate.mjs --force",
     "db:local": "node scripts/local-db.mjs",
     "db:seed": "node --env-file=.env.development.local scripts/seed-demo.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "eval:concierge": "tsx --tsconfig evals/concierge/tsconfig.json evals/concierge/run-eval.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
@@ -51,6 +52,7 @@
     "eslint-config-next": "16.4.3",
     "prettier": "3.9.10",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.5"
   }
