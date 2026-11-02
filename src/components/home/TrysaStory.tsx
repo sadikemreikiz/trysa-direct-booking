@@ -1,3 +1,4 @@
+import { storyPhotos } from "@/content/site";
 import { responsiveImage } from "@/lib/images";
 import { container, type T } from "./shared";
 
@@ -24,17 +25,33 @@ export function TrysaStory({ t }: T) {
             {t.trysaStory.cta}
           </a>
         </div>
-        {/* Dusk over the Ambar cabins, as tall as the text next to it (laid out like the restaurant
-            card). Placeholder until there is a good photo of the ruins. */}
-        <div className="relative h-56 md:h-auto md:w-2/5 lg:w-[460px]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            {...responsiveImage("/img/home/trysa-dusk.jpg", "(min-width: 768px) 460px, 100vw")}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-[50%_60%]"
-          />
+        {/* A frieze panel (now in Vienna) above the view from the ruins, together as tall as the
+            text next to them (laid out like the restaurant card) */}
+        <div className="grid h-80 grid-rows-2 gap-1 md:h-auto md:w-2/5 lg:w-[460px]">
+          {storyPhotos.map((p) => (
+            <div key={p.src} className="relative overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                {...responsiveImage(
+                  p.src,
+                  "(min-width: 1024px) 460px, (min-width: 768px) 40vw, 100vw",
+                  1200,
+                )}
+                alt={t.trysaStory.photos[p.label]}
+                loading="lazy"
+                decoding="async"
+                className={`absolute inset-0 h-full w-full object-cover ${p.focus}`}
+              />
+              <a
+                href={p.source}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute right-0 bottom-0 inline-flex min-h-6 items-center rounded-tl-lg bg-black/60 px-2 text-[10px] text-white hover:underline"
+              >
+                © {p.credit} · CC BY-SA 4.0 · {t.trysaStory.edited}
+              </a>
+            </div>
+          ))}
         </div>
       </div>
     </section>

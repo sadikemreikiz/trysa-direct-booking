@@ -134,3 +134,31 @@ export const foodPhotos: { src: string; label: PhotoLabel; width: number; focus:
   { src: "/img/food/karisik-izgara.jpg", label: "grill", width: 963, focus: "object-[50%_45%]" },
   { src: "/img/food/gozleme.jpg", label: "gozleme", width: 1037, focus: "object-[50%_70%]" },
 ];
+
+/**
+ * Photos in the Trysa story card. The family has no photo of the ruins yet, so these come from
+ * Wikimedia Commons (CC BY-SA 4.0: the photographer, the licence and "edited" are shown on each
+ * photo, linking to its Commons page). Resized, sharpened and given a little more contrast.
+ */
+export const storyPhotos: {
+  src: string;
+  label: "frieze" | "view";
+  focus: string;
+  credit: string;
+  source: string;
+}[] = [
+  {
+    src: "/img/home/trysa-frieze.jpg",
+    label: "frieze",
+    focus: "object-[50%_35%]",
+    credit: "Wolfgang Sauber",
+    source: "https://commons.wikimedia.org/wiki/File:KHM_-_Heroon_Trysa_1.jpg",
+  },
+  {
+    src: "/img/home/trysa-view.jpg",
+    label: "view",
+    focus: "object-center",
+    credit: "Volker Höhfeld",
+    source: "https://commons.wikimedia.org/wiki/File:Trysa_Yavu-Bergland_09_1989.jpg",
+  },
+];

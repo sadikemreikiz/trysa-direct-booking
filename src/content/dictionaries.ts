@@ -88,6 +88,11 @@ const tr = {
     desc: "2.400 yıllık antik Trysa tam tepemizde. Dünyaca ünlü frizleri bugün Viyana'da sergileniyor — ama kentin kendisi hâlâ burada. Tesisten yürüyerek harabelere çıkabilirsin.",
     link: "https://tr.wikipedia.org/wiki/Trysa",
     cta: "Trysa'yı keşfet →",
+    photos: {
+      frieze: "Trysa'nın Viyana'daki frizinden bir kabartma",
+      view: "Trysa harabelerinden Likya dağlarına manzara",
+    },
+    edited: "düzenlendi",
   },
   experiences: {
     title: "Deneyimler",
@@ -367,6 +372,11 @@ const en: Dict = {
     desc: "The 2,400-year-old ancient city of Trysa sits right above us. Its world-famous friezes are now displayed in Vienna — but the city itself is still here. You can walk up to the ruins from the property.",
     link: "https://en.wikipedia.org/wiki/Trysa",
     cta: "Discover Trysa →",
+    photos: {
+      frieze: "A relief from the Trysa frieze in Vienna",
+      view: "View from the ruins of Trysa over the Lycian mountains",
+    },
+    edited: "edited",
   },
   experiences: {
     title: "Experiences",
@@ -645,6 +655,11 @@ const de: Dict = {
     desc: "Das 2.400 Jahre alte antike Trysa liegt direkt über uns. Seine weltberühmten Friese sind heute in Wien zu sehen — die Stadt selbst ist jedoch noch hier. Vom Gelände aus kannst du zu den Ruinen wandern.",
     link: "https://de.wikipedia.org/wiki/Heroon_von_Trysa",
     cta: "Trysa entdecken →",
+    photos: {
+      frieze: "Ein Relief vom Fries aus Trysa in Wien",
+      view: "Blick von den Ruinen von Trysa über die lykischen Berge",
+    },
+    edited: "bearbeitet",
   },
   experiences: {
     title: "Erlebnisse",
