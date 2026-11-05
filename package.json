@@ -25,7 +25,7 @@
     "eval:concierge": "tsx --tsconfig evals/concierge/tsconfig.json evals/concierge/run-eval.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.131.0",
+    "@anthropic-ai/sdk": "^1.3.0",
     "@vercel/analytics": "^2.0.1",
     "better-auth": "^1.7.13",
     "drizzle-orm": "^0.45.4",
